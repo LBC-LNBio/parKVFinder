@@ -1,6 +1,6 @@
 # KVFinder Installation Guide
 
-## Linux
+## Linux and MacOS
 
 On the terminal, go to the directory containing **KVFinder_linux_distribution.tar.gz**. Then, follow these steps:
 
@@ -21,35 +21,6 @@ $ echo "export KVFinder_PATH=`pwd` >> ~/.bashrc
 ```bash
 $ make clean
 $ make
-```
-
-### Command line feature
-A command line version of KVFinder is available through a *C++* executable.
-However, a *conda* environment should be properly set to run a compatible *g++* version.
-
-Follow these steps:
-1) Create a conda environment and activate it.
-```bash
-$ conda create --name gcc4
-$ conda activate gcc4 
-```
-2) Install gcc 4.8.5 through Anaconda Cloud.
-```bash
-$ conda install -c anaconda mpfr
-$ ln -s $CONDA_PREFIX/lib/libmpfr.so $CONDA_PREFIX/lib/libmpfr.so.4
-$ conda install -c anaconda gcc
-```
-Note: Symbolic link to libmpfr.so solves an error to install gcc.
-
-3) On the terminal, go to the *KVFinder_linux* directory and compile the command line feature.
-```bash
-$ cd KVFinder_linux
-$ make Command_line
-```
-4) Now, user can use KVFinder in bash.
-```bash
-$ ./kvfinder
-use -h for help
 ```
 
 ### PyMOL v1.8 Plug-in installation
