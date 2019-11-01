@@ -5,19 +5,26 @@
 On the terminal, go to the directory containing **KVFinder_linux_distribution.tar.gz**. Then, follow these steps:
 
 1) Untar *KVFinder_linux_distribution.tar.gz*.
+
 ```bash
 $ tar -zxvf KVFinder_linux_distribution.tar.gz
 ```
+
 2) Change working directory to KVFinder_linux folder (Note: folder will show after decompression)*.
+
 ```bash    
 $ cd KVFinder_linux
 ```
+
 3) Export *KVFinder_PATH* variable and add to *~/.bashrc* file.
+
 ```bash
 $ export KVFinder_PATH=`pwd`
 $ echo "export KVFinder_PATH=`pwd` >> ~/.bashrc
 ```
+
 4) Recompile KVFinder.
+
 ```bash
 $ make clean
 $ make
