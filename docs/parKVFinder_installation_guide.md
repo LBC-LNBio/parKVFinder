@@ -23,6 +23,7 @@ $ make clean
 $ make
 ```
 
+
 ### PyMOL v1.8 Plug-in installation
 
 A graphical interface is available to use KVFinder alongside PyMOL v1.8.
