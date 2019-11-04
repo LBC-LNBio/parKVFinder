@@ -20,8 +20,6 @@ void resolution_input (char flag_in[7],
                        double* Vvoxel,
                        int* resolution_mode,
                        double* h);
-void remove_substring (char *s,
-                       const char *substring);
 char convertRES (char RES[RES_SIZE]);
 int dictionary_load (dict *DIC[TABLE_SIZE],
                      int tablesize,

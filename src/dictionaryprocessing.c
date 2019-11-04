@@ -318,13 +318,3 @@ resolution_input (char flag_in[7],
 
 	}
 }
-
-void
-remove_substring (char *s,
-                  const char *substring)
-{
-
-	while (s = strstr (s, substring))
-	    memmove (s, s + strlen (substring), 1 + strlen (s + strlen (substring)));
-
-}
