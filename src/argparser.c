@@ -219,7 +219,7 @@ print_toml (char *toml_name,
 	fprintf (toml_file, "dictionary = \"%s\"\n", dictionary_name);
 	fprintf (toml_file, "# The path of the input PDB file.\n");
 	fprintf (toml_file, "pdb = \"%s\"\n", PDB_NAME);
-	fprintf (toml_file, "The path of the output directory.\n");
+	fprintf (toml_file, "# The path of the output directory.\n");
 	fprintf (toml_file, "output = \"%s\"\n", OUTPUT);
 	fprintf (toml_file, "# Base name for output files.\n");
 	fprintf (toml_file, "base_name = \"%s\"\n", BASE_NAME);
