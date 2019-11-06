@@ -187,7 +187,7 @@ Otherwise, parKVFinder cannot be executed in PyMOL parKVFinder Tools.""",
                        text=
                        """\nparKVFinder (parallel KVFinder) software identifies and describes cavities in target \
 biomolecular structure using a dual probe system.\n\nThe description includes spatial and constitutional \
-characterization. Spatial characterization includes shape, volume and area. Constitutional characterization includes \
+characterization. Spatial description includes shape, volume and area. Constitutional description includes \
 amino acids that form the identified cavities.\n""",
                        background='lightgray',
                        foreground='black',
@@ -548,10 +548,10 @@ amino acids that form the identified cavities.\n""",
         results = self.notebook.add('Results Visualization')
 
         #### (3.1) Information Group ###################################################################################
-        information_group = Pmw.Group(results, 
+        information_group = Pmw.Group(results,
                                       tag_text='Information')
         information_group.pack(fill=BOTH, padx=10, pady=5)
-        
+
         #### (3.1.1) Results File Frame
         results_frame = Frame(information_group.interior())
         results_frame.grid(row=0, sticky='W', padx=10, pady=1)

@@ -519,9 +519,13 @@ print_arguments (char *variable,
 void
 print_header ()
 {
-
-	print_line("parKVFinder (parallel KVFinder) software identifies and describes cavities in target biomolecular structure using a dual probe system.");
-	print_line("The description includes spatial and constitutional characterization. Spatial characterization includes shape, volume and area. Constitutional characterization includes amino acids that form the identified cavities.");
+  fprintf(stdout, "parKVFinder (parallel KVFinder) software identifies and describes cavities in\n");
+  fprintf(stdout, "target biomolecular structure using a dual probe system.\n");
+  fprintf(stdout, "\n");
+  fprintf(stdout, "The description includes spatial and constitutional characterization. Spatial \n");
+  fprintf(stdout, "description includes shape, volume and area. Constitutional description includes\n");
+  fprintf(stdout, "amino acids that form the identified cavities.\n");
+  fprintf(stdout, "\n");
 
 }
 
@@ -529,24 +533,17 @@ void
 print_usage ()
 {
 
-	fprintf(stdout, "USAGE\n");
-	fprintf(stdout, "parKVFinder PDB [OPTIONS]\n");
-	fprintf(stdout, "    where PDB is a path to a target PDB file\n\n");
+	fprintf(stdout, "Usage: parKVFinder PDB [OPTIONS],\n");
+	fprintf(stdout, "\twhere PDB is a path to a target PDB file.\n");
+  fprintf(stdout, "\n");
 	fprintf(stdout, "OPTIONS\n");
-	fprintf(stdout, " -h, --help\n");
-	fprintf(stdout, "\t  Display this help message\n");
-	fprintf(stdout, " -v, --version\n");
-	fprintf(stdout, "\t  Display parKVFinder version\n");
-	fprintf(stdout, " --verbose\n");
-	fprintf(stdout, "\t  Print extra information to stdout\n");
+	fprintf(stdout, "  -h, --help\n");
+	fprintf(stdout, "\t  Display this help message.\n");
+	fprintf(stdout, "  -v, --version\n");
+	fprintf(stdout, "\t  Display parKVFinder version.\n");
+	fprintf(stdout, "  --verbose\n");
+	fprintf(stdout, "\t  Print extra information to stdout.\n");
 	fprintf(stdout, "\n");
-
-
-//	print_line("Usage: parKVFinder PDB [options], where PDB is a path to a target PDB file and options are:");
-//	print_arguments("Options:", "", NULL);
-//	print_arguments("   -h, --help", "Show this help message.", NULL);
-//	print_arguments("   -v, --version", "Show parKVFinder version number.", NULL);
-//	print_arguments("   --verbose", "Print extra information to stdout.", NULL);
 
 }
 
@@ -554,55 +551,55 @@ void
 print_options ()
 {
 
-	char cwd[256];
-	getcwd (cwd, sizeof (cwd));
-
 	/* GENERAL KVFINDER PARAMETERS */
-	fprintf(stdout, "General options:\n");
-	fprintf(stdout, " -p, --parameters\t[<.toml>]\n");
-	fprintf(stdout, "\t  Define path to parameters file\n");
-	fprintf(stdout, " -d, --dictionary\t[<dictionary>]\t(%s/dictionary)\n", getenv ("KVFinder_PATH"));
-	fprintf(stdout, "\t  Define path to dictionary file\n");
-	fprintf(stdout, " -r, --resolution\t<string>\t(Low)\n");
-	fprintf(stdout, "\t  Define resolution mode (Off, Low, Medium, High)\n");
-	fprintf(stdout, " -s, --step\t\t<real>\t\t(0.0)\n");
-	fprintf(stdout, "\t  Define step size (grid spacing)\n");
-	fprintf(stdout, " -i, --probe_in\t\t<real>\t\t(1.4)\n");
-	fprintf(stdout, "\t  Define probe in size\n");
-	fprintf(stdout, " -o, --probe_out\t<real>\t\t(4.0)\n");
-	fprintf(stdout, "\t  Define probe out size\n");
-	fprintf(stdout, " --volume_cutoff\t<real>\t\t(5.0)\n");
-	fprintf(stdout, "\t  Define cavities volume filter\n");
-	fprintf(stdout, " --removal_distance\t<real>\t\t(2.4)\n");
-	fprintf(stdout, "\t  Define removal distance when comparing probes surfaces\n");
-	fprintf(stdout, " -t, --template\t\t[<.toml>]\t(%s/parameters.toml)\n", cwd); // TODO: Check if extension is ok
-	fprintf(stdout, "\t  Create a template parKVFinder parameters file with parameters\n");
-
-
-//	print_arguments ("General options:", NULL, NULL);
-//	print_arguments ("   -p, --parameters", "Define path to parameters file.", NULL);
-//	print_arguments ("   -d, --dictionary", "Define path to dictionary file.", NULL);
-//	print_arguments ("   -r, --resolution", "Define resolution mode (Off, Low, Medium, High)", "Default: Low");
-//	print_arguments ("   -s, --step", "Define step size (grid spacing).", "Default: 0.0 A");
-//	print_arguments ("   -i, --probe_in", "Define probe in size.", "Default: 1.4 A");
-//	print_arguments ("   -o, --probe_out", "Define probe out size.", "Default: 4.0 A");
-//	print_arguments ("   --volume_cutoff", "Define cavities volume filter.", "Default: 5.0 A^3");
-//	print_arguments ("   --removal_distance", "Define removal distance when comparing probes surfaces.", "Default: 2.4 A");
-//	print_arguments ("   -k, --filled", "Output filled cavities. Increase memory consumption for molecular visualization.", NULL);
-//	print_arguments ("   -t, --template", "Create a template parKVFinder parameters file with default parameters.", "Default: parameters.toml");
-	print_arguments ("   -B, --box", "Define a search box where parKVFinder will detect cavities.", NULL);
-	/* BOX ADJUSTMENT PARAMETERS */
-	print_arguments ("Box adjustment options:", NULL, NULL);
-	print_arguments ("   --custom_box", "Define a custom search box based on a file containing the minimum and maximum cartesian values of each axis in angstrom.", NULL);
-	print_arguments ("   --residues_box", "Automatically set a search box based a file containing a tab-separated list of residues.", NULL);
-	print_arguments ("   --padding", "Define residues box padding. Adds a padding length in each box direction.", "Default: 3.5 A");
+  fprintf(stdout, "General options:\n");
+	fprintf(stdout, "  -p, --parameters\t[<.toml>]\n");
+	fprintf(stdout, "\t  Define path to parameters file.\n");
+	fprintf(stdout, "  -d, --dictionary\t[<dictionary>]\n");
+	fprintf(stdout, "\t  Define path to a custom dictionary file.\n");
+	fprintf(stdout, "  -r, --resolution\t<string>\t(Low)\n");
+	fprintf(stdout, "\t  Define resolution mode. Options include: Off, Low, Medium and High.\n");
+	fprintf(stdout, "  -s, --step\t\t<real>\t\t(0.0 A)\n");
+	fprintf(stdout, "\t  Define step size (grid spacing).\n");
+	fprintf(stdout, "  -i, --probe_in\t<real>\t\t(1.4 A)\n");
+	fprintf(stdout, "\t  Define probe in size.\n");
+	fprintf(stdout, "  -o, --probe_out\t<real>\t\t(4.0 A)\n");
+	fprintf(stdout, "\t  Define probe out size.\n");
+	fprintf(stdout, "  --volume_cutoff\t<real>\t\t(5.0 A^3)\n");
+	fprintf(stdout, "\t  Define cavities volume filter.\n");
+	fprintf(stdout, "  --removal_distance\t<real>\t\t(2.4 A)\n");
+	fprintf(stdout, "\t  Define removal distance when comparing probes surfaces.\n");
+	fprintf(stdout, "  -t, --template\t\t\t(paramters.toml)\n");
+	fprintf(stdout, "\t  Create a parameter file template with defined parameters in current\n");
+  fprintf(stdout, "\t  working directory.\n");
+  fprintf(stdout, "\n");
+  /* BOX ADJUSTMENT PARAMETERS */
+  fprintf(stdout, "Box adjustment options:\n");
+  fprintf(stdout, "  -B, --box\n");
+  fprintf(stdout, "\t  Define a search box mode where parKVFinder will detect cavities.\n");
+  fprintf(stdout, "  --custom_box\t\t[<file>]\n");
+  fprintf(stdout, "\t  Define a custom search box based on a file containing the minimum and \n");
+  fprintf(stdout, "\t  maximum cartesian values of each axis in angstrom.\n");
+  fprintf(stdout, "  --residues_box\t[<file>]\n");
+  fprintf(stdout, "\t  Automatically set a search box based a file containing a tab-separated\n");
+  fprintf(stdout, "\t  list of residues.\n");
+  fprintf(stdout, "  --padding\t\t<real>\t\t(3.5 A)\n");
+  fprintf(stdout, "\t  Define residues box padding. Adds a length in each box direction.\n");
+  fprintf(stdout, "\n");
 	/* SURFACE MODE */
-	print_arguments ("Surface options:", NULL, NULL);
-	print_arguments ("   -S, --surface", "Define a surface representation. The options include: SAS and VdW. SAS specifies solvent accessible surface. VdW specifies van der Waals molecular surface.", "Default: VdW");
+  fprintf(stdout, "Surface options:\n");
+  fprintf(stdout, "  -S, --surface\t\t<string>\t(VdW)\n");
+  fprintf(stdout, "\t  Define a surface representation. Options include: SAS and VdW. SAS\n");
+  fprintf(stdout, "\t  specifies solvent accessible surface. VdW specifies van der Waals\n");
+  fprintf(stdout, "\t  molecular surface.\n");
+  fprintf(stdout, "\n");
 	/* LIGAND ADJUSTMENT PARAMETERS */
-	print_arguments ("Ligand options:", NULL, NULL);
-	print_arguments ("   -L, --ligand", "Define path to ligand PDB file.", "");
-	print_arguments ("   --ligand_cutoff", "Define ligand radius distance cutoff.", "Default: 5.0 A");
+  fprintf(stdout, "Ligand options:\n");
+  fprintf(stdout, "  -L, --ligand\t\t[<.pdb>]\n");
+  fprintf(stdout, "\t  Define path to ligand PDB file.\n");
+  fprintf(stdout, "  --ligand_cutoff\t<real>\t\t(5.0 A)\n");
+  fprintf(stdout, "\t  Define ligand radius distance cutoff.\n");
+  fprintf(stdout, "\n");
 
 }
 
@@ -717,7 +714,7 @@ argparser (int argc,
 			{"parameters", required_argument, NULL, 'p'},
 			{"dictionary", required_argument, NULL, 'd'},
 			{"ligand", required_argument, NULL, 'L'},
-			{"template", optional_argument, NULL, 't'},
+			{"template", no_argument, NULL, 't'},
 			/* Modes */
 			{"filled", no_argument, NULL, 'K'},
 			{"surface", no_argument, NULL, 'S'},
@@ -742,7 +739,7 @@ argparser (int argc,
 		/* getopt_long stores the option index here */
 		int option_index = 0;
 
-		c = getopt_long (argc, argv, "vhp:d:L:t:r:s:i:o:B", long_options, &option_index);
+		c = getopt_long (argc, argv, "vhp:d:L:t::r:s:i:o:B", long_options, &option_index);
 
 		if (c == -1)
 			break;
