@@ -529,29 +529,67 @@ void
 print_usage ()
 {
 
-	print_line("Usage: parKVFinder PDB [options], where PDB is a path to a target PDB file and options are:");
-	print_arguments("Options:", "", NULL);
-	print_arguments("   -h, --help", "Show this help message.", NULL);
-	print_arguments("   -v, --version", "Show parKVFinder version number.", NULL);
-	print_arguments("   --verbose", "Print extra information to stdout.", NULL);
+	fprintf(stdout, "USAGE\n");
+	fprintf(stdout, "parKVFinder PDB [OPTIONS]\n");
+	fprintf(stdout, "    where PDB is a path to a target PDB file\n\n");
+	fprintf(stdout, "OPTIONS\n");
+	fprintf(stdout, " -h, --help\n");
+	fprintf(stdout, "\t  Display this help message\n");
+	fprintf(stdout, " -v, --version\n");
+	fprintf(stdout, "\t  Display parKVFinder version\n");
+	fprintf(stdout, " --verbose\n");
+	fprintf(stdout, "\t  Print extra information to stdout\n");
+	fprintf(stdout, "\n");
+
+
+//	print_line("Usage: parKVFinder PDB [options], where PDB is a path to a target PDB file and options are:");
+//	print_arguments("Options:", "", NULL);
+//	print_arguments("   -h, --help", "Show this help message.", NULL);
+//	print_arguments("   -v, --version", "Show parKVFinder version number.", NULL);
+//	print_arguments("   --verbose", "Print extra information to stdout.", NULL);
 
 }
 
 void
 print_options ()
 {
+
+	char cwd[256];
+	getcwd (cwd, sizeof (cwd));
+
 	/* GENERAL KVFINDER PARAMETERS */
-	print_arguments ("General options:", NULL, NULL);
-	print_arguments ("   -p, --parameters", "Define path to parameters file.", NULL);
-	print_arguments ("   -d, --dictionary", "Define path to dictionary file.", NULL);
-	print_arguments ("   -r, --resolution", "Define resolution mode (Off, Low, Medium, High)", "Default: Low");
-	print_arguments ("   -s, --step", "Define step size (grid spacing).", "Default: 0.0 A");
-	print_arguments ("   -i, --probe_in", "Define probe in size.", "Default: 1.4 A");
-	print_arguments ("   -o, --probe_out", "Define probe out size.", "Default: 4.0 A");
-	print_arguments ("   --volume_cutoff", "Define cavities volume filter.", "Default: 5.0 A^3");
-	print_arguments ("   --removal_distance", "Define removal distance when comparing probes surfaces.", "Default: 2.4 A");
-	print_arguments ("   -k, --filled", "Output filled cavities. Increase memory consumption for molecular visualization.", NULL);
-	print_arguments ("   -t, --template", "Create a template parKVFinder parameters file with default parameters.", "Default: parameters.toml");
+	fprintf(stdout, "General options:\n");
+	fprintf(stdout, " -p, --parameters\t[<.toml>]\n");
+	fprintf(stdout, "\t  Define path to parameters file\n");
+	fprintf(stdout, " -d, --dictionary\t[<dictionary>]\t(%s/dictionary)\n", getenv ("KVFinder_PATH"));
+	fprintf(stdout, "\t  Define path to dictionary file\n");
+	fprintf(stdout, " -r, --resolution\t<string>\t(Low)\n");
+	fprintf(stdout, "\t  Define resolution mode (Off, Low, Medium, High)\n");
+	fprintf(stdout, " -s, --step\t\t<real>\t\t(0.0)\n");
+	fprintf(stdout, "\t  Define step size (grid spacing)\n");
+	fprintf(stdout, " -i, --probe_in\t\t<real>\t\t(1.4)\n");
+	fprintf(stdout, "\t  Define probe in size\n");
+	fprintf(stdout, " -o, --probe_out\t<real>\t\t(4.0)\n");
+	fprintf(stdout, "\t  Define probe out size\n");
+	fprintf(stdout, " --volume_cutoff\t<real>\t\t(5.0)\n");
+	fprintf(stdout, "\t  Define cavities volume filter\n");
+	fprintf(stdout, " --removal_distance\t<real>\t\t(2.4)\n");
+	fprintf(stdout, "\t  Define removal distance when comparing probes surfaces\n");
+	fprintf(stdout, " -t, --template\t\t[<.toml>]\t(%s/parameters.toml)\n", cwd); // TODO: Check if extension is ok
+	fprintf(stdout, "\t  Create a template parKVFinder parameters file with parameters\n");
+
+
+//	print_arguments ("General options:", NULL, NULL);
+//	print_arguments ("   -p, --parameters", "Define path to parameters file.", NULL);
+//	print_arguments ("   -d, --dictionary", "Define path to dictionary file.", NULL);
+//	print_arguments ("   -r, --resolution", "Define resolution mode (Off, Low, Medium, High)", "Default: Low");
+//	print_arguments ("   -s, --step", "Define step size (grid spacing).", "Default: 0.0 A");
+//	print_arguments ("   -i, --probe_in", "Define probe in size.", "Default: 1.4 A");
+//	print_arguments ("   -o, --probe_out", "Define probe out size.", "Default: 4.0 A");
+//	print_arguments ("   --volume_cutoff", "Define cavities volume filter.", "Default: 5.0 A^3");
+//	print_arguments ("   --removal_distance", "Define removal distance when comparing probes surfaces.", "Default: 2.4 A");
+//	print_arguments ("   -k, --filled", "Output filled cavities. Increase memory consumption for molecular visualization.", NULL);
+//	print_arguments ("   -t, --template", "Create a template parKVFinder parameters file with default parameters.", "Default: parameters.toml");
 	print_arguments ("   -B, --box", "Define a search box where parKVFinder will detect cavities.", NULL);
 	/* BOX ADJUSTMENT PARAMETERS */
 	print_arguments ("Box adjustment options:", NULL, NULL);
@@ -704,7 +742,7 @@ argparser (int argc,
 		/* getopt_long stores the option index here */
 		int option_index = 0;
 
-		c = getopt_long (argc, argv, "vhp:d:L:t::r:s:i:o:B", long_options, &option_index);
+		c = getopt_long (argc, argv, "vhp:d:L:t:r:s:i:o:B", long_options, &option_index);
 
 		if (c == -1)
 			break;
@@ -797,7 +835,7 @@ argparser (int argc,
             /* TEMPLATE */
 			case 't':
 				if (optarg != NULL)
-				    template_name = combine (cwd, optarg);
+				    template_name = optarg;
 				else
 				    template_name = "parameters.toml";
 				t_flag = 1;
