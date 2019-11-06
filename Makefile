@@ -1,6 +1,8 @@
 parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c
 	gcc -fopenmp -Isrc -g -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm
 # 	if [ ! "$(KVFinder_PATH)" ]; then echo "\n\nKVFinder_PATH variable not found. Export KVFinder_PATH and save it to your ~/.bashrc."; echo "export KVFinder_PATH=`pwd`\n"; fi
+# if [ -f ~/.bash_profile ]; then echo "export "; fi
+# if [ -f ~/.bashrc ]; then echo "export "; fi
 
 matrixprocessing.o: src/matrixprocessing.c src/matrixprocessing.h
 	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -static

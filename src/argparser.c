@@ -362,161 +362,6 @@ init80 (char S[80])
 }
 
 void
-format_variable (char* variable,
-                 int a,
-                 int b,
-                 char AUX[25])
-{
-    /* Declare variables */
-	int i;
-
-    /* Extract process */
-	for (i = a; i < b; i++)
-	    AUX[i - a] = variable[i];
-
-	/* Mark last position in S[] */
-	for (i; i < 25; i++)
-	    AUX[i] = ' ';
-	AUX[25] = '\0';
-
-}
-
-
-void
-format_text (char* description,
-             int a,
-             int b,
-             char AUX[55])
-{
-    /* Declare variables */
-	int i;
-
-    /* Extract process */
-	for (i = a; i < b; i++)
-	    AUX[i - a] = description[i];
-
-    /* Mark last position in S[] */
-	for (i; i < 55; i++)
-	    AUX[i] = ' ';
-	AUX[55] = '\0';
-
-}
-
-void
-format_title (char *title,
-              int a,
-              int b,
-              char AUX[80])
-{
-    /* Declare variables */
-	int i;
-
-    /* Extract process */
-	for (i = a; i < b; i++)
-	    AUX[i - a] = title[i];
-
-	/* Mark last position in S[] */
-	for (i; i < 80; i++)
-	    AUX[i] = ' ';
-	AUX[80] = '\0';
-
-}
-
-void
-print_line (char *title)
-{
-    /* Declare variables */
-	char TITLE[80];
-	int i, j, space;
-
-	/* Prepare title */
-	i = 0;
-	while (i < (int) strlen (title)) {
-
-		/* Define start of print */
-		if (title[i] == ' ')
-		    i++;
-
-		/* Define end of print */
-		for (j = i + 80 - 15; j < i + 80; j++)
-		    if (title[j] == ' ')
-		        space = j - (i + 80);
-		format_title (title, i, i + 80 + space, TITLE);
-		printf ("%s\n", TITLE);
-		i = i + 80 + space;
-		init80 (TITLE);
-
-	}
-	printf("\n");
-
-}
-
-void
-print_arguments (char *variable,
-                  char *description,
-                  char *extra)
-{
-    /* Declare variables */
-	char FLAG[25], DESCRIPTION[55];
-	int i, j, space;
-
-	/* Prepare command line argument */
-	format_variable (variable, 0, strlen (variable), FLAG);
-	printf ("%s", FLAG);
-	init25 (FLAG);
-
-	/* Prepare command line argument description */
-	if (description != NULL) {
-
-		/* Initialize counter */
-		i = 0;
-		while(i < (int) strlen (description)) {
-
-			/* Define start of print */
-			if (description[i] == ' ')
-			    i++;
-			/* Define end of print */
-			for(j = i + 55 - 15; j < i + 55; j++)
-			    if (description[j] == ' ')
-			        space = j - (i + 55);
-			format_text (description, i, i + 55 + space, DESCRIPTION);
-			if (i == 0)
-			    printf ("%s\n", DESCRIPTION);
-			else
-			    printf ("%s%s\n", FLAG, DESCRIPTION);
-			i = i + 55 + space;
-			init55 (DESCRIPTION);
-
-		}
-
-	}
-
-	/* Prepare extra argument */
-	i = 0;
-	if (extra != NULL) {
-
-		while(i < (int) strlen (extra)) {
-
-			/* Define start of print */
-			if (extra[i] == ' ')
-			    i++;
-			/* Define end of print */
-			for (j = i + 55 - 15; j < i + 55; j++)
-			    if (extra[j] == ' ')
-			        space = j - (i + 55);
-			format_text (extra, i, i + 55 + space, DESCRIPTION);
-			printf ("%s%s\n", FLAG, DESCRIPTION);
-			i = i + 55 + space;
-			init55 (DESCRIPTION);
-
-		}
-
-	}
-	printf ("\n");
-
-}
-
-void
 print_header ()
 {
   fprintf(stdout, "parKVFinder (parallel KVFinder) software identifies and describes cavities in\n");
@@ -533,10 +378,10 @@ void
 print_usage ()
 {
 
-	fprintf(stdout, "Usage: parKVFinder PDB [OPTIONS],\n");
+	fprintf(stdout, "Usage: parKVFinder PDB [options],\n");
 	fprintf(stdout, "\twhere PDB is a path to a target PDB file.\n");
   fprintf(stdout, "\n");
-	fprintf(stdout, "OPTIONS\n");
+	fprintf(stdout, "Options:\n");
 	fprintf(stdout, "  -h, --help\n");
 	fprintf(stdout, "\t  Display this help message.\n");
 	fprintf(stdout, "  -v, --version\n");

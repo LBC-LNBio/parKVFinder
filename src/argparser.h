@@ -26,22 +26,6 @@ void create_residues_box (char *box_name,
 void init25 (char S[25]);
 void init75 (char S[75]);
 void init80 (char S[80]);
-void format_variable (char* variable,
-                      int a,
-                      int b,
-                      char AUX[25]);
-void format_text (char* description,
-                  int a,
-                  int b,
-                  char AUX[75]);
-void format_title (char *title,
-                   int a,
-                   int b,
-                   char AUX[100]);
-void print_line (char *title);
-void print_arguments (char *variable,
-                      char *description,
-                      char *extra);
 void print_version ();
 void print_header ();
 void print_usage();
