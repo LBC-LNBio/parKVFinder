@@ -90,8 +90,13 @@ define_table (char TABLE[TABLE_SIZE][RES_SIZE],
 	arq = fopen (dictionary_name, "r");
 
 	/* File has not been found */
-	if (arq == NULL)
-	    printf ("Reading Error: Residues dictionary file not found!\n");
+	if (arq == NULL){
+
+		/* Print error and exit */
+		fprintf (stderr, "\033[0;31mError:\033[0m Residues dictionary file not found!\n");
+	    exit(-1);
+
+	}
 	/* File has been found */
 	else
 	    /* While EOF not read in AUX object, do ... */
@@ -132,13 +137,9 @@ dictionary_load (dict *DIC[TABLE_SIZE],
 	dictionary_file = fopen (dictionary_name, "r");
 	if (dictionary_file == NULL) {
 
-	    /* Print error */
-		printf ("Dictionary reading error! Please select a valid dictionary filename and try again.\n");
-		 /* Close dictionary file */
-		fclose (dictionary_file);
-
-		/* Return flag indicating file has not been found */
-		return !flag;
+	    /* Print error and exit */
+		fprintf (stderr, "\033[0;31mError:\033[0m Invalid dictionary file. Please select a valid dictionary filename and try again.\n");
+		exit(-1);
 
 	}
 

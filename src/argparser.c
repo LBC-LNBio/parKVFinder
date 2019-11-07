@@ -75,7 +75,7 @@ create_residues_box (char *box_name,
     }
 
     if (*Xmax < *Xmin || *Zmax < *Zmin || *Zmax < *Zmin) {
-        fprintf(stderr, "Error: Residues provided in residues box file has not been found in the PDB file!\n");
+        fprintf(stderr, "\033[0;31mError:\033[0m Residues provided in residues box file has not been found in the PDB file!\n");
         exit(-1);
     }
 
@@ -508,9 +508,10 @@ argparser (int argc,
            double *bY4,
            double *bZ4)
 {
+
 	/* Print Warning! if KVFinder_PATH was not found */
 	if ( strcmp (getenv ("KVFinder_PATH"), "") == 0 ) {
-		fprintf (stderr, "\033[0;31mWarning\033[0m: KVFinder_PATH system variable not found.\n");
+		fprintf (stderr, "\033[0;33mWarning:\033[0m KVFinder_PATH system variable not found.\n");
 		fprintf (stderr, "Export KVFinder_PATH to your system variables.\n\n");
 	}
 
@@ -602,21 +603,21 @@ argparser (int argc,
 			case 0:
 				/* LIGAND CUTOFF */
 				if (strcmp ("ligand_cutoff", long_options[option_index].name) == 0) {
-					if (check_input (optarg, "Error: Invalid ligand cutoff input!\n")) {
+					if (check_input (optarg, "\033[0;31mError:\033[0m Invalid ligand cutoff input!\n")) {
 						*ligand_cutoff = atof (optarg);
 						lc_flag = 1;
 					}
 				}
 				/* VOLUME CUTOFF */
 				if (strcmp ("volume_cutoff", long_options[option_index].name) == 0) {
-					if (check_input (optarg, "Error: Invalid volume cutoff input!\n")) {
+					if (check_input (optarg, "\033[0;31mError:\033[0m Invalid volume cutoff input!\n")) {
 						*volume_cutoff = atof (optarg);
 						vc_flag = 1;
 					}
 				}
 				/* REMOVAL DISTANCE */
 				if (strcmp ("removal_distance", long_options[option_index].name) == 0) {
-					if (check_input (optarg, "Error: Invalid removal distance input!\n")) {
+					if (check_input (optarg, "\033[0;31mError:\033[0m Invalid removal distance input!\n")) {
 						*removal_distance = atof (optarg);
 						rd_flag = 1;
 					}
@@ -627,13 +628,13 @@ argparser (int argc,
 					box_name = optarg;
 					rb_flag = 1;
 					if (access (box_name, F_OK)) {
-						fprintf (stderr, "Error: Residues list file does not exist!\n");
+						fprintf (stderr, "\033[0;31mError:\033[0m Residues list file does not exist!\n");
 						exit (-1);
 					}
 				}
 				/* residues box padding */
 				if (strcmp ("padding", long_options[option_index].name) == 0) {
-					if (check_input (optarg, "Error: Invalid residue box padding value input!\n")) {
+					if (check_input (optarg, "\033[0;31mError:\033[0m Invalid residue box padding value input!\n")) {
 						padding = atof (optarg);
 						prb_flag = 1;
 					}
@@ -643,7 +644,7 @@ argparser (int argc,
 					box_name = optarg;
 					cb_flag = 1;
 					if (access (box_name, F_OK)) {
-						fprintf (stderr, "Error: Custom box file does not exist!\n");
+						fprintf (stderr, "\033[0;31mError:\033[0m Custom box file does not exist!\n");
 						exit (-1);
 					}
 				}
@@ -663,7 +664,7 @@ argparser (int argc,
 				}
 				/* If input is not SAS or VdW, print error */
 				else {
-					fprintf (stderr, "Error: Wrong surface representation selected!\nPossible inputs: SAS, VdW.\n");
+					fprintf (stderr, "\033[0;31mError:\033[0m Wrong surface representation selected!\nPossible inputs: SAS, VdW.\n");
 					exit (-1);
 				}
 				surface_flag = 1;
@@ -695,7 +696,7 @@ argparser (int argc,
 				*ligand_mode = 1;
 				l_flag = 1;
 				if (access (LIGAND_NAME, F_OK)) {
-					fprintf (stderr, "Error: Ligand PDB file does not exist.\n");
+					fprintf (stderr, "\033[0;31mError:\033[0m Ligand PDB file does not exist.\n");
 					exit (-1);
 				}
 			    break;
@@ -703,7 +704,7 @@ argparser (int argc,
             /* PROBE IN */
 			case 'i':
 			    /*Check if input is numeric*/
-				if (check_input (optarg, "Error: Invalid probe in input!\n")) {
+				if (check_input (optarg, "\033[0;31mError:\033[0m Invalid probe in input!\n")) {
 				    /*Save probe in inside probe_in variable*/
 					*probe_in = atof (optarg);
 					i_flag = 1;
@@ -713,7 +714,7 @@ argparser (int argc,
             /* PROBE OUT */
 			case 'o':
 			    /* Check if input is numeric */
-				if (check_input (optarg, "Error: Invalid probe out input!\n")) {
+				if (check_input (optarg, "\033[0;31mError:\033[0m Invalid probe out input!\n")) {
 				    /* Save probe out inside probe_out variable */
 					*probe_out = atof (optarg);
 					o_flag = 1;
@@ -723,7 +724,7 @@ argparser (int argc,
             /* STEP SIZE */
 			case 's':
 				/*Check if input is numeric*/
-				if (check_input (optarg, "Error: Invalid step size input!\n")) {
+				if (check_input (optarg, "\033[0;31mError:\033[0m Invalid step size input!\n")) {
 				    /* Save step size inside h variable */
 					*h = atof (optarg);
 					s_flag = 1;
@@ -744,7 +745,7 @@ argparser (int argc,
 				    if (strcmp (resolution_flag, "Low") == 0);
 				/* If input is not Off, Low, Medium, High, print error */
 				else {
-					fprintf (stderr, "Error: Wrong resolution selected!\nPossible inputs: Off, Low, Medium, High.\n");
+					fprintf (stderr, "\033[0;31mError:\033[0m Wrong resolution selected!\nPossible inputs: Off, Low, Medium, High.\n");
 					exit(-1);
 				}
 				r_flag = 1;
@@ -755,7 +756,7 @@ argparser (int argc,
 				snprintf (dictionary_name, 500, "%s", realpath (optarg, NULL));
 				d_flag = 1;
 				if (access (dictionary_name, F_OK)) {
-					fprintf (stderr, "Error: Dictionary file does not exist!\n");
+					fprintf (stderr, "\033[0;31mError:\033[0m Dictionary file does not exist!\n");
 					exit (-1);
 				}
 			    break;
@@ -766,12 +767,12 @@ argparser (int argc,
 				p_flag = 1;
 				/* Check if parameters file exists */
 				if (access(parameters_name, F_OK)) {
-					fprintf (stderr, "Error: Parameter file does not exist!\n");
+					fprintf (stderr, "\033[0;31mError:\033[0m Parameter file does not exist!\n");
 					exit (-1);
 				}
 				/* Check parameters file extension*/
 				if (strcmp (get_file_extension(parameters_name), "toml")) {
-					fprintf (stderr, "Error: Wrong parameters file extension!\narg: [\'%s\']\n", parameters_name);
+					fprintf (stderr, "\033[0;31mError:\033[0m Wrong parameters file extension!\narg: [\'%s\']\n", parameters_name);
 					exit (-1);
 				}
 			    break;
@@ -805,7 +806,7 @@ argparser (int argc,
 	Parameters file must be set alone */
 	if (p_flag) {
 		if (d_flag || l_flag || t_flag || r_flag || o_flag || i_flag || s_flag || vc_flag || lc_flag || rd_flag) {
-			fprintf (stderr, "Error: Just define parameters file argument!\n");
+			fprintf (stderr, "\033[0;31mError:\033[0m Just define parameters file argument!\n");
 			exit (-1);
 		}
 		else {
@@ -854,7 +855,7 @@ argparser (int argc,
 	/* User provided more than one PDB file */
 	if (argc-optind > 1) {
 
-		fprintf (stderr, "Error: Incorrect number of PDB files!\nargs: [\'%s\'", argv[optind++]);
+		fprintf (stderr, "\033[0;31mError:\033[0m Incorrect number of PDB files!\nargs: [\'%s\'", argv[optind++]);
 		while (optind < argc) {
 			fprintf (stderr, ", \'%s\'", argv[optind++]);
 		}
@@ -900,18 +901,18 @@ argparser (int argc,
 
             /* Check if provided PDB file exist */
             if (access (PDB_NAME, F_OK)) {
-                fprintf (stderr, "Error: PDB file does not exist.\n");
+                fprintf (stderr, "\033[0;31mError:\033[0m PDB file does not exist.\n");
                 exit (-1);
             }
             /* Check PDB file extension*/
             if (strcmp (get_file_extension (PDB_NAME), "pdb")) {
-                fprintf (stderr, "Error: Wrong PDB file extension!\narg: [\'%s\']\n", PDB_NAME);
+                fprintf (stderr, "\033[0;31mError:\033[0m Wrong PDB file extension!\narg: [\'%s\']\n", PDB_NAME);
             }
 
 	    }
         /* User do not provide a PDB file */
         else {
-            fprintf (stderr, "Error: Missing path to PDB file!\n\n");
+            fprintf (stderr, "\033[0;31mError:\033[0m Missing path to PDB file!\n\n");
             print_usage ();
             exit (-1);
         }
@@ -991,7 +992,7 @@ argparser (int argc,
             if (r_flag) {
 
                 if (strcmp (resolution_flag, "Off") == 0) {
-                    fprintf (stderr, "Error: Resolution mode is Off! Step size (grid spacing) must be defined!\n");
+                    fprintf (stderr, "\033[0;31mError:\033[0m Resolution mode is Off! Step size (grid spacing) must be defined!\n");
                     exit (-1);
                 }
                 *h = 0.0;
@@ -1006,7 +1007,7 @@ argparser (int argc,
 	}
 	else {
 
-		fprintf (stderr, "Error: Resolution mode is On! Step size (grid spacing) should not be defined!\n");
+		fprintf (stderr, "\033[0;31mError:\033[0m Resolution mode is On! Step size (grid spacing) should not be defined!\n");
 		exit (-1);
 
 	}
@@ -1021,7 +1022,7 @@ argparser (int argc,
 	    /* Ligand mode is not set */
 		if (!*ligand_mode) {
 
-		    fprintf (stderr, "Error: Path to ligand PDB file is not provided! ");
+		    fprintf (stderr, "\033[0;31mError:\033[0m Path to ligand PDB file is not provided! ");
 			fprintf (stderr, "Define path through \'-L\' or \'--ligand_mode\' flag.\n");
 			exit(-1);
 
@@ -1053,14 +1054,14 @@ argparser (int argc,
 
 		if (rb_flag || cb_flag) {
 
-		    fprintf (stderr, "Error: Whole protein mode and Box adjustment options are chosen together! ");
+		    fprintf (stderr, "\033[0;31mError:\033[0m Whole protein mode and Box adjustment options are chosen together! ");
 			fprintf (stderr, "Define \'box\' flag or remove Box adjustment option (\'custom_box\' or \'residues_box\').\n");
 			exit (-1);
 
 		}
 		if (prb_flag) {
 
-			fprintf (stderr, "Error: Residue box mode is not chosen! Residue box padding should not be defined.\n");
+			fprintf (stderr, "\033[0;31mError:\033[0m Residue box mode is not chosen! Residue box padding should not be defined.\n");
 			exit (-1);
 
 		}
@@ -1076,7 +1077,7 @@ argparser (int argc,
 
 		if (rb_flag && cb_flag) {
 
-            fprintf (stderr, "Error: Just choose one box adjustment options! ");
+            fprintf (stderr, "\033[0;31mError:\033[0m Just choose one box adjustment options! ");
 			fprintf (stderr, "Define \'residues_box\' or \'custom_box\' options.\n");
 			exit (-1);
 
@@ -1100,7 +1101,7 @@ argparser (int argc,
                      /* Padding incorrectly defined */
                     if (prb_flag) {
 
-                        fprintf (stderr, "Error: Residue box padding should not be defined in custom box option!\n");
+                        fprintf (stderr, "\033[0;31mError:\033[0m Residue box padding should not be defined in custom box option!\n");
                         exit (-1);
 
                     }
@@ -1122,7 +1123,7 @@ argparser (int argc,
 		    }
 		    else {
 
-                fprintf (stderr, "Error: Choose a box adjustment option! ");
+                fprintf (stderr, "\033[0;31mError:\033[0m Choose a box adjustment option! ");
                 fprintf (stderr, "Define \'residues_box\' or \'custom_box\' options.\n");
                 exit (-1);
 

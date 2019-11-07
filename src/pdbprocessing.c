@@ -183,12 +183,9 @@ PDB_load (dict *DIC[TABLE_SIZE],
 	/* PDB file not found */
 	if (arqPDB == NULL) {
 
-	    /* Print error */
-		printf ("Reading Error: PDB file not found!\n");
-		/* Close PDB file */
-		fclose (arqPDB);
-		/* Return flag indicating file has not been found */
-		return !flag;
+	    /* Print error and exit*/
+		printf ("\033[0;31mError:\033[0m PDB file not found!\n");
+		exit(-1);
 
 	}
 	/* PDB file found */
@@ -295,12 +292,9 @@ PDB_load2(char PDB_NAME[NAME_MAX])
 	/* PDB file not found */
 	if (arqPDB == NULL) {
 
-	    /* Print error */
-		printf ("Reading Error: PDB file not found!\n");
-		/* Close PDB file */
-		fclose (arqPDB);
-		/* Return flag indicating file has not been found */
-		return !flag;
+	    /* Print error and exit */
+		printf ("\033[0;31mError:\033[0m PDB file not found!\n");
+		exit(-1);
 
 	}
 	/* PDB file found */
@@ -364,13 +358,10 @@ PDB_load3(char PDB_NAME[NAME_MAX])
 	/* PDB file not found */
 	if (arqPDB == NULL) {
 
-	    /* Print error */
-		printf ("Reading Error: PDB file not found!\n");
-		/* Close PDB file */
-		fclose (arqPDB);
-		/* Return flag indicating file has not been found */
-		return !flag;
-
+	    /* Print error and exit */
+		printf ("\033[0;31mError:\033[0m PDB file not found!\n");
+		exit(-1);
+		
 	}
 	else {
 
