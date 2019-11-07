@@ -404,15 +404,15 @@ print_options ()
 	fprintf(stdout, "\t  Define path to a custom dictionary file.\n");
 	fprintf(stdout, "  -r, --resolution\t<string>\t(Low)\n");
 	fprintf(stdout, "\t  Define resolution mode. Options include: Off, Low, Medium and High.\n");
-	fprintf(stdout, "  -s, --step\t\t<real>\t\t(0.0 A)\n");
+	fprintf(stdout, "  -s, --step\t\t<real>\t\t(0.0)\n");
 	fprintf(stdout, "\t  Define step size (grid spacing).\n");
-	fprintf(stdout, "  -i, --probe_in\t<real>\t\t(1.4 A)\n");
+	fprintf(stdout, "  -i, --probe_in\t<real>\t\t(1.4)\n");
 	fprintf(stdout, "\t  Define probe in size.\n");
-	fprintf(stdout, "  -o, --probe_out\t<real>\t\t(4.0 A)\n");
+	fprintf(stdout, "  -o, --probe_out\t<real>\t\t(4.0)\n");
 	fprintf(stdout, "\t  Define probe out size.\n");
-	fprintf(stdout, "  --volume_cutoff\t<real>\t\t(5.0 A^3)\n");
+	fprintf(stdout, "  --volume_cutoff\t<real>\t\t(5.0)\n");
 	fprintf(stdout, "\t  Define cavities volume filter.\n");
-	fprintf(stdout, "  --removal_distance\t<real>\t\t(2.4 A)\n");
+	fprintf(stdout, "  --removal_distance\t<real>\t\t(2.4)\n");
 	fprintf(stdout, "\t  Define removal distance when comparing probes surfaces.\n");
 	fprintf(stdout, "  -t, --template\t\t\t(paramters.toml)\n");
 	fprintf(stdout, "\t  Create a parameter file template with defined parameters in current\n");
@@ -428,7 +428,7 @@ print_options ()
   fprintf(stdout, "  --residues_box\t[<file>]\n");
   fprintf(stdout, "\t  Automatically set a search box based a file containing a tab-separated\n");
   fprintf(stdout, "\t  list of residues.\n");
-  fprintf(stdout, "  --padding\t\t<real>\t\t(3.5 A)\n");
+  fprintf(stdout, "  --padding\t\t<real>\t\t(3.5)\n");
   fprintf(stdout, "\t  Define residues box padding. Adds a length in each box direction.\n");
   fprintf(stdout, "\n");
 	/* SURFACE MODE */
@@ -442,7 +442,7 @@ print_options ()
   fprintf(stdout, "Ligand options:\n");
   fprintf(stdout, "  -L, --ligand\t\t[<.pdb>]\n");
   fprintf(stdout, "\t  Define path to ligand PDB file.\n");
-  fprintf(stdout, "  --ligand_cutoff\t<real>\t\t(5.0 A)\n");
+  fprintf(stdout, "  --ligand_cutoff\t<real>\t\t(5.0)\n");
   fprintf(stdout, "\t  Define ligand radius distance cutoff.\n");
   fprintf(stdout, "\n");
 
