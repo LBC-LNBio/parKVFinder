@@ -184,32 +184,6 @@ main (int argc,
 	if (verbose_flag)
 	    fprintf (stdout, "> Calculating grid dimensions\n");
 
-	/* Resizing step: increases the grid step size until the number of points on the grid be smaller than Vvoxel */
-	if (resolution_mode) {
-		/* Defines the grid inside the search space | Point 1 is the reference of our grid */
-		/* Calculate distances between points in box and reference */
-		norm1 = sqrt ((X2-X1)*(X2-X1) + (Y2-Y1)*(Y2-Y1) + (Z2-Z1)*(Z2-Z1));
-		norm2 = sqrt ((X3-X1)*(X3-X1) + (Y3-Y1)*(Y3-Y1) + (Z3-Z1)*(Z3-Z1));
-		norm3 = sqrt ((X4-X1)*(X4-X1) + (Y4-Y1)*(Y4-Y1) + (Z4-Z1)*(Z4-Z1));
-
-		/*Grid steps based on distances*/
-		m = (int)(norm1/h); /* X axis */
-		n = (int)(norm2/h); /* Y axis */
-		o = (int)(norm3/h); /* Z axis */
-
-        /* While volume of unitary box is less than Vlim, increment h and recalculate box sizes */
-		while ((norm1/m)*(norm2/n)*(norm3/o) < Vvoxel) {
-			h += 0.05;
-			m = (int)(norm1/h);
-			n = (int)(norm2/h);
-			o = (int)(norm3/h);
-			fprintf (log_file, "Step size too small! Resizing... New step size = %.2lf\n", h);
-		}
-		fprintf (log_file, "Chosen step size = %.2lf\n", h);
-	}
-	/* Convert step size to string */
-	sprintf (step_flag, "%.2lf", h);
-
 	if (whole_protein_mode) {
 
 		X1 = 999999; Y1 = 999999; Z1 = 999999;
@@ -239,6 +213,38 @@ main (int argc,
 	    /* Free van der Waals radius dictionary from memory */
 		free_atom ();
 
+	}	 /* If it will be used a user defined search space, without the Probe Out Adjustment define its limits */
+	 else
+	    if (box_mode) {};
+
+	/* Resizing step: increases the grid step size until the number of points on the grid be smaller than Vvoxel */
+	if (resolution_mode) {
+		/* Defines the grid inside the search space | Point 1 is the reference of our grid */
+		/* Calculate distances between points in box and reference */
+		norm1 = sqrt ((X2-X1)*(X2-X1) + (Y2-Y1)*(Y2-Y1) + (Z2-Z1)*(Z2-Z1));
+		norm2 = sqrt ((X3-X1)*(X3-X1) + (Y3-Y1)*(Y3-Y1) + (Z3-Z1)*(Z3-Z1));
+		norm3 = sqrt ((X4-X1)*(X4-X1) + (Y4-Y1)*(Y4-Y1) + (Z4-Z1)*(Z4-Z1));
+
+		/*Grid steps based on distances*/
+		m = (int)(norm1/h); /* X axis */
+		n = (int)(norm2/h); /* Y axis */
+		o = (int)(norm3/h); /* Z axis */
+
+        /* While volume of unitary box is less than Vlim, increment h and recalculate box sizes */
+		while ((norm1/m)*(norm2/n)*(norm3/o) < Vvoxel) {
+			h += 0.05;
+			m = (int)(norm1/h);
+			n = (int)(norm2/h);
+			o = (int)(norm3/h);
+			fprintf (log_file, "Step size too small! Resizing... New step size = %.2lf\n", h);
+		}
+		fprintf (log_file, "Chosen step size = %.2lf\n", h);
+	}
+	/* Convert step size to string */
+	sprintf (step_flag, "%.2lf", h);
+
+	if (whole_protein_mode) {
+
 		/*Transforms coordinates to step size multiples*/
 		X1 = roundf ((X1 + fabs((double)((int)(X1 * 1000) % (int)(h * 1000)) / 1000) - h) * 1000) / 1000;
 		Y1 = roundf ((Y1 + fabs((double)((int)(Y1 * 1000) % (int)(h * 1000)) / 1000) - h) * 1000) / 1000;
@@ -258,9 +264,6 @@ main (int argc,
 		Z2 = Z1; Z3 = Z1;
 
 	}
-	 /* If it will be used a user defined search space, without the Probe Out Adjustment define its limits */
-	 else
-	    if (box_mode) {};
 
 	/* Defines the grid inside the search space | Point 1 is the reference of our grid */
 	/* Calculate distances between points in box and reference */
