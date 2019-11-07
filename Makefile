@@ -23,6 +23,7 @@ resultsprocessing.o: src/resultsprocessing.c src/resultsprocessing.h
 	gcc -Isrc -c src/resultsprocessing.c
 
 move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o
+	if [ ! -d "lib" ]; then mkdir lib/; fi
 	mv dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o lib/
 
 link:
@@ -36,4 +37,5 @@ KVFinder_PATH:
 	@echo export KVFinder_PATH=`pwd` >> ~/.bashrc
 
 clean:
-	rm -r lib/matrixprocessing.o lib/dictionaryprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o parKVFinder
+	if [ -d "lib" ]; then rm -r lib/; fi
+	if [ -f parKVFinder ]; then rm parKVFinder; fi
