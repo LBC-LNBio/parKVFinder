@@ -1,8 +1,18 @@
 parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c
 	gcc -fopenmp -Isrc -g -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm
-# 	if [ ! "$(KVFinder_PATH)" ]; then echo "\n\nKVFinder_PATH variable not found. Export KVFinder_PATH and save it to your ~/.bashrc."; echo "export KVFinder_PATH=`pwd`\n"; fi
-# if [ -f ~/.bash_profile ]; then echo "export "; fi
-# if [ -f ~/.bashrc ]; then echo "export "; fi
+	@if [ ! "${KVFinder_PATH}" ]; then \
+		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
+		if [ -f ${HOME}/.bashrc ]; then \
+			printf "Run the following command:\n"; \
+			printf "> echo export KVFinder_PATH=`pwd` >> ~/.bashrc\n\n"; \
+		elif [ -f ${HOME}/.bash_profile ]; then \
+			printf "Run the following command:\n"; \
+			printf "> echo export KVFinder_PATH=`pwd` >> ~/.bash_profile\n\n"; \
+		else \
+			printf "Export the following command to your configuration file:\n"; \
+			printf "> export KVFinder_PATH=`pwd`\n\n"; \
+		fi \
+	fi
 
 matrixprocessing.o: src/matrixprocessing.c src/matrixprocessing.h
 	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -static
@@ -29,12 +39,6 @@ move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o toml
 link:
 	cd ${BASH_SOURCE[0]%/*}
 	sudo ln -s `pwd`/parKVFinder /usr/local/bin/parKVFinder
-
-KVFinder_PATH:
-	cd ${BASH_SOURCE[0]%/*}
-	@echo >> ~/.bashrc
-	@echo "# KVFinder environment variable" >> ~/.bashrc
-	@echo export KVFinder_PATH=`pwd` >> ~/.bashrc
 
 clean:
 	if [ -d "lib" ]; then rm -r lib/; fi
