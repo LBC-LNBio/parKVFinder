@@ -364,13 +364,14 @@ init80 (char S[80])
 void
 print_header ()
 {
-  fprintf(stdout, "parKVFinder (parallel KVFinder) software identifies and describes cavities in\n");
-  fprintf(stdout, "target biomolecular structure using a dual probe system.\n");
-  fprintf(stdout, "\n");
-  fprintf(stdout, "The description includes spatial and constitutional characterization. Spatial \n");
-  fprintf(stdout, "description includes shape, volume and area. Constitutional description includes\n");
-  fprintf(stdout, "amino acids that form the identified cavities.\n");
-  fprintf(stdout, "\n");
+
+	fprintf(stdout, "parKVFinder (parallel KVFinder) software identifies and describes cavities in\n");
+	fprintf(stdout, "target biomolecular structure using a dual probe system.\n");
+	fprintf(stdout, "\n");
+	fprintf(stdout, "The description includes spatial and constitutional characterization. Spatial \n");
+	fprintf(stdout, "description includes shape, volume and area. Constitutional description includes\n");
+	fprintf(stdout, "amino acids that form the identified cavities.\n");
+	fprintf(stdout, "\n");
 
 }
 
@@ -380,7 +381,7 @@ print_usage ()
 
 	fprintf(stdout, "Usage: parKVFinder PDB [options],\n");
 	fprintf(stdout, "\twhere PDB is a path to a target PDB file.\n");
-  fprintf(stdout, "\n");
+  	fprintf(stdout, "\n");
 	fprintf(stdout, "Options:\n");
 	fprintf(stdout, "  -h, --help\n");
 	fprintf(stdout, "\t  Display this help message.\n");
@@ -397,7 +398,7 @@ print_options ()
 {
 
 	/* GENERAL KVFINDER PARAMETERS */
-  fprintf(stdout, "General options:\n");
+  	fprintf(stdout, "General options:\n");
 	fprintf(stdout, "  -p, --parameters\t[<.toml>]\n");
 	fprintf(stdout, "\t  Define path to parameters file.\n");
 	fprintf(stdout, "  -d, --dictionary\t[<dictionary>]\n");
@@ -416,35 +417,35 @@ print_options ()
 	fprintf(stdout, "\t  Define removal distance when comparing probes surfaces.\n");
 	fprintf(stdout, "  -t, --template\t\t\t(paramters.toml)\n");
 	fprintf(stdout, "\t  Create a parameter file template with defined parameters in current\n");
-  fprintf(stdout, "\t  working directory.\n");
-  fprintf(stdout, "\n");
-  /* BOX ADJUSTMENT PARAMETERS */
-  fprintf(stdout, "Box adjustment options:\n");
-  fprintf(stdout, "  -B, --box\n");
-  fprintf(stdout, "\t  Define a search box mode where parKVFinder will detect cavities.\n");
-  fprintf(stdout, "  --custom_box\t\t[<file>]\n");
-  fprintf(stdout, "\t  Define a custom search box based on a file containing the minimum and \n");
-  fprintf(stdout, "\t  maximum cartesian values of each axis in angstrom.\n");
-  fprintf(stdout, "  --residues_box\t[<file>]\n");
-  fprintf(stdout, "\t  Automatically set a search box based a file containing a tab-separated\n");
-  fprintf(stdout, "\t  list of residues.\n");
-  fprintf(stdout, "  --padding\t\t<real>\t\t(3.5)\n");
-  fprintf(stdout, "\t  Define residues box padding. Adds a length in each box direction.\n");
-  fprintf(stdout, "\n");
+	fprintf(stdout, "\t  working directory.\n");
+	fprintf(stdout, "\n");
+	/* BOX ADJUSTMENT PARAMETERS */
+	fprintf(stdout, "Box adjustment options:\n");
+	fprintf(stdout, "  -B, --box\n");
+	fprintf(stdout, "\t  Define a search box mode where parKVFinder will detect cavities.\n");
+	fprintf(stdout, "  --custom_box\t\t[<file>]\n");
+	fprintf(stdout, "\t  Define a custom search box based on a file containing the minimum and \n");
+	fprintf(stdout, "\t  maximum cartesian values of each axis in angstrom.\n");
+	fprintf(stdout, "  --residues_box\t[<file>]\n");
+	fprintf(stdout, "\t  Automatically set a search box based a file containing a tab-separated\n");
+	fprintf(stdout, "\t  list of residues.\n");
+	fprintf(stdout, "  --padding\t\t<real>\t\t(3.5)\n");
+	fprintf(stdout, "\t  Define residues box padding. Adds a length in each box direction.\n");
+	fprintf(stdout, "\n");
 	/* SURFACE MODE */
-  fprintf(stdout, "Surface options:\n");
-  fprintf(stdout, "  -S, --surface\t\t<string>\t(VdW)\n");
-  fprintf(stdout, "\t  Define a surface representation. Options include: SAS and VdW. SAS\n");
-  fprintf(stdout, "\t  specifies solvent accessible surface. VdW specifies van der Waals\n");
-  fprintf(stdout, "\t  molecular surface.\n");
-  fprintf(stdout, "\n");
+	fprintf(stdout, "Surface options:\n");
+	fprintf(stdout, "  -S, --surface\t\t<string>\t(VdW)\n");
+	fprintf(stdout, "\t  Define a surface representation. Options include: SAS and VdW. SAS\n");
+	fprintf(stdout, "\t  specifies solvent accessible surface. VdW specifies van der Waals\n");
+	fprintf(stdout, "\t  molecular surface.\n");
+	fprintf(stdout, "\n");
 	/* LIGAND ADJUSTMENT PARAMETERS */
-  fprintf(stdout, "Ligand options:\n");
-  fprintf(stdout, "  -L, --ligand\t\t[<.pdb>]\n");
-  fprintf(stdout, "\t  Define path to ligand PDB file.\n");
-  fprintf(stdout, "  --ligand_cutoff\t<real>\t\t(5.0)\n");
-  fprintf(stdout, "\t  Define ligand radius distance cutoff.\n");
-  fprintf(stdout, "\n");
+	fprintf(stdout, "Ligand options:\n");
+	fprintf(stdout, "  -L, --ligand\t\t[<.pdb>]\n");
+	fprintf(stdout, "\t  Define path to ligand PDB file.\n");
+	fprintf(stdout, "  --ligand_cutoff\t<real>\t\t(5.0)\n");
+	fprintf(stdout, "\t  Define ligand radius distance cutoff.\n");
+	fprintf(stdout, "\n");
 
 }
 
