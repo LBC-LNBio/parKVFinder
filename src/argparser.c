@@ -508,6 +508,11 @@ argparser (int argc,
            double *bY4,
            double *bZ4)
 {
+	/* Print Warning! if KVFinder_PATH was not found */
+	if ( strcmp (getenv ("KVFinder_PATH"), "") == 0 ) {
+		fprintf (stderr, "\033[0;31mWarning\033[0m: KVFinder_PATH system variable not found.\n");
+		fprintf (stderr, "Export KVFinder_PATH to your system variables.\n\n");
+	}
 
     /* Declare variables */
 	/* Flag set by ‘--verbose’. */
