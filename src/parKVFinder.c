@@ -28,13 +28,6 @@ main (int argc,
       char **argv)
 {
 
-  /* Print error if KVFinder_PATH is not defined */
-  if (strcmp (getenv("KVFinder_PATH"), "") == 0) {
-    fprintf(stderr, "\nThe system variable KVFinder_PATH is not set.\n");
-    fprintf(stderr, "Please set KVFinder_PATH to be able to run parKVFinder\n\n");
-    exit(-1);
-  }
-
 	/* Evaluate elapsed time */
 	struct timeval toc, tic;
 	gettimeofday (&tic, NULL);
