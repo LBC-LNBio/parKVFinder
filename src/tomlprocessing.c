@@ -85,30 +85,6 @@ init500 (char S[500])
 
 }
 
-/* Fill vector S[2] with 0s */
-void
-init2 (int S[2])
-{
-    /* Declare variables */
-	int i;
-
-	for (i = 0; i < 2; i++)
-	    S[i] = 0;
-
-}
-
-/* Fill vector S[4] with 0s */
-void
-init4 (int S[4])
-{
-    /* Declare variables */
-	int i;
-
-	for (i = 0; i < 4; i++)
-	    S[i] = 0;
-
-}
-
 /* Convert true or false input to int input */
 int
 TF_input (char flag_in[6])
@@ -128,10 +104,10 @@ readTOML (toml *p,
 {
     /* Declare variables */
 	FILE *parameters_file;
-	int i = 0, j = 0, m = 0, n = 0, max = 0;
-	int equal[4], virg[2], chave[2], end, config_bar[2];
 	char LINE[500], config[500] = "", value[500] = "", key[500] = "";
-	char keys[3][500], values[3][500];
+	char *vb, *ib, *p1, *p2, *p3, *p4;
+	int i = 0, equal = 0, flag_visiblebox = 0, flag_internalbox = 0, count = 0;
+	int config_bar[2];
 
 	/* Allocate memory to struct TOML */
 	p = (toml*) malloc (sizeof (toml));
@@ -147,7 +123,6 @@ readTOML (toml *p,
 		exit (-1);
 
 	}
-	/* TOML file found */
 	else {
 	    /* While TOML file is not over, do... */
         while (get_toml_line (parameters_file, LINE)) {
@@ -159,210 +134,250 @@ readTOML (toml *p,
              trim2 (LINE, ' ');
 
             /* If a '#' is found, ignore line */
-            if (LINE[0] == '#' || LINE[0] == ' ');
+            if (LINE[0] == '#' || LINE[0] == '\n' || LINE[0] == ' ');
             else {
 
-				for (max = 0; LINE[max] != '\n'; max++);
+				for (i = 0; i < strlen(LINE); i++) {
 
-                /* Loop through all positions in LINE */
-                for (j = 0; j < max; j++) {
+					/* Get position of newline symbol in LINE */
+					if (LINE[i] == '=')
+						equal = i;
 
-                    /* Get positions of equal symbols in LINE */
-                    if (LINE[j] == '=') {
+					/* Get position of '[' symbol in LINE */
+					if (LINE[i] == '[')
+						config_bar[0] = i;
 
-                        equal[n] = j;
-                        n++;
+					/* Get position of ']' symbol in LINE */
+					if (LINE[i] == ']')
+						config_bar[1] = i;
 
-                    }
+				}
 
-                    /* Get positions of comma symbols in LINE */
-                    if (LINE[j] == ',') {
+				/* If vector config_bar are filled, do ... */
+				if (config_bar[1] != 0) {
 
-                        virg[m] = j;
-                        m++;
+					/* Restart string config[100] */
+					init500 (config);
+					/* Extract name of configuration */
+					extract_toml_line (LINE, config_bar[0] + 1, config_bar[1], config);
 
-                    }
+					vb = strstr (config, ".visiblebox.");
+					ib = strstr (config, ".internalbox.");
 
-                    /* Get position of newline symbol in LINE */
-                    if (LINE[j] == '\n')
-                        end = j;
+					/* If configuration is visiblebox, do ... */
+					if (vb != NULL) {
+						flag_visiblebox = 1;
+						count = 0;
+					}
 
-                    /* Get position of '[' symbol in LINE */
-                    if (LINE[j] == '[')
-                        config_bar[0] = j;
+					/* If configuration is internalbox, do ... */
+					if (ib != NULL) {
+						flag_internalbox = 1;
+						count = 0;
+					}
 
-                    /* Get position of ']' symbol in LINE */
-                    if (LINE[j] == ']')
-                        config_bar[1] = j;
+				}
 
-                    /* Get position of '{' symbol in LINE */
-                    if (LINE[j] == '{')
-                        chave[0] = j;
+				/* If equal symbol is found, do ... */
+				if (equal != 0) {
 
-                    /* Get position of '}' symbol in LINE */
-                    if (LINE[j] == '}')
-                        chave[1] = j;
+					/* Extract key */
+					extract_toml_line (LINE, 0, equal, key);
 
-                }
+					/* Extract value */
+					extract_toml_line (LINE, equal + 1, strlen(LINE) - 1, value);
 
-                /* If vector config_bar are filled, do ... */
-                if (config_bar[1] != 0) {
+					/* If bracket is found, do ... */
+					if (flag_visiblebox || flag_internalbox) {
 
-                    /* Restart string config[100] */
-                    init500 (config);
-                    /* Extract name of configuration */
-                    extract_toml_line (LINE, config_bar[0] + 1, config_bar[1], config);
+						p1 = strstr(config, ".p1");
+						p2 = strstr(config, ".p2");
+						p3 = strstr(config, ".p3");
+						p4 = strstr(config, ".p4");
 
-                }
+						/* Visible box */
+						if (flag_visiblebox) {
 
-                /* If equal symbol is found, do ... */
-                if (equal[0] != 0) {
+							/* Count number of coordinates read */
+							count++;
 
-                    /* If bracket is found, do ... */
-                    if (chave[0] != 0 && chave[1] != 0) {
+							/* Visible point 1 : bP1 */
+							if (p1 != NULL) {
 
-                        /* Extract first key inside keys[0] */
-                        extract_toml_line (LINE, chave[0] + 1, equal[1], keys[0]);
+								/* Get x, y or z coordinates */
+								if (strcmp (key, "x") == 0)
+									(p->bX1) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->bY1) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->bZ1) = atof (value);
 
-                        /* Extract first value inside values[0] */
-                        extract_toml_line (LINE, equal[1] + 1, virg[0], values[0]);
+							}
 
-                        /* Extract second key inside keys[1] */
-                        extract_toml_line (LINE, virg[0] + 1, equal[2], keys[1]);
+							/* Visible point 2 : bP2 */
+							if (p2 != NULL) {
 
-                        /* Extract second value inside values[1] */
-                        extract_toml_line (LINE, equal[2] + 1, virg[1], values[1]);
+								if (strcmp (key, "x") == 0)
+									(p->bX2) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->bY2) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->bZ2) = atof (value);
 
-                        /* Extract third key inside keys[2] */
-                        extract_toml_line (LINE, virg[1] + 1, equal[3], keys[2]);
+							}
 
-                        /* Extract third value inside values[2] */
-                        extract_toml_line (LINE, equal[3] + 1, chave[1], values[2]);
+							/* Visible point 3 : bP3 */
+							if (p3 != NULL) {
 
-                        /* Save values inside struct TOML */
-                        if (strcmp (keys[0], "bX1") == 0) {
-                            (p->bX1) = atof (values[0]);
-                            (p->bY1) = atof (values[1]);
-                            (p->bZ1) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "bX2") == 0) {
-                            (p->bX2) = atof (values[0]);
-                            (p->bY2) = atof (values[1]);
-                            (p->bZ2) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "bX3") == 0) {
-                            (p->bX3) = atof (values[0]);
-                            (p->bY3) = atof (values[1]);
-                            (p->bZ3) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "bX4") == 0) {
-                            (p->bX4) = atof (values[0]);
-                            (p->bY4) = atof (values[1]);
-                            (p->bZ4) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "X1") == 0) {
-                            (p->X1) = atof (values[0]);
-                            (p->Y1) = atof (values[1]);
-                            (p->Z1) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "X2") == 0) {
-                            (p->X2) = atof (values[0]);
-                            (p->Y2) = atof (values[1]);
-                            (p->Z2) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "X3") == 0) {
-                            (p->X3) = atof (values[0]);
-                            (p->Y3) = atof (values[1]);
-                            (p->Z3) = atof (values[2]);
-                        }
-                        if (strcmp (keys[0], "X4") == 0) {
-                            (p->X4) = atof (values[0]);
-                            (p->Y4) = atof (values[1]);
-                            (p->Z4) = atof (values[2]);
-                        }
+								if (strcmp (key, "x") == 0)
+									(p->bX3) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->bY3) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->bZ3) = atof (value);
 
-                    }
-                    else {
+							}
 
-                        /* Extract key */
-                        extract_toml_line (LINE, 0, equal[0], key);
+							/* Visible point 4 : bP4 */
+							if (p4 != NULL) {
 
-                        /* Extract value */
-                        if (end < max) end = max;
-                        extract_toml_line (LINE, equal[0] + 1, end, value);
+								if (strcmp (key, "x") == 0)
+									(p->bX4) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->bY4) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->bZ4) = atof (value);
 
-                        /* Remove quotation marks */
-                        trim2 (value, '\"');
-                        trim2 (value, '\"');
+							}
 
-                        /* Save values inside struct TOML */
-                        if (strcmp (key, "output") == 0)
-                            strcpy ((p->OUTPUT), value);
-                        if (strcmp (key, "base_name") == 0)
-                            strcpy( (p->BASE_NAME), value);
-                        if (strcmp (key, "pdb") == 0)
-                            strcpy ((p->PDB_NAME), value);
-                        if (strcmp (key, "ligand") == 0)
-                            strcpy ((p->LIGAND_NAME), value);
-                        if (strcmp (key, "dictionary") == 0)
-                            strcpy ((p->dictionary_name), value);
-                        if (strcmp (key, "whole_protein_mode") == 0)
-                            (p->whole_protein_mode) = TF_input (value);
-                        if (strcmp (key, "resolution_mode") == 0)
-                            strcpy( (p->resolution_flag), value);
-                        if (strcmp (key, "box_mode") == 0)
-                            (p->box_mode) = TF_input (value);
-                        if (strcmp (key, "surface_mode") == 0)
-                            (p->surface_mode) = TF_input (value);
-                        if (strcmp (key, "kvp_mode") == 0)
-                            (p->kvp_mode) = TF_input (value);
-                        if (strcmp (key, "ligand_mode") == 0)
-                            (p->ligand_mode) = TF_input (value);
-                        if (strcmp (key, "step_size") == 0)
-                            (p->h) = atof (value);
-                        if (strcmp (key, "probe_in") == 0)
-                            (p->probe_in) = atof (value);
-                        if (strcmp (key, "probe_out") == 0)
-                            (p->probe_out) = atof (value);
-                        if (strcmp (key, "volume_cutoff") == 0)
-                            (p->volume_cutoff) = atof (value);
-                        if (strcmp (key, "ligand_cutoff") == 0)
-                            (p->ligand_cutoff) = atof (value);
-                        if (strcmp (key, "removal_distance") == 0)
-                            (p->removal_distance) = atof (value);
+							if (count == 3)
+								flag_visiblebox = 0;
 
-                    }
+						}
 
-                }
+						/* Visible box */
+						if (flag_internalbox) {
 
-            }
+							count++;
 
-            /* Restart all varibles */
-            init500 (keys[0]);
-            init500 (keys[1]);
-            init500 (keys[2]);
-            init500 (values[0]);
-            init500 (values[1]);
-            init500 (values[2]);
-            init500 (LINE);
-            init500 (key);
-            init500 (value);
-            init2 (chave);
-            init2 (virg);
-            init4 (equal);
-            config_bar[0] = 0;
-            config_bar[1] = 0;
-            end = 0;
-            n = 0;
-            m = 0;
+							/* Internal point 1 : P1 */
+							if (p1 != NULL) {
 
-        }
+								/* Get x, y or z coordinates */
+								if (strcmp (key, "x") == 0)
+									(p->X1) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->Y1) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->Z1) = atof (value);
+
+							}
+
+							/* Internal point 2 : P2 */
+							if (p2 != NULL) {
+
+								if (strcmp (key, "x") == 0)
+									(p->X2) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->Y2) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->Z2) = atof (value);
+
+							}
+
+							/* Internal point 3 : P3 */
+							if (p3 != NULL) {
+
+								if (strcmp (key, "x") == 0)
+									(p->X3) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->Y3) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->Z3) = atof (value);
+
+							}
+
+							/* Internal point 4 : P4 */
+							if (p4 != NULL) {
+
+								if (strcmp (key, "x") == 0)
+									(p->X4) = atof (value);
+								if (strcmp (key, "y") == 0)
+									(p->Y4) = atof (value);
+								if (strcmp (key, "z") == 0)
+									(p->Z4) = atof (value);
+
+							}
+
+							if (count == 3)
+								flag_internalbox = 0;
+
+						}
+
+					}
+					else {
+
+						/* Remove quotation marks */
+						trim2 (value, '\"');
+						trim2 (value, '\"');
+
+						/* Save values inside struct TOML */
+						if (strcmp (key, "output") == 0)
+							strcpy ((p->OUTPUT), value);
+						if (strcmp (key, "base_name") == 0)
+							strcpy( (p->BASE_NAME), value);
+						if (strcmp (key, "pdb") == 0)
+							strcpy ((p->PDB_NAME), value);
+						if (strcmp (key, "ligand") == 0)
+							strcpy ((p->LIGAND_NAME), value);
+						if (strcmp (key, "dictionary") == 0)
+							strcpy ((p->dictionary_name), value);
+						if (strcmp (key, "whole_protein_mode") == 0)
+							(p->whole_protein_mode) = TF_input (value);
+						if (strcmp (key, "resolution_mode") == 0)
+							strcpy( (p->resolution_flag), value);
+						if (strcmp (key, "box_mode") == 0)
+							(p->box_mode) = TF_input (value);
+						if (strcmp (key, "surface_mode") == 0)
+							(p->surface_mode) = TF_input (value);
+						if (strcmp (key, "kvp_mode") == 0)
+							(p->kvp_mode) = TF_input (value);
+						if (strcmp (key, "ligand_mode") == 0)
+							(p->ligand_mode) = TF_input (value);
+						if (strcmp (key, "step_size") == 0)
+							(p->h) = atof (value);
+						if (strcmp (key, "probe_in") == 0)
+							(p->probe_in) = atof (value);
+						if (strcmp (key, "probe_out") == 0)
+							(p->probe_out) = atof (value);
+						if (strcmp (key, "volume_cutoff") == 0)
+							(p->volume_cutoff) = atof (value);
+						if (strcmp (key, "ligand_cutoff") == 0)
+							(p->ligand_cutoff) = atof (value);
+						if (strcmp (key, "removal_distance") == 0)
+							(p->removal_distance) = atof (value);
+
+					}
+
+				}
+
+         	}
+
+			/* Restart variables */
+			init500 (LINE);
+			init500(key);
+			init500(value);
+			equal = 0;
+			config_bar[0] = 0;
+			config_bar[1] = 0;
+
+		}
 
 	}
 
 	/* Check if last line read found EOF in the middle of the line */
 	for (i = 0; LINE[i] != EOF; i++);
-	if (i > 0){
+	if (i > 0) {
 		LINE[i] = '\n';
 		goto HANDLE_LAST_LINE;
 	}

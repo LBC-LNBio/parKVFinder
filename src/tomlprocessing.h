@@ -19,8 +19,6 @@ toml *param;
 
 toml* readTOML(toml *p, char *path);
 int TF_input(char flag_in[6]);
-void init2(int S[2]);
-void init4(int S[4]);
 void init500(char S[500]);
 void trim2(char S[500], char c);
 void extract_toml_line(char LINE[500], int a, int b, char S[500]);

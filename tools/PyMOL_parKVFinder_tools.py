@@ -1949,17 +1949,40 @@ Default: 2.4 angstroms.
         # Create box parameters
         boxparam = u"""\n\t[SETTINGS.visiblebox]
 \t# Coordinates of the vertices that define the visible 3D grid. Only four points are required to define the search space.
-\tbP1 = {{bX1 = {:.2f}, bY1 = {:.2f}, bZ1 = {:.2f}}}
-\tbP2 = {{bX2 = {:.2f}, bY2 = {:.2f}, bZ2 = {:.2f}}}
-\tbP3 = {{bX3 = {:.2f}, bY3 = {:.2f}, bZ3 = {:.2f}}}
-\tbP4 = {{bX4 = {:.2f}, bY4 = {:.2f}, bZ4 = {:.2f}}}
-
-\t[SETTINGS.internalbox]
+\n\t[SETTINGS.visiblebox.p1]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.visiblebox.p2]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.visiblebox.p3]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.visiblebox.p4]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.internalbox]
 \t# Coordinates of the internal 3D grid. Used for calculations.
-\tP1 = {{X1 = {:.2f}, Y1 = {:.2f}, Z1 = {:.2f}}}
-\tP2 = {{X2 = {:.2f}, Y2 = {:.2f}, Z2 = {:.2f}}}
-\tP3 = {{X3 = {:.2f}, Y3 = {:.2f}, Z3 = {:.2f}}}
-\tP4 = {{X4 = {:.2f}, Y4 = {:.2f}, Z4 = {:.2f}}}
+\n\t[SETTINGS.internalbox.p1]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.internalbox.p2]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.internalbox.p3]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
+\n\t[SETTINGS.internalbox.p4]
+\tx = {:.2f}
+\ty = {:.2f}
+\tz = {:.2f}
 """.format(round(bX1, 2), round(bY1, 2), round(bZ1, 2),
            round(bX2, 2), round(bY2, 2), round(bZ2, 2),
            round(bX3, 2), round(bY3, 2), round(bZ3, 2),
