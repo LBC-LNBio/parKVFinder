@@ -1,2 +1,4 @@
 parKVFinder
 input/KV_Files
+lib/*
+debug
