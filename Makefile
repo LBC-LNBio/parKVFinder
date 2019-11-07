@@ -9,8 +9,8 @@ parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser
 			printf "Run the following command:\n"; \
 			printf "> echo export KVFinder_PATH=`pwd` >> ~/.bash_profile\n\n"; \
 		else \
-			printf "Export the following command to your configuration file:\n"; \
-			printf "> export KVFinder_PATH=`pwd`\n\n"; \
+			printf "Set the following path to the KVFinder_PATH system variable in your configuration file:\n"; \
+			printf "> KVFinder_PATH=`pwd`\n\n"; \
 		fi \
 	fi
 
