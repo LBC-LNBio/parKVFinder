@@ -403,7 +403,7 @@ print_options ()
 	fprintf (stdout, "\t  Define path to parameters file.\n");
 	fprintf (stdout, "  -d, --dictionary\t[<dictionary>]\n");
 	fprintf (stdout, "\t  Define path to a custom dictionary file.\n");
-	fprintf (stdout, "  -r, --resolution\t<string>\t(Low)\n");
+	fprintf (stdout, "  -r, --resolution\t<enum>\t(Low)\n");
 	fprintf (stdout, "\t  Define resolution mode. Options include: Off, Low, Medium and High.\n");
 	fprintf (stdout, "  -s, --step\t\t<real>\t\t(0.0)\n");
 	fprintf (stdout, "\t  Define step size (grid spacing).\n");
@@ -434,7 +434,7 @@ print_options ()
 	fprintf (stdout, "\n");
 	/* SURFACE MODE */
 	fprintf (stdout, "Surface options:\n");
-	fprintf (stdout, "  -S, --surface\t\t<string>\t(VdW)\n");
+	fprintf (stdout, "  -S, --surface\t\t<enum>\t(VdW)\n");
 	fprintf (stdout, "\t  Define a surface representation. Options include: SAS and VdW. SAS\n");
 	fprintf (stdout, "\t  specifies solvent accessible surface. VdW specifies van der Waals\n");
 	fprintf (stdout, "\t  molecular surface.\n");
