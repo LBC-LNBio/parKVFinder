@@ -907,6 +907,7 @@ argparser (int argc,
             /* Check PDB file extension*/
             if (strcmp (get_file_extension (PDB_NAME), "pdb")) {
                 fprintf (stderr, "\033[0;31mError:\033[0m Wrong PDB file extension!\narg: [\'%s\']\n", PDB_NAME);
+                exit(-1);
             }
 
 	    }
