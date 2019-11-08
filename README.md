@@ -1,6 +1,6 @@
 
 
-Welcome to the **parallel KVFinder (parKVFinder)**
+Welcome to the **parallel KVFinder (_parKVFinder_)**
 [wiki](https://github.com/LBC-LNBio/parKVFinder/wiki), this page was
 built to help you get started with our cavity detection software.
 
