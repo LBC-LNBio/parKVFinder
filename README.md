@@ -6,11 +6,11 @@ built to help you get started with our cavity detection software.
 
 1. [Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/parKVFinder-Installation)
 
-  - [GCC Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/)
+    - [GCC Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/)
   
 2. [PyMOL plug-in installation](https://github.com/LBC-LNBio/parKVFinder/wiki/PyMOL-Plugin-Installation)
 
-  - [PyMOL Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/PyMOL-Installation)
+    - [PyMOL Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/PyMOL-Installation)
    
 3. [Manual](https://github.com/LBC-LNBio/parKVFinder/wiki/parKVFinder-Manual)
 
