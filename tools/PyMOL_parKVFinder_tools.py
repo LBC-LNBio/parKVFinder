@@ -734,7 +734,7 @@ parKVFinder and PyMOL parKVFinder Tools was developed by:
 
 <Address>
 
-Please contact the authors and cite this plugin if you use it in a publication.
+Please refer and cite the original paper if you use it in a publication.
 
 Citation:
     <paper>
