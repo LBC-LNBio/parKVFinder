@@ -275,7 +275,7 @@ amino acids that form the identified cavities.\n""",
         ## (1.1.3.1) Base Name
         self.base_name = Pmw.EntryField(settings_group.interior(),
                                         labelpos='w',
-                                        label_text='Output base name:',
+                                        label_text='Output Base Name:',
                                         value=self.defaults['base_name'],
                                         entry_width=6)
         self.base_name.pack(anchor='w', fill=X, padx=10)
@@ -305,7 +305,7 @@ amino acids that form the identified cavities.\n""",
         ## (1.1.3.4) Volume Cutoff
         self.volume_cutoff = Pmw.Counter(settings_group.interior(),
                                          labelpos='w',
-                                         label_text=u"Volume cutoff ({}{}):".format(chr(0x212b), chr(0x00b3)),
+                                         label_text=u"Volume Cutoff ({}{}):".format(chr(0x212b), chr(0x00b3)),
                                          datatype={'counter': self._custom_real_counter},
                                          entryfield_validate={'validator': 'real', 'min': 0.0},
                                          increment=0.10,
@@ -641,7 +641,7 @@ amino acids that form the identified cavities.\n""",
         self.scrollbar_area_horizontal = Scrollbar(self.area_frame,
                                                    orient="horizontal")
         Label(self.area_frame,
-              text=u"Surface area ({}{})".format(chr(0x212b),
+              text=u"Surface Area ({}{})".format(chr(0x212b),
                                                  chr(0x00b2))).pack()
         self.list_area = Listbox(self.area_frame,
                                  height=18,
@@ -664,7 +664,7 @@ amino acids that form the identified cavities.\n""",
         self.scrollbar_residues_horizontal = Scrollbar(self.residues_frame,
                                                        orient="horizontal")
         Label(self.residues_frame,
-              text="Interface residues").pack()
+              text="Interface Residues").pack()
         self.list_residues = Listbox(self.residues_frame,
                                      height=18,
                                      width=25,
