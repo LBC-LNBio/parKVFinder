@@ -1245,7 +1245,7 @@ Citation for PyMOL may be found here:
             self.ang_s = Pmw.Counter(self,
                                      labelpos='w',
                                      label_text=u"Angle 1 ({}):".format(chr(176)),
-                                     label_foreground='blue',
+                                     label_foreground='black',
                                      datatype='real',
                                      entryfield_validate={'validator': 'real', 'min': -180, 'max': 180},
                                      increment=1,
@@ -1257,7 +1257,7 @@ Citation for PyMOL may be found here:
             self.ang2_s = Pmw.Counter(self,
                                       labelpos='w',
                                       label_text=u"Angle 2 ({}):".format(chr(176)),
-                                      label_foreground='red',
+                                      label_foreground='black',
                                       datatype='real',
                                       entryfield_validate={'validator': 'real', 'min': -180, 'max': 180},
                                       increment=1,
@@ -2089,12 +2089,16 @@ Default: 2.4 angstroms.
                 elif self.resolution.getcurselection() == 'High':
                     h = 0.25
             # Round dimensions
-            minX = round(minX - (minX % h), 1)
-            minY = round(minY - (minY % h), 1)
-            minZ = round(minZ - (minZ % h), 1)
-            maxX = round(maxX - (maxX % h) + h, 1)
-            maxY = round(maxY - (maxY % h) + h, 1)
-            maxZ = round(maxZ - (maxZ % h) + h, 1)
+            if h == 0.0:
+                tkMessageBox.showerror("Error", "Cannot draw grid! Step size set to 0.0!", parent=self.parent)
+                return
+            else:
+                minX = round(minX - (minX % h), 1)
+                minY = round(minY - (minY % h), 1)
+                minZ = round(minZ - (minZ % h), 1)
+                maxX = round(maxX - (maxX % h) + h, 1)
+                maxY = round(maxY - (maxY % h) + h, 1)
+                maxZ = round(maxZ - (maxZ % h) + h, 1)
             # Add probe_out
             probe_out = float(self.probe_out.get())
             probe_out = round(probe_out - round(probe_out, 4) % round(h, 4), 1)
@@ -2297,6 +2301,7 @@ Default: 2.4 angstroms.
             self.results_file.configure(state='readonly')
 
         #### Restore parameters
+        cmd.delete("grid")
         self.surface.setvalue(self.defaults['surface_representation'])
         self.cavity_representation.setvalue(self.defaults['cavity_representation'])
         self.base_name.delete(0, len(self.base_name.get()))
@@ -2317,6 +2322,7 @@ Default: 2.4 angstroms.
         self.ligand_mode.set(self.defaults['ligand_mode'])
         self.ligand_cutoff.setentry(self.defaults['ligand_cutoff'])
         self.check_ligand_mode()
+        cmd.frame(1)
 
     def quit(self):
         """
