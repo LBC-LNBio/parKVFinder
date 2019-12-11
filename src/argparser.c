@@ -403,7 +403,7 @@ void
 print_usage ()
 {
 
-	fprintf (stdout, "Usage: parKVFinder PDB [options],\n");
+	fprintf (stdout, "Usage: parKVFinder <.pdb> [options],\n");
 	fprintf (stdout, "\twhere PDB is a path to a target PDB file.\n");
   	fprintf (stdout, "\n");
 	fprintf (stdout, "Options:\n");
