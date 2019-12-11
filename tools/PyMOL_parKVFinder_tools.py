@@ -26,7 +26,6 @@
 ###################################################################################################
 
 # Import required modules
-from builtins import chr  # unichr works for python 2 and 3
 import os
 import subprocess
 import math
@@ -34,8 +33,13 @@ import time
 import Pmw
 from pymol import cmd
 import pymol
-import sys
 import toml
+import sys
+
+try:
+    from builtins import chr  # unichr works for python 2 and 3
+except ImportError:
+    from __builtin__ import chr
 
 # Import Tkinter
 try:
