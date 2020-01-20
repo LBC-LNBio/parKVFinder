@@ -893,7 +893,7 @@ check_faces (int ***S,
 
 }
 
-/* Area calculation: KVFinder method */
+/* Area calculation: Mullikin and Verbeek adapted method */
 void
 Area_search (int ***S,
              int m,
@@ -903,25 +903,24 @@ Area_search (int ***S,
              int tag)
 {
     /* Declare variables */
-	int *area, i, j, k;
+	int i, j, k;
+	double *area = (double*) calloc(tag, sizeof(double));
 
     /* Set number of processes in OpenMP */
 	int ncores = omp_get_num_procs () - 1;
 	omp_set_num_threads (ncores);
 
-	/* Allocate memory to area object */
-	area = (int*) calloc (tag, sizeof (int));
-
+	/* Initialize area object */
 	for (i = 0; i < tag; i++)
-	    area[i] = 0;
+	    area[i] = 0.0000;
 
-/* Create a parallel loop, collapsing 3 loops inside 1 and schedule dynamic allocation of threads */
-#pragma omp parallel for shared (S, i, j, k, m, n, o) collapse (3) reduction (+: area[:tag])
+/* Create a parallel loop and schedule dynamic allocation of threads */
+#pragma omp parallel for shared (S, i, j, k, m, n, o, h) schedule(dynamic) reduction (+: area[:tag])
 	for (i = 0; i < m; i++)
 		for (j = 0; j < n; j++)
 			for (k = 0; k < o; k++){
 				if (S[i][j][k] > 1)
-					area[S[i][j][k] - 2]++;
+					check_faces(S, i, j, k, h, area);
 			}
 
     /* Save area in KVFinder results struct */
