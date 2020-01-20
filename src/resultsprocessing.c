@@ -92,7 +92,7 @@ write_results (char *output_results,
 
 	/* Write results file */
 	/* File header */
-	fprintf (results_file, "# TOML results file for KVFinder software\n\ntitle = \"KVFinder results file\"\n\n");
+	fprintf (results_file, "# TOML results file for parKVFinder software\n\ntitle = \"parKVFinder results file\"\n\n");
 
 	/* Files paths */
 	fprintf (results_file,
