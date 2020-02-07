@@ -593,7 +593,7 @@ argparser (int argc,
 			{"template", no_argument, NULL, 't'},
 			/* Modes */
 			{"filled", no_argument, NULL, 'K'},
-			{"surface", no_argument, NULL, 'S'},
+			{"surface", required_argument, NULL, 'S'},
 			{"box", no_argument, NULL, 'B'},
 			/* Settings */
 			{"resolution", required_argument, NULL, 'r'},
@@ -615,7 +615,7 @@ argparser (int argc,
 		/* getopt_long stores the option index here */
 		int option_index = 0;
 
-		c = getopt_long (argc, argv, "vhp:d:L:t::r:s:i:o:B", long_options, &option_index);
+		c = getopt_long (argc, argv, "vhp:d:L:t::r:s:i:o:BS:", long_options, &option_index);
 
 		if (c == -1)
 			break;
