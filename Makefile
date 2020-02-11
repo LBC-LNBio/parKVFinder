@@ -1,4 +1,4 @@
-parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c
+parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c pip
 	gcc -fopenmp -Isrc -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
@@ -36,9 +36,16 @@ move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o toml
 	if [ ! -d "lib" ]; then mkdir lib/; fi
 	mv dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o lib/
 
+pip:
+	pip install -r tools/requirements.txt
+
 link:
-	cd ${BASH_SOURCE[0]%/*}
-	sudo ln -s `pwd`/parKVFinder /usr/local/bin/parKVFinder
+	@if [ -f /usr/local/bin/parKVFinder ]; then \
+  		printf "[==> parKVFinder symbolic link already exist ...\n"; \
+	else \
+		cd ${BASH_SOURCE[0]%/*}; \
+		sudo ln -s `pwd`/parKVFinder; \
+	fi
 
 clean:
 	if [ -d "lib" ]; then rm -r lib/; fi
