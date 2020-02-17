@@ -439,7 +439,10 @@ print_options ()
 	fprintf (stdout, "\t  Define cavities volume filter.\n");
 	fprintf (stdout, "  --removal_distance\t<real>\t\t(2.4)\n");
 	fprintf (stdout, "\t  Define removal distance when comparing probes surfaces.\n");
-	fprintf (stdout, "  -t, --template\t\t\t(paramters.toml)\n");
+	fprintf (stdout, "  --filled\n");
+	fprintf (stdout, "\t  Output filled cavities. Increase memory consumption\n");
+	fprintf (stdout, "\t  for molecular visualization.\n");
+	fprintf (stdout, "  -t, --template\t\t\t(parameters.toml)\n");
 	fprintf (stdout, "\t  Create a parameter file template with defined parameters in current\n");
 	fprintf (stdout, "\t  working directory.\n");
 	fprintf (stdout, "\n");
@@ -592,7 +595,7 @@ argparser (int argc,
 			{"ligand", required_argument, NULL, 'L'},
 			{"template", no_argument, NULL, 't'},
 			/* Modes */
-			{"filled", no_argument, NULL, 'K'},
+			{"filled", no_argument, NULL, 0},
 			{"surface", required_argument, NULL, 'S'},
 			{"box", no_argument, NULL, 'B'},
 			/* Settings */
@@ -672,6 +675,10 @@ argparser (int argc,
 						exit (-1);
 					}
 				}
+				/* FILLED CAVITIES MODE (KVP MODE) */
+				if (strcmp ("filled", long_options[option_index].name) == 0)  {
+					*kvp_mode = 1;
+				}
 				break;
 
 			/* SHORT OPTIONS */
@@ -698,11 +705,6 @@ argparser (int argc,
 			case 'B':
 				*box_mode = 1;
 				*whole_protein_mode = 0;
-			    break;
-
-            /* FILLED CAVITIES MODE (KVP MODE) */
-			case 'K':
-				*kvp_mode = 1;
 			    break;
 
             /* TEMPLATE */
