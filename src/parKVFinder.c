@@ -445,6 +445,6 @@ main (int argc,
 	fflush (log_file);
 	fclose (log_file);
 
-	return ncav;
+	return 0;
 
 }

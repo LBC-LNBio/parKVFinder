@@ -2006,6 +2006,12 @@ Default: 2.4 angstroms.
 
         return True
 
+    def get_number_of_cavities(self):
+        results = toml.load('{}/KV_Files/{}/{}.KVFinder.results.toml'.format(self.output.get(),
+                                                                             self.base_name.getvalue(),
+                                                                             self.base_name.getvalue()))
+        return len(results['RESULTS']['VOLUME'].keys())
+
     def parKVFinder(self):
         """
         Run parKVFinder with parameters set in PyMOL parKVFinder Tools.
@@ -2017,8 +2023,9 @@ Default: 2.4 angstroms.
             "\nRunning parKVFinder for: {}/KV_Files/{}.KVFinder.input.pdb\n".format(self.output.get(),
                                                                                   self.base_name.getvalue()))
         start_time = time.time()
-        number_of_cavities = subprocess.call(self.execKVFinder.get().replace(' ', '\\ '),
-                                             stdout=subprocess.PIPE)
+        subprocess.call(self.execKVFinder.get().replace(' ', '\\ '),
+                        stdout=subprocess.PIPE)
+        number_of_cavities = self.get_number_of_cavities()
         sys.stdout.write("Number of cavities detected: {}!\n".format(number_of_cavities))
         elapsed_time = time.time() - start_time
         sys.stdout.write("done!\n")
