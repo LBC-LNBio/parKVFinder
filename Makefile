@@ -39,10 +39,10 @@ move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o toml
 requirements: pip pip3
 
 pip:
-	if ! command -v pip &> /dev/null; then pip install -r tools/requirements.txt; fi
+	if command -v pip &> /dev/null; then pip install -r tools/requirements.txt; fi
 
 pip3:
-	if ! command -v pip3 &> /dev/null; then pip3 install -r tools/requirements.txt; fi
+	if command -v pip3 &> /dev/null; then pip3 install -r tools/requirements.txt; fi
 
 link:
 	@if [ -f /usr/local/bin/parKVFinder ]; then \
