@@ -39,10 +39,12 @@ move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o toml
 requirements: pip pip3
 
 pip:
-	if [ ! $(command -v pip) ]; then pip install -r tools/requirements.txt; fi
+	@pip_exists=$(command -v pip)
+	if [ -f pip_exists ]; then pip install -r tools/requirements.txt; fi
 
 pip3:
-	if [ ! $(command -v pip3) ]; then pip3 install -r tools/requirements.txt; fi
+	@pip3_exists=$(command -v pip3)
+	if [ -f pip3_exists ]; then pip3 install -r tools/requirements.txt; fi
 
 link:
 	@if [ -f /usr/local/bin/parKVFinder ]; then \
