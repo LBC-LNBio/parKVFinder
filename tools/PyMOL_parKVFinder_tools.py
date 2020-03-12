@@ -734,8 +734,8 @@ parKVFinder and PyMOL parKVFinder Tools was developed by:
 - Jo{}o Victor da Silva Guerra
 - Helder Veras Filho
 - Leandro Oliveira Bortot
-- Rodrigo V Honorato
-- Felipe AN Ferraz
+- Rodrigo Vargas Honorato
+- Felipe Augusto Nunes Ferraz
 - Jos{} Geraldo de Carvalho Pereira
 - Paulo Sergio Lopes de Oliveira (paulo.oliveira@lnbio.cnpem.br)
 
