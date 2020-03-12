@@ -189,9 +189,9 @@ Otherwise, parKVFinder cannot be executed in PyMOL parKVFinder Tools.""",
         # Create Dialog label
         self.w = Label(self.dialog.interior(),
                        text=
-                       """\nparKVFinder (parallel KVFinder) software identifies and describes cavities in target \
+                       """\nparKVFinder (parallel KVFinder) software identifies and describes cavities in a target \
 biomolecular structure using a dual probe system.\n\nThe description includes spatial and constitutional \
-characterization. Spatial description includes shape, volume and area. Constitutional description includes \
+characterization. The spatial description includes shape, volume and area. The constitutional description includes \
 amino acids that form the identified cavities.\n""",
                        background='lightgray',
                        foreground='black',
@@ -731,12 +731,16 @@ In the simplest case to run parKVFinder:
 4) Click the "Run parKVFinder" button.
 
 parKVFinder and PyMOL parKVFinder Tools was developed by:
-- <author 1> (<e-mail 1>)
-- <author 2> (<e-mail 2>)
-- [...]
-- <author N> (<e-mail N>)
+- Jo{}o Victor da Silva Guerra
+- Helder Veras Filho
+- Leandro Oliveira Bortot
+- Rodrigo V Honorato
+- Felipe AN Ferraz
+- Jos{} Geraldo de Carvalho Pereira
+- Paulo Sergio Lopes de Oliveira (paulo.oliveira@lnbio.cnpem.br)
 
-<Address>
+Brazilian Center for Research in Energy and Materials - CNPEM
+Brazilian Biosciences National Laboratory - LNBio
 
 Please refer and cite the original paper if you use it in a publication.
 
@@ -745,7 +749,8 @@ Citation:
 
 Citation for PyMOL may be found here:
     http://pymol.sourceforge.net/faq.html#CITE
-"""
+""".format(chr(0x00e3),
+           chr(0x00e9))
         # Insert text
         text_holder.insert(END, text)
         text_holder.pack(side=LEFT, expand=1, fill=BOTH)
