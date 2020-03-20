@@ -38,13 +38,22 @@ move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o toml
 
 requirements: pip pip3
 
-pip:
-	@pip_exists=$(command -v pip)
-	if [ -f pip_exists ]; then pip install -r tools/requirements.txt; fi
+PIP := $(shell command -v pip 2> /dev/null)
+PIP3 := $(shell command -v pip3 2> /dev/null)
 
-pip3:
-	@pip3_exists=$(command -v pip3)
-	if [ -f pip3_exists ]; then pip3 install -r tools/requirements.txt; fi
+pip:
+ifndef PIP
+	printf "\n> python-pip is not available. To use PyMOL v1, please install python-pip\n\n"
+else
+	pip install -r tools/requirements.txt
+endif	
+
+pip3:	
+ifndef PIP3
+	@printf "\n> python3-pip is not available. To use PyMOL v2, please install python3-pip\n\n"
+else
+	pip3 install -r tools/requirements.txt
+endif
 
 link:
 	@if [ -f /usr/local/bin/parKVFinder ]; then \
