@@ -43,14 +43,14 @@ PIP3 := $(shell command -v pip3 2> /dev/null)
 
 pip:
 ifndef PIP
-	printf "\n> python-pip is not available. To use PyMOL v1, please install python-pip\n\n"
+	printf "\n> python-pip is not available. To use parKVFinder with PyMOL v1, please install python-pip\n\n"
 else
 	pip install -r tools/requirements.txt
 endif	
 
 pip3:	
 ifndef PIP3
-	@printf "\n> python3-pip is not available. To use PyMOL v2, please install python3-pip\n\n"
+	@printf "\n> python3-pip is not available. To use parKVFinder with PyMOL v2, please install python3-pip\n\n"
 else
 	pip3 install -r tools/requirements.txt
 endif
