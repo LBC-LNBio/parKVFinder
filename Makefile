@@ -46,9 +46,9 @@ ifndef PIP
 	printf "\n> python-pip is not available. To use parKVFinder with PyMOL v1, please install python-pip and run make pip\n\n"
 else
 	pip install -r tools/requirements.txt
-endif	
+endif
 
-pip3:	
+pip3:
 ifndef PIP3
 	@printf "\n> python3-pip is not available. To use parKVFinder with PyMOL v2, please install python3-pip and run make pip3\n\n"
 else
@@ -59,8 +59,7 @@ link:
 	@if [ -f /usr/local/bin/parKVFinder ]; then \
   		printf "[==> parKVFinder symbolic link already exist ...\n"; \
 	else \
-		cd ${BASH_SOURCE[0]%/*}; \
-		sudo ln -s `pwd`/parKVFinder; \
+		sudo ln -s `pwd`/parKVFinder /usr/local/bin/parKVFinder; \
 	fi
 
 clean:
