@@ -46,25 +46,31 @@ insert_res (int resnum,
 		res_info->chain = chain;
 		res_info->resname = resname;
 
-		/* Special case II: Insertion in the head end */
-		if (KVFinder_results[kvnum].res_info->resnum >= resnum) {
+		// if (KVFinder_results[kvnum].res_info->chain == chain){
 
-			/* Pass generic structure to linked list */
-			res_info->next = KVFinder_results[kvnum].res_info;
-			KVFinder_results[kvnum].res_info = res_info;
+		// 	/* Locate node before the point of insertion */
+		// 	while (KVFinder_results[kvnum].res_info->next != NULL && KVFinder_results[kvnum].res_info->resnum < resnum)
+		// 		KVFinder_results[kvnum].res_info = KVFinder_results[kvnum].res_info->next;
 
-		}
-		else {
+		// 	/* Pass generic structure to linked list */
+		// 	res_info->next = KVFinder_results[kvnum].res_info->next;
+		// 	KVFinder_results[kvnum].res_info->next = res_info;
 
-			/* Locate node before the point of insertion */
-			while (KVFinder_results[kvnum].res_info->next != NULL && KVFinder_results[kvnum].res_info->resnum < resnum)
-				KVFinder_results[kvnum].res_info = KVFinder_results[kvnum].res_info->next;
+		// }
+		// else {
+
+		// 	while (KVFinder_results[kvnum].res_info->chain < chain) {
+		// 		KVFinder_results[kvnum].res_info = KVFinder_results[kvnum].res_info->next;
+		// 	}
+		// 	while (KVFinder_results[kvnum].res_info->resnum < resnum) {
+		// 		KVFinder_results[kvnum].res_info = KVFinder_results[kvnum].res_info->next;
+		// 	}
 
 			/* Pass generic structure to linked list */
 			res_info->next = KVFinder_results[kvnum].res_info->next;
 			KVFinder_results[kvnum].res_info->next = res_info;
-
-		}
+				
+		// }
 	}
 }
 

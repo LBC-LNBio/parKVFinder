@@ -289,7 +289,7 @@ Matrix_search (int ***A,
 						if (i < m-1 && i > 0 && j < n-1 && j > 0 && k < o-1 && k > 0) {
 
                             /* If point contain tag number, do ... */
-							if (A[i][j][k] == cont) {
+							if (abs(A[i][j][k]) == cont) {
 								dist = sqrt (pow ((x1 - i), 2) + pow ((y1 - j), 2) + pow ((z1 - k), 2));
 								if (dist <= H) {
 									/*Residue number range from 1 to 9999 in a PDB file*/
