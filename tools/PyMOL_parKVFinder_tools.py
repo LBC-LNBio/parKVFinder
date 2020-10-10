@@ -744,11 +744,13 @@ Brazilian Biosciences National Laboratory - LNBio
 Please refer and cite the original paper if you use it in a publication.
 
 Citation:
-    <paper>
+    Jo{}o Victor da Silva Guerra, Helder Veras Ribeiro Filho, Leandro Oliveira Bortot, Rodrigo Vargas Honorato, Jos{} Geraldo de Carvalho Pereira, Paulo Sergio Lopes de Oliveira, ParKVFinder: A thread-level parallel approach in biomolecular cavity detection, SoftwareX, 2020, https://doi.org/10.1016/j.softx.2020.100606
 
 Citation for PyMOL may be found here:
     http://pymol.sourceforge.net/faq.html#CITE
 """.format(chr(0x00e3),
+           chr(0x00e9),
+           chr(0x00e3),
            chr(0x00e9))
         # Insert text
         text_holder.insert(END, text)
