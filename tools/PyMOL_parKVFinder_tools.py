@@ -732,7 +732,7 @@ In the simplest case to run parKVFinder:
 
 parKVFinder and PyMOL parKVFinder Tools was developed by:
 - Jo{}o Victor da Silva Guerra
-- Helder Veras Filho
+- Helder Veras Ribeiro Filho
 - Leandro Oliveira Bortot
 - Rodrigo Vargas Honorato
 - Jos{} Geraldo de Carvalho Pereira
