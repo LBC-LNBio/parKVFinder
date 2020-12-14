@@ -1,5 +1,5 @@
 parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c requirements
-	gcc -fopenmp -Isrc -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm
+	gcc -fopenmp -Isrc -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm -fcommon
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
 		if [ -f ${HOME}/.bashrc ]; then \
@@ -15,22 +15,22 @@ parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser
 	fi
 
 matrixprocessing.o: src/matrixprocessing.c src/matrixprocessing.h
-	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -static
+	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -fcommon
 
 dictionaryprocessing.o: src/dictionaryprocessing.c src/dictionaryprocessing.h
-	gcc -Isrc -c src/dictionaryprocessing.c
+	gcc -Isrc -c src/dictionaryprocessing.c -fcommon
 
 pdbprocessing.o: src/pdbprocessing.c src/pdbprocessing.h
-	gcc -Isrc -c src/pdbprocessing.c
+	gcc -Isrc -c src/pdbprocessing.c -fcommon
 
 argparser.o: src/argparser.c src/argparser.h
-	gcc -Isrc -c src/argparser.c
+	gcc -Isrc -c src/argparser.c -fcommon
 
 tomlprocessing.o: src/tomlprocessing.c src/tomlprocessing.h
-	gcc -Isrc -c src/tomlprocessing.c
+	gcc -Isrc -c src/tomlprocessing.c -fcommon
 
 resultsprocessing.o: src/resultsprocessing.c src/resultsprocessing.h
-	gcc -Isrc -c src/resultsprocessing.c
+	gcc -Isrc -c src/resultsprocessing.c -fcommon
 
 move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
