@@ -925,7 +925,7 @@ Area_search (int ***S,
 
     /* Save area in KVFinder results struct */
 	for (i = 0; i < tag; i++)
-	    KVFinder_results[i].area = area[i] * h * h;
+	    KVFinder_results[i].area = area[i];
 
 	 /* Free area object from memory */
 	 free(area);
