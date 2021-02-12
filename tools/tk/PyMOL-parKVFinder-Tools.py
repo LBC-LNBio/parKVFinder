@@ -57,8 +57,8 @@ except ImportError:
 def __init_plugin__(self):
     self.menuBar.addmenuitem('Plugin',
                              'command',
-                             'PyMOL parKVFinder Tools v1.0',
-                             label='PyMOL parKVFinder Tools v1.0',
+                             'PyMOL parKVFinder Tools',
+                             label='PyMOL parKVFinder Tools',
                              command=lambda s=self: PyMOL_parKVFinder_Tools(s))
 
 
@@ -181,7 +181,7 @@ Otherwise, parKVFinder cannot be executed in PyMOL parKVFinder Tools.""",
                                           'Restore Default Values',
                                           'Exit'),
                                  defaultbutton='Run parKVFinder',
-                                 title='PyMOL parKVFinder Tools v1.0',
+                                 title='PyMOL parKVFinder Tools',
                                  command=self.execute)
         self.dialog.withdraw()
         Pmw.setbusycursorattributes(self.dialog.component('hull'))
