@@ -10,6 +10,8 @@ built to help you get started with our cavity detection software.
 4. [Manual](https://github.com/LBC-LNBio/parKVFinder/wiki/parKVFinder-Manual)
 5. [About](https://github.com/LBC-LNBio/parKVFinder/wiki/About)
 
+If you are planning on using parKVFinder on Windows, refer to this parKVFinder-win [repository](https://github.com/LBC-LNBio/parKVFinder-win).
+
 Please read and cite the original paper **[ParKVFinder: A thread-level parallel approach in biomolecular cavity detection](https://doi.org/10.1016/j.softx.2020.100606)** (10.1016/j.softx.2020.100606).
 
 ---
