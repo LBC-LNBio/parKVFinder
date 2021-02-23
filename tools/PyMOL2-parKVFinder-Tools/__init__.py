@@ -289,11 +289,14 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 self.tabs.setCurrentIndex(2)
                 self.load_results()
             elif ncavs == 0:
+                from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.warning(self, "Warning!", "No cavities found!")
             else:
+                from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.critical(self, "Error!", "An error occurred during cavity detection!")
                 return False
         else:
+            from PyQt5.QtWidgets import QMessageBox
             QMessageBox.critical(self, "Error", "An error occurred while creating the parameters file! Check the parKVFinder parameters!")
             return False
 
@@ -314,7 +317,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         :return: Call draw_grid function with minimum and maximum coordinates or return Error.
         """
         from pymol import cmd
-        from PyQt5 import QtWidgets
 
         global x, y, z
 
@@ -343,7 +345,8 @@ class PyMOL2parKVFinderTools(QMainWindow):
             # Draw Grid
             self.draw_grid(min_x, max_x, min_y, max_y, min_z, max_z)
         else:
-            QtWidgets.QMessageBox.critical(self, "Error", "Select an input PDB!")
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(self, "Error", "Select an input PDB!")
             return
 
 
