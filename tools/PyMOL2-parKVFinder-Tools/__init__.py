@@ -181,7 +181,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.button_browse.clicked.connect(self.select_directory)
         self.button_browse2.clicked.connect(lambda: self.select_file("Choose parKVFinder executable", self.parKVFinder, "*"))
         self.button_browse3.clicked.connect(lambda: self.select_file("Choose van der Waals radii dictionary", self.dictionary, "*"))
-        self.button_browse4.clicked.connect(lambda: self.select_file("Choose KVFinder Results File", self.results_file_entry, "KVFinder Results File (*.KVFinder.results.toml)"))
+        self.button_browse4.clicked.connect(lambda: self.select_file("Choose KVFinder Results File", self.results_file_entry, "KVFinder Results File (*.toml);;All files (*)"))
 
         # hook up Refresh buttons callback
         self.refresh_input.clicked.connect(lambda: self.refresh(self.input))
@@ -1138,7 +1138,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         results_file = self.results_file_entry.text()
 
         # Check if results file exist
-        if os.path.exists(results_file) and results_file.endswith('KVFinder.results.toml'):
+        if os.path.exists(results_file) and results_file.endswith('.toml'):
             print(f"> Loading results from: {self.results_file_entry.text()}")
         else:
             from PyQt5.QtWidgets import QMessageBox
@@ -1150,6 +1150,19 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Read results (Ubuntu/macOS)
         results = toml.load(results_file)
+
+        if 'FILES' in results.keys():
+            results['FILES_PATH'] = results.pop('FILES')
+        elif 'FILES_PATH' in results.keys():
+            pass
+        else:
+            from PyQt5.QtWidgets import QMessageBox
+            error_msg = QMessageBox.critical(self, "Error", "Results file has incorrect format! Please check your file.")
+            return False
+
+        if 'PARAMETERS' in results.keys():
+            if 'STEP' in results['PARAMETERS'].keys():
+                results['PARAMETERS']['STEP_SIZE'] = results['PARAMETERS'].pop('STEP')
 
         # Clean results
         self.clean_results()
@@ -1242,7 +1255,9 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.cavities_file_entry.setText(f"{results['FILES_PATH']['OUTPUT']}")
 
         # Step Size
-        self.step_size_entry.setText(f"{results['PARAMETERS']['STEP_SIZE']:.2f}")
+        if 'PARAMETERS' in results.keys():
+            if 'STEP_SIZE' in results['PARAMETERS'].keys():
+                self.step_size_entry.setText(f"{results['PARAMETERS']['STEP_SIZE']:.2f}")
 
         return
 
@@ -1282,6 +1297,11 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Get selected cavities from residues list
         cavs = [item.text() for item in self.residues_list.selectedItems()]
 
+        # Clean objects
+        cmd.set("auto_zoom", 0)
+        cmd.delete("res")
+        cmd.delete("residues")
+
         # Return if no cavity is selected
         if len(cavs) < 1:
             return
@@ -1292,11 +1312,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
             for residue in results['RESULTS']['RESIDUES'][cav]:
                 if residue not in residues:
                     residues.append(residue)
-
-        # Clean objects
-        cmd.set("auto_zoom", 0)
-        cmd.delete("res")
-        cmd.delete("residues")
 
         # Check if input pdb is loaded
         control = 0
@@ -1338,14 +1353,14 @@ class PyMOL2parKVFinderTools(QMainWindow):
             else:
                 list2.item(index).setSelected(False)
 
-        # Return if no cavity is selected
-        if len(cavs) < 1:
-            return
-
         # Clean objects
         cmd.set("auto_zoom", 0)
         cmd.delete("cavs")
         cmd.delete("cavities")
+
+        # Return if no cavity is selected
+        if len(cavs) < 1:
+            return
 
         # Check if cavity file is loaded
         control = 0
@@ -1369,7 +1384,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         cmd.show("nonbonded", "cavities")
 
         # Color surface cavity points as red nb_spheres
-        cmd.select("cavs", "cavities and name HS")
+        cmd.select("cavs", "cavities and name HS+HA")
         cmd.color("red", "cavs")
         cmd.show("nb_spheres", "cavs")
         cmd.delete("cavs")
