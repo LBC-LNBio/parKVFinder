@@ -1238,7 +1238,7 @@ The description includes spatial and constitutional characterization. The spatia
            <item row="6" column="0">
             <layout class="QHBoxLayout" name="hframe12">
              <item>
-              <widget class="QLabel" name="max_y_label">
+              <widget class="QLabel" name="min_y_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum Y (Å):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -1251,7 +1251,7 @@ The description includes spatial and constitutional characterization. The spatia
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="max_y">
+              <widget class="QDoubleSpinBox" name="min_y">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -1590,7 +1590,7 @@ The description includes spatial and constitutional characterization. The spatia
            <item row="7" column="0">
             <layout class="QHBoxLayout" name="hframe11">
              <item>
-              <widget class="QLabel" name="min_y_label">
+              <widget class="QLabel" name="max_y_label">
                <property name="text">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum Y (Å):&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
@@ -1603,7 +1603,7 @@ The description includes spatial and constitutional characterization. The spatia
               </widget>
              </item>
              <item>
-              <widget class="QDoubleSpinBox" name="min_y">
+              <widget class="QDoubleSpinBox" name="max_y">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -2225,8 +2225,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>padding</tabstop>
   <tabstop>min_x</tabstop>
   <tabstop>max_x</tabstop>
-  <tabstop>max_y</tabstop>
   <tabstop>min_y</tabstop>
+  <tabstop>max_y</tabstop>
   <tabstop>min_z</tabstop>
   <tabstop>max_z</tabstop>
   <tabstop>angle1</tabstop>
