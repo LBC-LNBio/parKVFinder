@@ -349,7 +349,7 @@ check_input (char *optarg,
 void
 print_version ()
 {
-	printf ("parKVFinder (parallel KVFinder) v1.0\n");
+	printf ("parKVFinder (parallel KVFinder) v1.1.3\n");
 }
 
 void
