@@ -478,7 +478,7 @@ int main(int argc, char **argv) {
     /* Computing Depth */
     if (verbose_flag)
       fprintf(stdout, "> Calculating depth\n");
-    // Matrix_search(A, S, m, n, o, h, probe_in, X1, Y1, Z1, ncav);
+    Depth_search(A, M, m, n, o, h, ncav);
 
     /*Free data structures used for depth calculation*/
     free(kvcoords);
