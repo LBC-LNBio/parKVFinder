@@ -900,3 +900,64 @@ void free_node() {
     free(p);
   }
 }
+
+/* Development section */
+// TODO: integrate pull requests from pyKVFinder in code
+void Depth_search(int ***A, double ***M, int m, int n, int o, double h, int ncav){
+  int i, j, k, i2, j2, k2, count, tag;
+  double distance, tmp;
+
+
+  // Set number of threads in OpenMP
+	int ncores = omp_get_num_procs();
+	omp_set_num_threads(ncores);
+  omp_set_nested(1);
+
+#pragma omp parallel default (none), \
+    shared(A, M, m, n, o, h, ncav, kvcoords, frontiercoords, KVFinder_results), \
+    private(tmp, tag, i, j, k, i2, j2, k2, distance, count)
+  {
+#pragma omp for schedule(dynamic)
+    for (tag = 0; tag < ncav; tag++) {
+      KVFinder_results[tag].max_depth = 0.0;
+      KVFinder_results[tag].avg_depth = 0.0;
+      count = 0;
+
+      for(i = kvcoords[tag].Xmin; i <= kvcoords[tag].Xmax; i++)
+        for(j = kvcoords[tag].Ymin; j <= kvcoords[tag].Ymax; j++)
+          for(k = kvcoords[tag].Zmin; k <= kvcoords[tag].Zmax; k++)
+            if(abs(A[i][j][k]) == (tag+2)) {
+              tmp = sqrt(pow(m, 2) + pow(n, 2) + pow(o, 2)) * h;
+              count++;
+
+              if (frontiercoords[tag].Xmin == m && frontiercoords[tag].Ymin == n &&
+                  frontiercoords[tag].Zmin == o && frontiercoords[tag].Xmax == 0.0 &&
+                  frontiercoords[tag].Ymax == 0.0 && frontiercoords[tag].Zmax == 0.0) {
+                // Cavity without boundary (void)
+                tmp = 0.0;
+              } else {
+                for(i2 = frontiercoords[tag].Xmin; i2 <= frontiercoords[tag].Xmax; i2++)
+								  for(j2 = frontiercoords[tag].Ymin; j2 <= frontiercoords[tag].Ymax; j2++)
+									  for(k2 = frontiercoords[tag].Zmin; k2 <= frontiercoords[tag].Zmax; k2++)
+											if(A[i2][j2][k2] == -(tag+2)) {
+                        distance = sqrt(pow(i2 - i, 2) + pow(j2 - j, 2) + pow(k2 - k, 2)) * h;
+                        if (distance < tmp)
+                          tmp = distance;
+                      }
+              }
+
+              // Save depth for cavity point
+              M[i][j][k] = tmp;
+
+              // Save maximum depth for cavity tag
+              if (tmp > KVFinder_results[tag].max_depth)
+                KVFinder_results[tag].max_depth = tmp;
+              
+              // Add cavity point depth to average depth for cavity tag
+              KVFinder_results[tag].avg_depth += tmp;
+            }
+      // Divide sum of depths by number of cavity points for cavity tag
+      KVFinder_results[tag].avg_depth /= count;
+    }
+  }
+}

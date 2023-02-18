@@ -4,6 +4,15 @@ dictionaries, fundamental data to the software*/
 #ifndef RESULTSPROCESSING_H
 #define RESULTSPROCESSING_H
 
+typedef struct COORDINATES{
+	double Xmin;
+	double Xmax;
+	double Ymin;
+	double Ymax;
+	double Zmin;
+	double Zmax;
+} coords;
+
 typedef struct RESIDUES_INFORMATION {
   int resnum;
   char resname;
@@ -12,9 +21,11 @@ typedef struct RESIDUES_INFORMATION {
 } residues_info;
 
 typedef struct KVFINDER_RESULTS {
-  /* Spatial properties */
+  /* Geometric properties */
   double volume;
   double area;
+  double max_depth;
+  double avg_depth;
   /* Residues */
   residues_info *res_info;
 } KVresults;
@@ -22,6 +33,8 @@ typedef struct KVFINDER_RESULTS {
 /* Declare structs */
 residues_info *t;
 KVresults *KVFinder_results;
+coords* kvcoords;
+coords* frontiercoords;
 
 /* Define custom functions */
 void insert_res(int resnum, char chain, char resname, int kvnum);

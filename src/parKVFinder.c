@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
   FILE *parameters_file, *log_file;
   atom *p;
   int ***A, ***S;
+  double ***M;
 
   if (argc == 1) {
     /* Check if parameters.toml exists */
@@ -245,34 +246,11 @@ int main(int argc, char **argv) {
   else if (box_mode) {
   };
 
-  /* Resizing step: increases the grid step size until the number of points on
-   * the grid be smaller than Vvoxel */
+  /* Predefined resolution:
+  - Low: h = 0.6A
+  - Medium: h = 0.5A
+  - High h = 0.25A */
   if (resolution_mode) {
-    /* Defines the grid inside the search space | Point 1 is the reference of
-     * our grid */
-    /* Calculate distances between points in box and reference */
-    norm1 = sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1) +
-                 (Z2 - Z1) * (Z2 - Z1));
-    norm2 = sqrt((X3 - X1) * (X3 - X1) + (Y3 - Y1) * (Y3 - Y1) +
-                 (Z3 - Z1) * (Z3 - Z1));
-    norm3 = sqrt((X4 - X1) * (X4 - X1) + (Y4 - Y1) * (Y4 - Y1) +
-                 (Z4 - Z1) * (Z4 - Z1));
-
-    /*Grid steps based on distances*/
-    m = (int)(norm1 / h); /* X axis */
-    n = (int)(norm2 / h); /* Y axis */
-    o = (int)(norm3 / h); /* Z axis */
-
-    /* While volume of unitary box is less than Vlim, increment h and
-     * recalculate box sizes */
-    while ((norm1 / m) * (norm2 / n) * (norm3 / o) < Vvoxel) {
-      h += 0.05;
-      m = (int)(norm1 / h);
-      n = (int)(norm2 / h);
-      o = (int)(norm3 / h);
-      fprintf(log_file,
-              "Step size too small! Resizing... New step size = %.2lf\n", h);
-    }
     fprintf(log_file, "Chosen step size = %.2lf\n", h);
   }
   /* Convert step size to string */
@@ -280,50 +258,13 @@ int main(int argc, char **argv) {
 
   if (whole_protein_mode) {
 
-    /*Transforms coordinates to step size multiples*/
-    X1 =
-        roundf((X1 + fabs((double)((int)(X1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    Y1 =
-        roundf((Y1 + fabs((double)((int)(Y1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    Z1 =
-        roundf((Z1 + fabs((double)((int)(Z1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    X2 =
-        roundf((X2 - fabs((double)((int)(X2 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-    Y3 =
-        roundf((Y3 - fabs((double)((int)(Y3 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-    Z4 =
-        roundf((Z4 - fabs((double)((int)(Z4 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-
-    /* Increase box for probe_out in step size multiple value */
-    multiple =
-        roundf((probe_out -
-                ((double)((int)(probe_out * 1000) % (int)(h * 1000)) / 1000)) *
-               1000) /
-        1000;
-    X1 -= (multiple);
-    Y1 -= (multiple);
-    Z1 -= (multiple);
-    X2 += (multiple);
-    Y3 += (multiple);
-    Z4 += (multiple);
+    /* Prepare vertices */
+    X1 = X1 - probe_out - h;
+    Y1 = Y1 - probe_out - h;
+    Z1 = Z1 - probe_out - h;
+    X2 = X2 + probe_out + h;
+    Y3 = Y3 + probe_out + h;
+    Z4 = Z4 + probe_out + h;
     X3 = X1;
     X4 = X1;
     Y2 = Y1;
@@ -343,15 +284,30 @@ int main(int argc, char **argv) {
                (Z4 - Z1) * (Z4 - Z1));
 
   /* Grid steps based on distances */
-  m = (int)(norm1 / h) + 1; /*X axis*/
-  n = (int)(norm2 / h) + 1; /*Y axis*/
-  o = (int)(norm3 / h) + 1; /*Z axis*/
+  /*X axis*/
+  if (fmod(norm1,h) != 0) {
+    m = (int)(norm1 / h) + 1;
+  } else {
+    m = (int)(norm1 / h);
+  }
+  /*Y axis*/
+  if (fmod(norm2,h) != 0) {
+    n = (int)(norm2 / h) + 1;
+  } else {
+    n = (int)(norm2 / h);
+  }
+  /*Z axis*/
+  if (fmod(norm3,h) != 0) {
+    o = (int)(norm3 / h) + 1;
+  } else {
+    o = (int)(norm3 / h);
+  }
 
   /* Calculate data used on the spatial manipulation of the protein */
   sina = (Y4 - Y1) / norm3;
   cosa = (Y3 - Y1) / norm2;
-  cosb = (X2 - X1) / norm1;
   sinb = (Z2 - Z1) / norm1;
+  cosb = (X2 - X1) / norm1;
 
   /* Calculate Voxel volume */
   Vvoxel = h * h * h;
@@ -383,15 +339,19 @@ int main(int argc, char **argv) {
     cavity point */
     A = (int ***)calloc(m, sizeof(int **));
     S = (int ***)calloc(m, sizeof(int **));
+    M = (double ***)calloc(m, sizeof(double **));
     for (i = 0; i < m; i++) {
       A[i] = (int **)calloc(n, sizeof(int *));
       S[i] = (int **)calloc(n, sizeof(int *));
+      M[i] = (double **)calloc(n, sizeof(double *));
       for (j = 0; j < n; j++) {
         A[i][j] = (int *)calloc(o, sizeof(int));
         S[i][j] = (int *)calloc(o, sizeof(int));
+        M[i][j] = (double *)calloc(o, sizeof(double));
         for (k = 0; k < o; k++) {
           A[i][j][k] = 1;
           S[i][j][k] = 1;
+          M[i][j][k] = 0.0;
         }
       }
     }
@@ -448,7 +408,7 @@ int main(int argc, char **argv) {
     /* Computing Volume and Grouping Cavities */
     if (verbose_flag)
       fprintf(stdout, "> Calculating volume\n");
-
+    
     /*Remove outlier points*/
     filter_outliers(A, m, n, o);
 
@@ -478,6 +438,22 @@ int main(int argc, char **argv) {
     free(p);
     free(V);
 
+    /*Create coordinates for center of mass and depth*/
+    /*Create max-min cavities and frontier coordinates struct*/
+    kvcoords = (coords*) calloc(ncav, sizeof(coords));
+    frontiercoords = (coords*) calloc(ncav, sizeof(coords));
+    for(int iterator = 0; iterator < ncav; iterator++){
+      /*Start min and max cavities coordinates*/
+      kvcoords[iterator].Xmin = m; kvcoords[iterator].Xmax = 0;
+      kvcoords[iterator].Ymin = n; kvcoords[iterator].Ymax = 0;
+      kvcoords[iterator].Zmin = o; kvcoords[iterator].Zmax = 0;
+
+      /*Start min and max frontier coordinates*/
+      frontiercoords[iterator].Xmin = m; frontiercoords[iterator].Xmax = 0;
+      frontiercoords[iterator].Ymin = n; frontiercoords[iterator].Ymax = 0;
+      frontiercoords[iterator].Zmin = o; frontiercoords[iterator].Zmax = 0;
+    }
+
     /* Define surface points of each cavity */
     if (verbose_flag)
       fprintf(stdout, "> Calculating surface points\n");
@@ -498,6 +474,15 @@ int main(int argc, char **argv) {
   /* Free PDB linked list (dictionary) from memory */
   NOCAV:
     free_atom();
+
+    /* Computing Depth */
+    if (verbose_flag)
+      fprintf(stdout, "> Calculating depth\n");
+    // Matrix_search(A, S, m, n, o, h, probe_in, X1, Y1, Z1, ncav);
+
+    /*Free data structures used for depth calculation*/
+    free(kvcoords);
+    free(frontiercoords);
 
     /* Turn ON(1) filled cavities option */
     if (verbose_flag)

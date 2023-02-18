@@ -47,6 +47,7 @@ void remove_cavity(int ***A, int m, int n, int o, int tag);
 void filter_outliers(int ***A, int m, int n, int o);
 void check_faces(int ***S, int i, int j, int k, double h, double *area);
 void Area_search(int ***S, int m, int n, int o, double h, int tag);
+void Depth_search(int ***A, double ***M, int m, int n, int o, double h, int ncav);
 void free_matrix(int ***A, int m, int n, int o);
 void free_node();
 

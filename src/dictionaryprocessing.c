@@ -271,18 +271,18 @@ void resolution_input(char flag_in[7], double *Vvoxel, int *resolution_mode,
   switch (flag_in[0]) {
 
   case 'L':
-    *Vvoxel = 0.2;
-    *h = 0.1;
+    *h = 0.6;
+    *Vvoxel = 0.216;
     break;
 
   case 'M':
-    *Vvoxel = 0.1;
-    *h = 0.1;
+    *Vvoxel = 0.125;
+    *h = 0.5;
     break;
 
   case 'H':
-    *Vvoxel = 0.01;
-    *h = 0.1;
+    *Vvoxel = 0.015625;
+    *h = 0.25;
     break;
 
   default:
