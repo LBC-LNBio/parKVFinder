@@ -27,7 +27,7 @@ int DFS_search(int ***A, int m, int n, int o, double h, double filter);
 char *combine(const char *s1, const char *s2);
 void Matrix_fill(int ***A, int m, int n, int o, double h, double probe,
                  double X1, double Y1, double Z1);
-void Matrix_export(int ***A, int ***S, int kvp_mode, int m, int n, int o,
+void Matrix_export(int ***A, int ***S, double ***M, int kvp_mode, int m, int n, int o,
                    double h, int ncav, char *output_base_name, char *output_pdb,
                    double X1, double Y1, double Z1);
 void Matrix_surf(int ***A, int m, int n, int o, double h, double radius);
@@ -47,8 +47,12 @@ void remove_cavity(int ***A, int m, int n, int o, int tag);
 void filter_outliers(int ***A, int m, int n, int o);
 void check_faces(int ***S, int i, int j, int k, double h, double *area);
 void Area_search(int ***S, int m, int n, int o, double h, int tag);
-void Depth_search(int ***A, double ***M, int m, int n, int o, double h, int ncav);
 void free_matrix(int ***A, int m, int n, int o);
 void free_node();
+int define_boundary_points(int ***A, int m, int n, int o, int i, int j, int k);
+void filter_boundary(int ***A, int m, int n, int o);
+void Depth_search(int ***A, double ***M, int m, int n, int o, double h, int ncav);
+void remove_boundary(int ***A, int m, int n, int o, int ncav);
+void free_matrix2(double ***M, int m, int n, int o);
 
 #endif

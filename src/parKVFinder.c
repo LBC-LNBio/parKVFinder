@@ -478,7 +478,9 @@ int main(int argc, char **argv) {
     /* Computing Depth */
     if (verbose_flag)
       fprintf(stdout, "> Calculating depth\n");
+    filter_boundary(A, m, n, o);
     Depth_search(A, M, m, n, o, h, ncav);
+    remove_boundary(A, m, n, o, ncav);
 
     /*Free data structures used for depth calculation*/
     free(kvcoords);
@@ -488,13 +490,14 @@ int main(int argc, char **argv) {
     if (verbose_flag)
       fprintf(stdout, "> Writing cavities PDB file\n");
     /* Export Cavities PDB */
-    Matrix_export(A, S, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1, Y1,
+    Matrix_export(A, S, M, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1, Y1,
                   Z1);
   }
 
   /* Clean 3D-grids from memory */
   free_matrix(A, m, n, o); /*Free int A grid from memory*/
   free_matrix(S, m, n, o); /*Free int S grid from memory*/
+  free_matrix2(M, m, n, o); /*Free double M grid from memory*/
 
   /* Write results file */
   if (verbose_flag)

@@ -81,7 +81,7 @@ void write_results(char *output_results, char *pdb_name, char *output_pdb,
             resolution_flag, step_flag);
 
     /* Results header */
-    fprintf(results_file, "[RESULTS]\n# Volume, area and interface residues "
+    fprintf(results_file, "[RESULTS]\n# Volume, area, depth and interface residues "
                           "information for each cavity\n");
 
     /* Volume */
@@ -100,6 +100,23 @@ void write_results(char *output_results, char *pdb_name, char *output_pdb,
 
       fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
               65 + ((kvnum) % 26), KVFinder_results[kvnum].area);
+    }
+
+    /* Maximum Depth */
+    fprintf(results_file,
+            "\n\t[RESULTS.MAX_DEPTH]\n\t# Maximum depth unit is angstrom\n");
+    for (kvnum = 0; kvnum < ncav; kvnum++) {
+
+      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+              65 + ((kvnum) % 26), KVFinder_results[kvnum].max_depth);
+    }
+
+    /* Average Depth */
+    fprintf(results_file,
+            "\n\t[RESULTS.AVG_DEPTH]\n\t# Average depth unit is angstrom\n");
+    for (kvnum = 0; kvnum < ncav; kvnum++) {
+      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+              65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_depth);
     }
 
     /* Interface Residues */

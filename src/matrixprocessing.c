@@ -340,8 +340,8 @@ void Matrix_surface(int ***A, int ***S, int m, int n, int o, double h,
           /* Apply filters */
           /* Mark surface points */
           S[i][j][k] = check_pos4(A, i, j, k, m, n, o);
-          /* Mark frontier points between cavity and medium */
-          A[i][j][k] = contact_protein_kv(A, i, j, k, m, n, o);
+          // /* Mark frontier points between cavity and medium */
+          // A[i][j][k] = contact_protein_kv(A, i, j, k, m, n, o);
 
         } else {
 
@@ -485,7 +485,7 @@ void Matrix_filter(int ***A, int ***S, int m, int n, int o, double h,
 }
 
 /* Export the cavity points to PDB file */
-void Matrix_export(int ***A, int ***S, int kvp_mode, int m, int n, int o,
+void Matrix_export(int ***A, int ***S, double ***M, int kvp_mode, int m, int n, int o,
                    double h, int ncav, char *output_base_name, char *output_pdb,
                    double X1, double Y1, double Z1) {
   /* Declare variables */
@@ -528,7 +528,7 @@ void Matrix_export(int ***A, int ***S, int kvp_mode, int m, int n, int o,
                       "ATOM  %5.d  HS  K%c%c   259    %8.3lf%8.3lf%8.3lf  "
                       "1.00%6.2lf\n",
                       count, 65 + (((S[i][j][k] - 2) / 26) % 26),
-                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux, 0.0);
+                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux, M[i][j][k]);
 
             } else {
               if (kvp_mode)
@@ -537,14 +537,14 @@ void Matrix_export(int ***A, int ***S, int kvp_mode, int m, int n, int o,
                         "1.00%6.2lf\n",
                         count, 65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        0.0);
+                        M[i][j][k]);
               else if (check_pos2(A, i, j, k, m, n, o) != 0)
                 fprintf(output,
                         "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf  "
                         "1.00%6.2lf\n",
                         count, 65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        0.0);
+                        M[i][j][k]);
             }
             count++;
 
@@ -889,6 +889,21 @@ void free_matrix(int ***A, int m, int n, int o) {
   free(A);
 }
 
+/* Free int*** matrix from memory */
+void free_matrix2(double ***M, int m, int n, int o) {
+  /* Declare variables */
+  int i, j;
+
+  for (i = 0; i < m; i++) {
+
+    for (j = 0; j < n; j++)
+      free(M[i][j]);
+    free(M[i]);
+  }
+
+  free(M);
+}
+
 /* Free node (volume and tag linked list) from memory */
 void free_node() {
   /* Declare variables */
@@ -903,6 +918,95 @@ void free_node() {
 
 /* Development section */
 // TODO: integrate pull requests from pyKVFinder in code
+int define_boundary_points(int ***A, int m, int n, int o, int i, int j,
+                           int k) {
+  if (i - 1 >= 0)
+    if (A[i-1][j][k] == -1)
+      return -(A[i][j][k]);
+  if (i + 1 < m)
+    if (A[i+1][j][k] == -1)
+      return -(A[i][j][k]);
+  if (j - 1 >= 0)
+    if (A[i][j-1][k] == -1)
+      return -(A[i][j][k]);
+  if (j + 1 < n)
+    if (A[i][j+1][k] == -1)
+      return -(A[i][j][k]);
+  if (k - 1 >= 0)
+    if (A[i][j][k-1] == -1)
+      return -(A[i][j][k]);
+  if (k + 1 < o)
+    if (A[i][j][k+1] == -1)
+      return -(A[i][j][k]);
+
+  return A[i][j][k];
+}
+
+void filter_boundary(int ***A, int m, int n, int o) {
+  int i, j, k, tag;
+
+  // Set number of threads in OpenMP
+	int ncores = omp_get_num_procs();
+	omp_set_num_threads(ncores);
+  omp_set_nested(1);
+
+#pragma omp parallel default(none),                                            \
+    shared(A, m, n, o, kvcoords, frontiercoords), private(i, j, k, tag)
+  {
+#pragma omp for collapse(3) schedule(static)
+    for (i = 0; i < m; i++)
+      for (j = 0; j < n; j++)
+        for (k = 0; k < o; k++)
+          #pragma omp critical
+          if (A[i][j][k] > 1) {
+            // Get cavity identifier
+            tag = A[i][j][k] - 2;
+
+            // Get min and max coordinates of each cavity
+            kvcoords[tag].Xmin = min(kvcoords[tag].Xmin, i);
+            kvcoords[tag].Ymin = min(kvcoords[tag].Ymin, j);
+            kvcoords[tag].Zmin = min(kvcoords[tag].Zmin, k);
+            kvcoords[tag].Xmax = max(kvcoords[tag].Xmax, i);
+            kvcoords[tag].Ymax = max(kvcoords[tag].Ymax, j);
+            kvcoords[tag].Zmax = max(kvcoords[tag].Zmax, k);
+
+            // Define cavity-bulk boundary points
+            A[i][j][k] = define_boundary_points(A, m, n, o, i, j, k);
+
+            // Get min and max coordinates of each cavity-bulk boundary
+            if (A[i][j][k] < -1) {
+              frontiercoords[tag].Xmin = min(frontiercoords[tag].Xmin, i);
+              frontiercoords[tag].Ymin = min(frontiercoords[tag].Ymin, j);
+              frontiercoords[tag].Zmin = min(frontiercoords[tag].Zmin, k);
+              frontiercoords[tag].Xmax = max(frontiercoords[tag].Xmax, i);
+              frontiercoords[tag].Ymax = max(frontiercoords[tag].Ymax, j);
+              frontiercoords[tag].Zmax = max(frontiercoords[tag].Zmax, k);
+            }
+          }
+  }
+}
+
+void remove_boundary(int ***A, int m, int n, int o, int ncav) {
+  int i, j, k, tag;
+
+  // Set number of threads in OpenMP
+	int ncores = omp_get_num_procs();
+	omp_set_num_threads(ncores);
+  omp_set_nested(1);
+
+#pragma omp parallel default(none),                                            \
+    shared(A, frontiercoords, ncav, m, n, o), private(tag, i, j, k)
+#pragma omp for schedule(dynamic)
+  for (tag = 0; tag < ncav; tag++)
+    for (i = frontiercoords[tag].Xmin; i <= frontiercoords[tag].Xmax; i++)
+      for (j = frontiercoords[tag].Ymin; j <= frontiercoords[tag].Ymax; j++)
+        for (k = frontiercoords[tag].Zmin; k <= frontiercoords[tag].Zmax; k++)
+          if (A[i][j][k] < -1)
+            // Untag cavity-bulk boundary points
+            A[i][j][k] =
+                abs(A[i][j][k]);
+}
+
 void Depth_search(int ***A, double ***M, int m, int n, int o, double h, int ncav){
   int i, j, k, i2, j2, k2, count, tag;
   double distance, tmp;
