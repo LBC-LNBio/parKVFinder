@@ -58,9 +58,6 @@ int PDB_load(dict *DIC[TABLE_SIZE], int tablesize,
              double Z1, FILE **log_file);
 int PDB_load2(char PDB_NAME[NAME_MAX]);
 int PDB_load3(char PDB_NAME[NAME_MAX]);
-char extractChain(char LINE[100]);
-void convert(char S[50], double *coord);
-void extract(char LINE[100], int a, int b, char S[]);
 void insert_atom(double x, double y, double z, double radius, int resnumber,
                  char chain, char res_name);
 void free_atom();

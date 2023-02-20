@@ -133,21 +133,22 @@ void _extract(char FROM[], int nF, char TO[], int nT, int start, int end)
 }
 
 /*
- * Function: _extract_chain
- * ------------------------
+ * Function: _remove_char
+ * ----------------------
  *
- * Extract chain identifier from FROM[21]
+ * Remove char from string
  *
- * FROM: flexible array to extract the chain identifier
- * nF: size of FROM
- * 
- * returns: chain identifier
+ * FROM: flexible array with a string
+ * c: char to remove from string
  *
  */
-char _extract_chain(char FROM[], int nF)
+void _remove_char(char FROM[], int nF, char c)
 {
-    int i;
+    int i, j;
 
-    if (nF > 21)
-        return FROM[21];
+    for (i = 0; FROM[i] != '\0'; i++) {
+        if (FROM[i] == c)
+            for (j = i; FROM[j] != '\0'; j++)
+                FROM[j] = FROM[j + 1];
+  }
 }
