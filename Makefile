@@ -1,5 +1,5 @@
-parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c requirements
-	gcc -fopenmp -Isrc -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm -fcommon
+parKVFinder: utils.o dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c requirements
+	gcc -fopenmp -Isrc -o parKVFinder lib/utils.o lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm -fcommon
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
 		if [ -f ${HOME}/.bashrc ]; then \
@@ -32,9 +32,12 @@ tomlprocessing.o: src/tomlprocessing.c src/tomlprocessing.h
 resultsprocessing.o: src/resultsprocessing.c src/resultsprocessing.h
 	gcc -Isrc -c src/resultsprocessing.c -fcommon
 
-move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o
+utils.o: src/utils.c src/utils.h
+	gcc -Isrc -c src/utils.c -fcommon
+
+move: utils.o dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
-	mv dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o lib/
+	mv utils.o dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o lib/
 
 requirements: pip pip3
 

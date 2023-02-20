@@ -16,15 +16,12 @@ double volume;
 int flagr;
 
 /* Define custom functions */
-double min(double a, double b);
-double max(double a, double b);
 int check_pos(int ***A, int i, int j, int k, int m, int n, int o);
 int check_pos2(int ***A, int i, int j, int k, int m, int n, int o);
 int check_pos3(int ***A, int i, int j, int k, int m, int n, int o);
 int check_pos4(int ***A, int i, int j, int k, int m, int n, int o);
 int contact_protein_kv(int ***A, int i, int j, int k, int m, int n, int o);
 int DFS_search(int ***A, int m, int n, int o, double h, double filter);
-char *combine(const char *s1, const char *s2);
 void Matrix_fill(int ***A, int m, int n, int o, double h, double probe,
                  double X1, double Y1, double Z1);
 void Matrix_export(int ***A, int ***S, double ***M, int kvp_mode, int m, int n, int o,

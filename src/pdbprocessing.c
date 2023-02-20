@@ -8,53 +8,9 @@
 #include <string.h>
 
 /* Import custom modules  */
+#include "utils.h"
 #include "dictionaryprocessing.h"
 #include "pdbprocessing.h"
-
-/* Read PDB file inside LINE */
-int get_line(FILE *arq, char LINE[100]) {
-  /* Declare variables */
-  int i;
-
-  /* Read PDB file inside LINE[100] */
-  for (i = 0, LINE[i] = getc(arq); LINE[i] != EOF && LINE[i] != '\n' && i < 100;
-       i++, LINE[i] = getc(arq))
-    ;
-
-  /* If LINE[100] is not \n, read PDB file until LINE[100] assume \n or EOF
-   * value */
-  if (i == 100 && LINE[i] != '\n')
-    for (; LINE[i] != '\n' && LINE[i] != EOF; LINE[i] = getc(arq))
-      ;
-
-  /* If PDB file is over, return False */
-  if (LINE[i] == EOF)
-    return 0;
-  /* If PDB file is not over, return True */
-  else
-    return 1;
-}
-
-/* Extract from LINE[a] until LINE[b] to a char array S[] of size b-a */
-void extract(char LINE[100], int a, int b, char S[]) {
-  /* Declare variables */
-  int i;
-
-  /* Test input */
-  if (b - a > 50 || b > 100 || a > b)
-    return;
-
-  /* Extract process */
-  for (i = a; i < b; i++)
-    S[i - a] = LINE[i];
-
-  /* Mark last position in S[] */
-  if (i < 50)
-    S[i] = '\0';
-}
-
-/* Extract chain identifier in LINE[21] */
-char extractChain(char LINE[100]) { return LINE[21]; }
 
 /* Convert string to double */
 void convert(char S[50], double *coord) {
@@ -64,7 +20,8 @@ void convert(char S[50], double *coord) {
 
   for (i = 0; S[i] != '\0' && i < 50; i++)
     ;
-  extract(S, 0, i + 1, AUX);
+  // extract(S, 0, i + 1, AUX);
+  _extract(S, strlen(S), AUX, strlen(AUX), 0, i+1);
   *coord = atof(AUX);
 }
 
@@ -123,7 +80,7 @@ int PDB_load(dict *DIC[TABLE_SIZE], int tablesize,
              double Z1, FILE **log_file) {
   /* Declare variables */
   int flag = 1, i, j, number;
-  char AUX[50] = "", AUX2[50] = "", LINE[100] = "", X[50] = "", Y[50] = "",
+  char AUX[50] = "", LINE[100] = "", X[50] = "", Y[50] = "",
        Z[50] = "", RES[RES_SIZE], ATOM_TYPE[ATOM_SIZE], ATOM_SYMBOL[2], chain;
   double x, y, z, x1, y1, z1, xaux, yaux, zaux, radius;
   FILE *arqPDB;
@@ -144,10 +101,11 @@ int PDB_load(dict *DIC[TABLE_SIZE], int tablesize,
 
     /* Parse PDB */
     /* While PDB file is not over, do ... */
-    while (get_line(arqPDB, LINE)) {
+    while (_read_line(arqPDB, LINE, 100)) {
 
       /* Extract Record Name */
-      extract(LINE, 0, 6, AUX);
+      // extract(LINE, 0, 6, AUX);
+      _extract(LINE, strlen(LINE), AUX, strlen(AUX), 0, 6);
       /* If Record Name is equal to ATOM or HETATM, do ... */
       if (!strcmp(AUX, "ATOM  ") || !strcmp(AUX, "HETATM")) {
         for (i = 12, j = 0; i < 17; i++) {
@@ -170,29 +128,25 @@ int PDB_load(dict *DIC[TABLE_SIZE], int tablesize,
 
         /* Get residue sequence number */
         number = 0;
-        extract(LINE, 22, 26, AUX2);
-        number = atoi(AUX2);
+        _extract(LINE, strlen(LINE), AUX, strlen(AUX), 22, 26);
+        number = atoi(AUX);
 
         /* Extract atom symbol */
-        extract(LINE, 76, 78, ATOM_SYMBOL);
+        // extract(LINE, 76, 78, ATOM_SYMBOL);
+        _extract(LINE, strlen(LINE), ATOM_SYMBOL, strlen(ATOM_SYMBOL), 76, 78);
 
         /* Extract chain identifier */
-        chain = extractChain(LINE);
+        chain = _extract_chain(LINE, strlen(LINE));
 
         /* Extract x coordinate */
-        extract(LINE, 30, 38, X);
+        _extract(LINE, strlen(LINE), X, strlen(X), 30, 38);
+        x = atof(X);
         /* Extract y coordinate */
-        extract(LINE, 38, 46, Y);
+        _extract(LINE, strlen(LINE), Y, strlen(Y), 38, 46);
+        y = atof(Y);
         /* Extract z coordinate */
-        extract(LINE, 46, 54, Z);
-        /* Remove whitespaces */
-        trim(X, ' ');
-        trim(Y, ' ');
-        trim(Z, ' ');
-        /* Convert coordinates from strings to doubles */
-        convert(X, &x);
-        convert(Y, &y);
-        convert(Z, &z);
+        _extract(LINE, strlen(LINE), Z, strlen(Z), 46, 54);
+        z = atof(Z);
 
         /* Get radius for an atom in a specific residue based on VdW radius
          * dictionary */
@@ -262,19 +216,23 @@ int PDB_load2(char PDB_NAME[NAME_MAX]) {
 
     /* Parse PDB */
     /* While PDB file is not over, do... */
-    while (get_line(arqPDB, LINE)) {
+    while (_read_line(arqPDB, LINE, 100)) {
 
       /* Extract Record Name */
-      extract(LINE, 0, 6, AUX);
+      // extract(LINE, 0, 6, AUX);
+      _extract(LINE, strlen(LINE), AUX, strlen(AUX), 0, 6);
       /* If Record Name is equal to ATOM or HETATM, do ... */
       if (!strcmp(AUX, "ATOM  ") || !strcmp(AUX, "HETATM")) {
 
         /* Extract x coordinate */
-        extract(LINE, 30, 38, X);
+        // extract(LINE, 30, 38, X);
+        _extract(LINE, strlen(LINE), X, strlen(X), 30, 38);
         /* Extract y coordinate */
-        extract(LINE, 38, 46, Y);
+        // extract(LINE, 38, 46, Y);
+        _extract(LINE, strlen(LINE), Y, strlen(Y), 38, 46);
         /* Extract z axis coordinate */
-        extract(LINE, 46, 54, Z);
+        // extract(LINE, 46, 54, Z);
+        _extract(LINE, strlen(LINE), Z, strlen(Z), 46, 54);
         /* Remove whitespaces */
         trim(X, ' ');
         trim(Y, ' ');
@@ -303,7 +261,7 @@ int PDB_load3(char PDB_NAME[NAME_MAX]) {
   /* Declare variables */
   int flag = 1, i, resnumber;
   double x, y, z;
-  char AUX[50] = "", AUX2[50] = "", X[50] = "", Y[50] = "", Z[50] = "",
+  char AUX[50] = "", X[50] = "", Y[50] = "", Z[50] = "",
        LINE[100], chain;
   FILE *arqPDB;
 
@@ -324,24 +282,28 @@ int PDB_load3(char PDB_NAME[NAME_MAX]) {
 
     /* Parse PDB */
     /* While PDB is not over, do ... */
-    while (get_line(arqPDB, LINE)) {
+    while (_read_line(arqPDB, LINE, 100)) {
 
       /* Extract Record Name */
-      extract(LINE, 0, 6, AUX);
+      // extract(LINE, 0, 6, AUX);
+      _extract(LINE, strlen(LINE), AUX, strlen(AUX), 0, 6);
       /* If Record Name is equal to ATOM or HETATM, do ... */
       if (!strcmp(AUX, "ATOM  ") || !strcmp(AUX, "HETATM")) {
 
         /*Get residue sequence number*/
         resnumber = 0;
-        extract(LINE, 22, 26, AUX2);
-        resnumber = atoi(AUX2);
+        _extract(LINE, strlen(LINE), AUX, strlen(AUX), 22, 26);
+        resnumber = atoi(AUX);
 
         /* Extract x coordinate */
-        extract(LINE, 30, 38, X);
+        // extract(LINE, 30, 38, X);
+        _extract(LINE, 100, X, strlen(X), 30, 38);
         /* Extract y coordinate */
-        extract(LINE, 38, 46, Y);
+        // extract(LINE, 38, 46, Y);
+        _extract(LINE, 100, Y, strlen(Y), 38, 46);
         /* Extract z coordinate */
-        extract(LINE, 46, 54, Z);
+        // extract(LINE, 46, 54, Z);
+        _extract(LINE, 100, Z, strlen(Z), 46, 54);
 
         /* Remove whitespaces */
         trim(X, ' ');
@@ -353,7 +315,7 @@ int PDB_load3(char PDB_NAME[NAME_MAX]) {
         convert(Z, &z);
 
         /* Extract chain identifier */
-        chain = extractChain(LINE);
+        chain = _extract_chain(LINE, strlen(LINE));
 
         /* Save coordinate (x,y,z), residue number and chain */
         insert_atom(x, y, z, 0.0, resnumber, chain, 0);

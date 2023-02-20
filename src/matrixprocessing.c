@@ -11,26 +11,11 @@ explained in the source code.*/
 #include <unistd.h>
 
 /* Import custom modules */
+#include "utils.h"
 #include "dictionaryprocessing.h"
 #include "matrixprocessing.h"
 #include "pdbprocessing.h"
 #include "resultsprocessing.h"
-
-double max(double a, double b) {
-
-  if (a > b)
-    return a;
-  else
-    return b;
-}
-
-double min(double a, double b) {
-
-  if (a < b)
-    return a;
-  else
-    return b;
-}
 
 /* Check if a given cavity point on the grid is next to a protein point */
 int check_pos(int ***A, int i, int j, int k, int m, int n, int o) {
@@ -860,18 +845,6 @@ void filter_outliers(int ***A, int m, int n, int o) {
             A[i][j][k] = -1;
         }
       }
-}
-
-char *combine(const char *s1, const char *s2) {
-  /* Declare variables */
-  const size_t len1 = strlen(s1);
-  const size_t len2 = strlen(s2);
-  char *result = malloc(len1 + len2 + 1); /* +1 for the zero-terminator */
-
-  memcpy(result, s1, len1);
-  memcpy(result + len1, s2, len2 + 1); /* +1 to copy the null-terminator */
-
-  return result;
 }
 
 /* Free int*** matrix from memory */

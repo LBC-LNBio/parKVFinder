@@ -8,31 +8,8 @@
 #include <string.h>
 
 /* Import custom modules */
+#include "utils.h"
 #include "tomlprocessing.h"
-
-/*Reads TOML file inside LINE*/
-int get_toml_line(FILE *arq, char LINE[500]) {
-  /* Declare variables */
-  int i;
-
-  /* Read PDB file inside LINE[500] */
-  for (i = 0, LINE[i] = getc(arq); LINE[i] != EOF && LINE[i] != '\n' && i < 500;
-       i++, LINE[i] = getc(arq))
-    ;
-
-  /* If LINE[500] is not \n, read PDB file until LINE[100] assume \n or EOF
-   * value */
-  if (i == 500 && LINE[i] != '\n')
-    for (; LINE[i] != '\n' && LINE[i] != EOF; LINE[i] = getc(arq))
-      ;
-
-  /* If PDB file is over, return False */
-  if (LINE[i] == EOF)
-    return 0;
-  /* If PDB file is not over, return True */
-  else
-    return 1;
-}
 
 /* Extract from LINE[a] until LINE[b] to a char array S[100] of size b-a */
 void extract_toml_line(char LINE[500], int a, int b, char S[500]) {
@@ -107,7 +84,7 @@ toml *readTOML(toml *p, char *path) {
 
   } else {
     /* While TOML file is not over, do... */
-    while (get_toml_line(parameters_file, LINE)) {
+    while (_read_line(parameters_file, LINE, 500)) {
 
     HANDLE_LAST_LINE:
       /* Remove tabs */
@@ -138,7 +115,7 @@ toml *readTOML(toml *p, char *path) {
         /* If vector config_bar are filled, do ... */
         if (config_bar[1] != 0) {
 
-          /* Restart string config[100] */
+          /* Restart string config[500] */
           init500(config);
           /* Extract name of configuration */
           extract_toml_line(LINE, config_bar[0] + 1, config_bar[1], config);

@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 /* Import customs modules */
+#include "utils.h"
 #include "dictionaryprocessing.h"
 #include "matrixprocessing.h"
 #include "pdbprocessing.h"
@@ -19,7 +20,8 @@
  * residues box file */
 void create_residues_box(char *box_name, double *Xmin, double *Xmax,
                          double *Ymin, double *Ymax, double *Zmin, double *Zmax,
-                         double padding, char PDB_NAME[NAME_MAX]) {
+                         double padding, char PDB_NAME[NAME_MAX])
+{
   /* Declare variables */
   int resnum;
   char chain[2];
@@ -41,16 +43,19 @@ void create_residues_box(char *box_name, double *Xmin, double *Xmax,
   box_file = fopen(box_name, "r");
 
   /* Read file by each element (resnum_chain) */
-  while (!feof(box_file)) {
+  while (!feof(box_file))
+  {
 
     fscanf(box_file, "%d_%s[^\t][^\n]", &resnum, chain);
 
     /* Check coordinates */
-    for (p = v; p != NULL; p = p->next) {
+    for (p = v; p != NULL; p = p->next)
+    {
 
       /* Find RESNUM and CHAIN */
       if (p->resnum == resnum &&
-          (p->chain == chain[0] || p->chain == chain[1])) {
+          (p->chain == chain[0] || p->chain == chain[1]))
+      {
 
         /* Update min and max coordinates */
         if (p->x < *Xmin)
@@ -69,7 +74,8 @@ void create_residues_box(char *box_name, double *Xmin, double *Xmax,
     }
   }
 
-  if (*Xmax < *Xmin || *Zmax < *Zmin || *Zmax < *Zmin) {
+  if (*Xmax < *Xmin || *Zmax < *Zmin || *Zmax < *Zmin)
+  {
     fprintf(stderr, "\033[0;31mError:\033[0m Residues provided in residues box "
                     "file has not been found in the PDB file!\n");
     exit(-1);
@@ -90,7 +96,8 @@ void create_residues_box(char *box_name, double *Xmin, double *Xmax,
 /* Get custom box coordinates (Xmin, Xmax, Ymin, Ymax, Zmin, Zmax) from custom
  * box file */
 void create_custom_box(char *box_name, double *Xmin, double *Xmax, double *Ymin,
-                       double *Ymax, double *Zmin, double *Zmax) {
+                       double *Ymax, double *Zmin, double *Zmax)
+{
   /* Declare variables */
   int i = 0;
   double coord[6];
@@ -100,7 +107,8 @@ void create_custom_box(char *box_name, double *Xmin, double *Xmax, double *Ymin,
   box_file = fopen(box_name, "r");
 
   /* Read file until EOF */
-  while (!feof(box_file) && i < 6) {
+  while (!feof(box_file) && i < 6)
+  {
     fscanf(box_file, "%lf[^\t][^\n]", &coord[i]);
     i++;
   }
@@ -115,7 +123,8 @@ void create_custom_box(char *box_name, double *Xmin, double *Xmax, double *Ymin,
 }
 
 /* Get file extension */
-char *get_file_extension(char *filename) {
+char *get_file_extension(char *filename)
+{
   /* Declare variables */
   char *dot = strrchr(filename, '.');
 
@@ -125,7 +134,8 @@ char *get_file_extension(char *filename) {
 }
 
 /* Convert int to true or false input */
-char TF(int mode, char **tomlmode) {
+char TF(int mode, char **tomlmode)
+{
   if (mode)
     *tomlmode = "true";
   else
@@ -144,7 +154,8 @@ void print_toml(char *toml_name, char OUTPUT[500], char BASE_NAME[500],
                 double Z3, double X4, double Y4, double Z4, double bX1,
                 double bY1, double bZ1, double bX2, double bY2, double bZ2,
                 double bX3, double bY3, double bZ3, double bX4, double bY4,
-                double bZ4) {
+                double bZ4)
+{
   /* Declare variables */
   FILE *toml_file;
   char buffer[1024], *wpmode, *bmode, *smode, *kmode, *lmode, *hmode, *emode;
@@ -284,7 +295,8 @@ void print_toml(char *toml_name, char OUTPUT[500], char BASE_NAME[500],
 }
 
 /* Check if numeric inputs are in correct format */
-int check_input(char *optarg, char *error) {
+int check_input(char *optarg, char *error)
+{
   /* Declare variables */
   int i, hitDecimal = 0, len;
 
@@ -292,14 +304,16 @@ int check_input(char *optarg, char *error) {
   len = strlen(optarg);
 
   /* Loop through string option */
-  for (i = 0; i < len; i++) {
+  for (i = 0; i < len; i++)
+  {
 
     /* Count number of points in numeric option */
     if (optarg[i] == '.' && !hitDecimal)
       hitDecimal = 1;
     else
       /* Check if all chars, that are not a point, are not digits */
-      if (!isdigit(optarg[i])) {
+      if (!isdigit(optarg[i]))
+      {
 
         /* Found a char that is not a digit, print error*/
         fprintf(stderr, "%s", error);
@@ -314,7 +328,8 @@ int check_input(char *optarg, char *error) {
 
 void print_version() { printf("parKVFinder (parallel KVFinder) v1.1.4\n"); }
 
-void init25(char S[25]) {
+void init25(char S[25])
+{
   /* Declare variables */
   int i;
 
@@ -322,7 +337,8 @@ void init25(char S[25]) {
     S[i] = ' ';
 }
 
-void init55(char S[55]) {
+void init55(char S[55])
+{
   /* Declare variables */
   int i;
 
@@ -330,7 +346,8 @@ void init55(char S[55]) {
     S[i] = ' ';
 }
 
-void init80(char S[80]) {
+void init80(char S[80])
+{
   /* Declare variables */
   int i;
 
@@ -338,7 +355,8 @@ void init80(char S[80]) {
     S[i] = ' ';
 }
 
-void print_header() {
+void print_header()
+{
 
   fprintf(stdout, "parKVFinder (parallel KVFinder) software identifies and "
                   "describes cavities in\n");
@@ -352,7 +370,8 @@ void print_header() {
   fprintf(stdout, "\n");
 }
 
-void print_usage() {
+void print_usage()
+{
 
   fprintf(stdout, "Usage: parKVFinder <.pdb> [options],\n");
   fprintf(stdout, "\twhere PDB is a path to a target PDB file.\n");
@@ -367,7 +386,8 @@ void print_usage() {
   fprintf(stdout, "\n");
 }
 
-void print_options() {
+void print_options()
+{
 
   /* GENERAL KVFINDER PARAMETERS */
   fprintf(stdout, "General options:\n");
@@ -433,7 +453,8 @@ void print_options() {
   fprintf(stdout, "\n");
 }
 
-void print_help() {
+void print_help()
+{
 
   fprintf(stdout, "============================================================"
                   "====================\n");
@@ -459,10 +480,12 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               double *Z3, double *X4, double *Y4, double *Z4, double *bX1,
               double *bY1, double *bZ1, double *bX2, double *bY2, double *bZ2,
               double *bX3, double *bY3, double *bZ3, double *bX4, double *bY4,
-              double *bZ4) {
+              double *bZ4)
+{
 
   /* Print Warning! if KVFinder_PATH was not found */
-  if (strcmp(getenv("KVFinder_PATH"), "") == 0) {
+  if (strcmp(getenv("KVFinder_PATH"), "") == 0)
+  {
     fprintf(
         stderr,
         "\033[0;33mWarning:\033[0m KVFinder_PATH system variable not found.\n");
@@ -500,7 +523,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
   int o_flag = 0, i_flag = 0, s_flag = 0, vc_flag = 0, lc_flag = 0, rd_flag = 0,
       cb_flag = 0, rb_flag = 0, prb_flag = 0;
 
-  while (1) {
+  while (1)
+  {
 
     static struct option long_options[] = {
 
@@ -543,44 +567,53 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     if (c == -1)
       break;
 
-    switch (c) {
+    switch (c)
+    {
 
     /* LONG OPTIONS */
     /* Handle of long options without a short arg */
     case 0:
       /* LIGAND CUTOFF */
-      if (strcmp("ligand_cutoff", long_options[option_index].name) == 0) {
+      if (strcmp("ligand_cutoff", long_options[option_index].name) == 0)
+      {
         if (check_input(
                 optarg,
-                "\033[0;31mError:\033[0m Invalid ligand cutoff input!\n")) {
+                "\033[0;31mError:\033[0m Invalid ligand cutoff input!\n"))
+        {
           *ligand_cutoff = atof(optarg);
           lc_flag = 1;
         }
       }
       /* VOLUME CUTOFF */
-      if (strcmp("volume_cutoff", long_options[option_index].name) == 0) {
+      if (strcmp("volume_cutoff", long_options[option_index].name) == 0)
+      {
         if (check_input(
                 optarg,
-                "\033[0;31mError:\033[0m Invalid volume cutoff input!\n")) {
+                "\033[0;31mError:\033[0m Invalid volume cutoff input!\n"))
+        {
           *volume_cutoff = atof(optarg);
           vc_flag = 1;
         }
       }
       /* REMOVAL DISTANCE */
-      if (strcmp("removal_distance", long_options[option_index].name) == 0) {
+      if (strcmp("removal_distance", long_options[option_index].name) == 0)
+      {
         if (check_input(
                 optarg,
-                "\033[0;31mError:\033[0m Invalid removal distance input!\n")) {
+                "\033[0;31mError:\033[0m Invalid removal distance input!\n"))
+        {
           *removal_distance = atof(optarg);
           rd_flag = 1;
         }
       }
       /* BOX MODE PARAMETERS */
       /* residues box */
-      if (strcmp("residues_box", long_options[option_index].name) == 0) {
+      if (strcmp("residues_box", long_options[option_index].name) == 0)
+      {
         box_name = optarg;
         rb_flag = 1;
-        if (access(box_name, F_OK)) {
+        if (access(box_name, F_OK))
+        {
           fprintf(
               stderr,
               "\033[0;31mError:\033[0m Residues list file does not exist!\n");
@@ -588,25 +621,30 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
         }
       }
       /* residues box padding */
-      if (strcmp("padding", long_options[option_index].name) == 0) {
+      if (strcmp("padding", long_options[option_index].name) == 0)
+      {
         if (check_input(optarg, "\033[0;31mError:\033[0m Invalid residue box "
-                                "padding value input!\n")) {
+                                "padding value input!\n"))
+        {
           padding = atof(optarg);
           prb_flag = 1;
         }
       }
       /* custom box */
-      if (strcmp("custom_box", long_options[option_index].name) == 0) {
+      if (strcmp("custom_box", long_options[option_index].name) == 0)
+      {
         box_name = optarg;
         cb_flag = 1;
-        if (access(box_name, F_OK)) {
+        if (access(box_name, F_OK))
+        {
           fprintf(stderr,
                   "\033[0;31mError:\033[0m Custom box file does not exist!\n");
           exit(-1);
         }
       }
       /* FILLED CAVITIES MODE (KVP MODE) */
-      if (strcmp("filled", long_options[option_index].name) == 0) {
+      if (strcmp("filled", long_options[option_index].name) == 0)
+      {
         *kvp_mode = 1;
       }
       break;
@@ -615,15 +653,18 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
       /* SURFACE MODE */
     case 'S':
       /* If input is SAS, do ... */
-      if (strcmp(optarg, "SAS") == 0) {
+      if (strcmp(optarg, "SAS") == 0)
+      {
         *surface_mode = 0;
       }
       /* If input is VdW, do ... */
-      else if (strcmp(optarg, "VdW") == 0) {
+      else if (strcmp(optarg, "VdW") == 0)
+      {
         *surface_mode = 1;
       }
       /* If input is not SAS or VdW, print error */
-      else {
+      else
+      {
         fprintf(stderr, "\033[0;31mError:\033[0m Wrong surface representation "
                         "selected!\nPossible inputs: SAS, VdW.\n");
         exit(-1);
@@ -651,7 +692,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
       snprintf(LIGAND_NAME, 500, "%s", realpath(optarg, NULL));
       *ligand_mode = 1;
       l_flag = 1;
-      if (access(LIGAND_NAME, F_OK)) {
+      if (access(LIGAND_NAME, F_OK))
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Ligand PDB file does not exist.\n");
         exit(-1);
@@ -662,7 +704,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     case 'i':
       /*Check if input is numeric*/
       if (check_input(optarg,
-                      "\033[0;31mError:\033[0m Invalid probe in input!\n")) {
+                      "\033[0;31mError:\033[0m Invalid probe in input!\n"))
+      {
         /*Save probe in inside probe_in variable*/
         *probe_in = atof(optarg);
         i_flag = 1;
@@ -673,7 +716,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     case 'o':
       /* Check if input is numeric */
       if (check_input(optarg,
-                      "\033[0;31mError:\033[0m Invalid probe out input!\n")) {
+                      "\033[0;31mError:\033[0m Invalid probe out input!\n"))
+      {
         /* Save probe out inside probe_out variable */
         *probe_out = atof(optarg);
         o_flag = 1;
@@ -684,7 +728,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     case 's':
       /*Check if input is numeric*/
       if (check_input(optarg,
-                      "\033[0;31mError:\033[0m Invalid step size input!\n")) {
+                      "\033[0;31mError:\033[0m Invalid step size input!\n"))
+      {
         /* Save step size inside h variable */
         *h = atof(optarg);
         s_flag = 1;
@@ -705,7 +750,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
       else if (strcmp(resolution_flag, "Low") == 0)
         ;
       /* If input is not Off, Low, Medium, High, print error */
-      else {
+      else
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Wrong resolution selected!\nPossible "
                 "inputs: Off, Low, Medium, High.\n");
@@ -718,7 +764,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     case 'd':
       snprintf(dictionary_name, 500, "%s", realpath(optarg, NULL));
       d_flag = 1;
-      if (access(dictionary_name, F_OK)) {
+      if (access(dictionary_name, F_OK))
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Dictionary file does not exist!\n");
         exit(-1);
@@ -730,13 +777,15 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
       parameters_name = optarg;
       p_flag = 1;
       /* Check if parameters file exists */
-      if (access(parameters_name, F_OK)) {
+      if (access(parameters_name, F_OK))
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Parameter file does not exist!\n");
         exit(-1);
       }
       /* Check parameters file extension*/
-      if (strcmp(get_file_extension(parameters_name), "toml")) {
+      if (strcmp(get_file_extension(parameters_name), "toml"))
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Wrong parameters file "
                 "extension!\narg: [\'%s\']\n",
@@ -770,14 +819,18 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
 
   /* Parameters file test conditions
   Parameters file must be set alone */
-  if (p_flag) {
+  if (p_flag)
+  {
     if (d_flag || l_flag || t_flag || r_flag || o_flag || i_flag || s_flag ||
-        vc_flag || lc_flag || rd_flag) {
+        vc_flag || lc_flag || rd_flag)
+    {
       fprintf(
           stderr,
           "\033[0;31mError:\033[0m Just define parameters file argument!\n");
       exit(-1);
-    } else {
+    }
+    else
+    {
       /* Read parameters TOML files */
       toml *parameters = readTOML(
           param, parameters_name); /*Read TOML file inside struct TOML*/
@@ -840,28 +893,32 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
 
   /* PROCESS EXTRA ARGUMENTS - PDB FILE PROCESSING */
   /* User provided more than one PDB file */
-  if (argc - optind > 1) {
+  if (argc - optind > 1)
+  {
 
     fprintf(
         stderr,
         "\033[0;31mError:\033[0m Incorrect number of PDB files!\nargs: [\'%s\'",
         argv[optind++]);
-    while (optind < argc) {
+    while (optind < argc)
+    {
       fprintf(stderr, ", \'%s\'", argv[optind++]);
     }
     fprintf(stderr, "]\n\n");
     print_usage();
     exit(-1);
-
-  } else
+  }
+  else
     /* User provided one PDB file */
-    if (optind < argc) {
+    if (optind < argc)
+    {
 
       /* Save PDB full path inside PDB_NAME variable */
       snprintf(PDB_NAME, 500, "%s", realpath(argv[optind], NULL));
 
       /* Loop through string PDB_NAME */
-      for (i = 0; PDB_NAME[i] != '\0'; i++) {
+      for (i = 0; PDB_NAME[i] != '\0'; i++)
+      {
         /* Get position of last bar symbol in PDB_NAME */
         if (PDB_NAME[i] == '/')
           bar = i;
@@ -890,22 +947,24 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
                 PDB_NAME);
 
       /* Check if provided PDB file exist */
-      if (access(PDB_NAME, F_OK)) {
+      if (access(PDB_NAME, F_OK))
+      {
         fprintf(stderr, "\033[0;31mError:\033[0m PDB file does not exist.\n");
         exit(-1);
       }
       /* Check PDB file extension*/
-      if (strcmp(get_file_extension(PDB_NAME), "pdb")) {
+      if (strcmp(get_file_extension(PDB_NAME), "pdb"))
+      {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Wrong PDB file extension!\narg: "
                 "[\'%s\']\n",
                 PDB_NAME);
         exit(-1);
       }
-
     }
     /* User do not provide a PDB file */
-    else {
+    else
+    {
       fprintf(stderr, "\033[0;31mError:\033[0m Missing path to PDB file!\n\n");
       print_usage();
       exit(-1);
@@ -913,7 +972,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
 
   /* Set default values for non-defined arguments */
   /* Path to dictionary file */
-  if (!d_flag) {
+  if (!d_flag)
+  {
 
     /* Set default path to dictionary */
     strcpy(dictionary_name, getenv("KVFinder_PATH"));
@@ -923,7 +983,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               dictionary_name);
   }
   /* Probe in */
-  if (!i_flag) {
+  if (!i_flag)
+  {
 
     /* Set default value to probe in */
     *probe_in = 1.4;
@@ -932,7 +993,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               *probe_in);
   }
   /* Probe out */
-  if (!o_flag) {
+  if (!o_flag)
+  {
 
     /* Set default value to probe out */
     *probe_out = 4.0;
@@ -941,7 +1003,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               *probe_out);
   }
   /* Volume cutoff */
-  if (!vc_flag) {
+  if (!vc_flag)
+  {
 
     /* Set default value to volume cutoff */
     *volume_cutoff = 5.0;
@@ -950,7 +1013,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               *volume_cutoff);
   }
   /* Removal distance */
-  if (!rd_flag) {
+  if (!rd_flag)
+  {
 
     /* Set default value to removal distance */
     *removal_distance = 2.4;
@@ -960,7 +1024,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               *removal_distance);
   }
   /* Step size and Resolution */
-  if (!s_flag && !r_flag) {
+  if (!s_flag && !r_flag)
+  {
 
     *h = 0.0;
     snprintf(resolution_flag, 7, "%s", "Low");
@@ -969,10 +1034,12 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
               "> Setting \'step\' (grid spacing) to %.2lf.\n> Setting "
               "\'resolution\' to flag: %s\n",
               *h, resolution_flag);
+  }
+  else if (s_flag || r_flag)
+  {
 
-  } else if (s_flag || r_flag) {
-
-    if (s_flag) {
+    if (s_flag)
+    {
 
       snprintf(resolution_flag, 7, "%s", "Off");
       if (verbose_flag)
@@ -981,9 +1048,11 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
                 "\'resolution\' to flag: %s\n",
                 *h, resolution_flag);
     }
-    if (r_flag) {
+    if (r_flag)
+    {
 
-      if (strcmp(resolution_flag, "Off") == 0) {
+      if (strcmp(resolution_flag, "Off") == 0)
+      {
         fprintf(stderr, "\033[0;31mError:\033[0m Resolution mode is Off! Step "
                         "size (grid spacing) must be defined!\n");
         exit(-1);
@@ -995,24 +1064,27 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
                 "to default value: %.2lf\n",
                 resolution_flag, *h);
     }
-
-  } else {
+  }
+  else
+  {
 
     fprintf(stderr, "\033[0;31mError:\033[0m Resolution mode is On! Step size "
                     "(grid spacing) should not be defined!\n");
     exit(-1);
   }
   /* Ligand mode */
-  if (!lc_flag) {
+  if (!lc_flag)
+  {
 
     *ligand_cutoff = 5.0;
     if (verbose_flag)
       fprintf(stdout, "> Setting \'ligand_cutoff\' to default value: %.2lf\n",
               *ligand_cutoff);
-
-  } else
+  }
+  else
     /* Ligand mode is not set */
-    if (!*ligand_mode) {
+    if (!*ligand_mode)
+    {
 
       fprintf(
           stderr,
@@ -1023,7 +1095,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     }
   /* Surface mode */
   /* Surface mode is not defined */
-  if (!surface_flag) {
+  if (!surface_flag)
+  {
 
     *surface_mode = 1;
     if (verbose_flag)
@@ -1031,7 +1104,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
   }
   /* Box mode */
   /* Box mode is Off */
-  if (!*box_mode) {
+  if (!*box_mode)
+  {
 
     /* visiblebox coordinates */
     *bX1 = 0;
@@ -1061,7 +1135,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     *Y4 = (*bY4) - (*probe_out);
     *Z4 = (*bZ4) + (*probe_out);
 
-    if (rb_flag || cb_flag) {
+    if (rb_flag || cb_flag)
+    {
 
       fprintf(stderr, "\033[0;31mError:\033[0m Whole protein mode and Box "
                       "adjustment options are chosen together! ");
@@ -1069,7 +1144,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
                       "(\'custom_box\' or \'residues_box\').\n");
       exit(-1);
     }
-    if (prb_flag) {
+    if (prb_flag)
+    {
 
       fprintf(stderr, "\033[0;31mError:\033[0m Residue box mode is not chosen! "
                       "Residue box padding should not be defined.\n");
@@ -1078,28 +1154,31 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
     if (verbose_flag)
       fprintf(stdout,
               "> Running parKVFinder for whole biomolecular structure\n");
-
   }
   /* Box mode is On */
-  else {
+  else
+  {
 
     if (verbose_flag)
       fprintf(stdout, "> Running parKVFinder for custom search box.\n");
 
-    if (rb_flag && cb_flag) {
+    if (rb_flag && cb_flag)
+    {
 
       fprintf(
           stderr,
           "\033[0;31mError:\033[0m Just choose one box adjustment options! ");
       fprintf(stderr, "Define \'residues_box\' or \'custom_box\' options.\n");
       exit(-1);
-
-    } else
+    }
+    else
       /* Only one box adjustment option is chosen */
-      if (rb_flag || cb_flag) {
+      if (rb_flag || cb_flag)
+      {
 
         /* Residues box */
-        if (rb_flag) {
+        if (rb_flag)
+        {
 
           /* Padding not defined */
           if (!prb_flag)
@@ -1108,10 +1187,12 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
                               PDB_NAME);
         }
         /* Custom box */
-        if (cb_flag) {
+        if (cb_flag)
+        {
 
           /* Padding incorrectly defined */
-          if (prb_flag) {
+          if (prb_flag)
+          {
 
             fprintf(stderr, "\033[0;31mError:\033[0m Residue box padding "
                             "should not be defined in custom box option!\n");
@@ -1146,8 +1227,9 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
         *X4 = (*bX4) - (*probe_out);
         *Y4 = (*bY4) - (*probe_out);
         *Z4 = (*bZ4) + (*probe_out);
-
-      } else {
+      }
+      else
+      {
 
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Choose a box adjustment option! ");
@@ -1157,7 +1239,8 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
   }
 
   /* Print template parameters file */
-  if (t_flag) {
+  if (t_flag)
+  {
     print_toml(template_name, OUTPUT, BASE_NAME, dictionary_name, PDB_NAME,
                LIGAND_NAME, *whole_protein_mode, resolution_flag, *box_mode,
                *surface_mode, *kvp_mode, *ligand_mode, *h, *probe_in,

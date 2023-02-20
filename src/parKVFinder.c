@@ -17,6 +17,7 @@ parts may be found in the source code */
 
 /* Import custom modules */
 /* WARNING: keep this importing order */
+#include "utils.h"
 #include "dictionaryprocessing.h"
 #include "pdbprocessing.h"
 #include "matrixprocessing.h"
