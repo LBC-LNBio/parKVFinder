@@ -41,6 +41,7 @@ jobs:
             - name: Build parKVFinder
               run: |
                 brew install gcc@${{ matrix.gcc }}
+                which gcc
                 sudo rm /usr/local/bin/gcc
                 sudo ln -s /usr/local/bin/gcc-${{ matrix.gcc }} /usr/local/bin/gcc 
                 make clean
