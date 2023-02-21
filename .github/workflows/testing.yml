@@ -6,7 +6,7 @@ on:
 
 jobs:
     ubuntu-testing:
-        name: Test on ${{ runner.os }} with gcc-${{ matrix.gcc }}
+        name: Test on Ubuntu with gcc-${{ matrix.gcc }}
         runs-on: ubuntu-latest
         strategy:
             fail-fast: true
@@ -31,7 +31,7 @@ jobs:
                 # cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
     
     macos-testing:
-        name: Test on ${{ runner.os }} with gcc-${{ matrix.gcc }}
+        name: Test on macOS with gcc-${{ matrix.gcc }}
         runs-on: macos-latest
         strategy:
             fail-fast: true
