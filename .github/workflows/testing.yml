@@ -5,19 +5,43 @@ on:
         branches: [master, refactoring]
 
 jobs:
-    testing:
-        name: Build parKVFinder on ${{ matrix.os }}
-        runs-on: ${{ matrix.os }}
+    ubuntu-testing:
+        name: Test on ${{ runner.os }} with gcc-${{ matrix.gcc }}
+        runs-on: ubuntu-latest
         strategy:
             fail-fast: true
             matrix:
                 gcc: [9, 10, 11, 12]
-                os: [ubuntu-latest, macos-latest]
         steps:
             - uses: actions/checkout@v3
             - name: Build parKVFinder
               run: |
                 sudo apt install gcc-${{ matrix.gcc }}
+                gcc --version
+                make clean
+                make
+                sudo make link
+              env:
+                CC: gcc-${{ matrix.gcc }}
+            - name: Integration testing
+              run: |
+                export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
+                bash tests/testing.sh
+                ls -R
+                # cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
+    
+    macos-testing:
+        name: Test on ${{ runner.os }} with gcc-${{ matrix.gcc }}
+        runs-on: macos-latest
+        strategy:
+            fail-fast: true
+            matrix:
+                gcc: [9, 10, 11, 12]
+        steps:
+            - uses: actions/checkout@v3
+            - name: Build parKVFinder
+              run: |
+                brew install gcc-${{ matrix.gcc }}
                 gcc --version
                 make clean
                 make
