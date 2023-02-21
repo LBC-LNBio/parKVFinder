@@ -42,8 +42,8 @@ jobs:
               run: |
                 brew install gcc@${{ matrix.gcc }}
                 which gcc
-                sudo rm /usr/local/bin/gcc
-                sudo ln -s /usr/local/bin/gcc-${{ matrix.gcc }} /usr/local/bin/gcc 
+                sudo rm /usr/bin/gcc
+                sudo ln -s /usr/local/bin/gcc-${{ matrix.gcc }} /usr/bin/gcc 
                 make clean
                 make
                 sudo make link
