@@ -41,7 +41,7 @@ jobs:
             - uses: actions/checkout@v3
             - name: Build parKVFinder
               run: |
-                brew install gcc-${{ matrix.gcc }}
+                brew install gcc@${{ matrix.gcc }}
                 gcc --version
                 make clean
                 make
