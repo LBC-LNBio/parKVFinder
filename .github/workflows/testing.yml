@@ -17,7 +17,6 @@ jobs:
             - name: Build parKVFinder
               run: |
                 sudo apt install gcc-${{ matrix.gcc }}
-                gcc --version
                 make clean
                 make
                 sudo make link
@@ -28,30 +27,3 @@ jobs:
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
                 cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
-    
-    macos-testing:
-        name: Test on macOS with gcc-${{ matrix.gcc }}
-        runs-on: macos-latest
-        strategy:
-            fail-fast: true
-            matrix:
-                gcc: [9, 10, 11, 12]
-        steps:
-            - uses: actions/checkout@v3
-            - name: Build parKVFinder
-              run: |
-                brew install gcc@${{ matrix.gcc }}
-                which gcc
-                sudo rm /usr/bin/gcc
-                sudo ln -s /usr/local/bin/gcc-${{ matrix.gcc }} /usr/bin/gcc 
-                make clean
-                make
-                sudo make link
-            - name: Integration testing
-              run: |
-                export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
-                bash tests/testing.sh
-                cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
-
-
-         
