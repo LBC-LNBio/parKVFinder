@@ -6,7 +6,7 @@ on:
 
 jobs:
     testing:
-        runs-on: ubuntu-latest
+        runs-on: [ubuntu-latest, macos-latest]
         strategy:
             fail-fast: true
             matrix:
@@ -26,7 +26,8 @@ jobs:
               run: |
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
-                cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
+                ls -R
+                # cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
 
 
          
