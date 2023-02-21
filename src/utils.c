@@ -152,3 +152,50 @@ void _remove_char(char FROM[], int nF, char c)
                 FROM[j] = FROM[j + 1];
   }
 }
+
+/* Convert 3-letter residue system to 1-letter residue system */
+char _convert_residue_code(char RESIDUE[]) {
+
+  if (!strcmp(RESIDUE, "ALA"))
+    return 'A';
+  if (!strcmp(RESIDUE, "ARG"))
+    return 'R';
+  if (!strcmp(RESIDUE, "ASN"))
+    return 'N';
+  if (!strcmp(RESIDUE, "ASP"))
+    return 'D';
+  if (!strcmp(RESIDUE, "CYS"))
+    return 'C';
+  if (!strcmp(RESIDUE, "GLN"))
+    return 'Q';
+  if (!strcmp(RESIDUE, "GLU"))
+    return 'E';
+  if (!strcmp(RESIDUE, "GLY"))
+    return 'G';
+  if (!strcmp(RESIDUE, "HIS"))
+    return 'H';
+  if (!strcmp(RESIDUE, "ILE"))
+    return 'I';
+  if (!strcmp(RESIDUE, "LEU"))
+    return 'L';
+  if (!strcmp(RESIDUE, "LYS"))
+    return 'K';
+  if (!strcmp(RESIDUE, "MET"))
+    return 'M';
+  if (!strcmp(RESIDUE, "PHE"))
+    return 'F';
+  if (!strcmp(RESIDUE, "PRO"))
+    return 'P';
+  if (!strcmp(RESIDUE, "SER"))
+    return 'S';
+  if (!strcmp(RESIDUE, "THR"))
+    return 'T';
+  if (!strcmp(RESIDUE, "TRP"))
+    return 'W';
+  if (!strcmp(RESIDUE, "TYR"))
+    return 'Y';
+  if (!strcmp(RESIDUE, "VAL"))
+    return 'V';
+
+  return 'X';
+}

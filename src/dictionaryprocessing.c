@@ -11,64 +11,6 @@ dictionaries, fundamental data to the software */
 #include "dictionaryprocessing.h"
 #include "resultsprocessing.h"
 
-/* Remove a char c from a string S[50] */
-void trim(char S[50], char c) {
-  /* Declare variables */
-  int i, j;
-
-  for (i = 0; S[i] != '\0'; i++)
-    if (S[i] == c)
-      for (j = i; S[j] != '\0'; j++)
-        S[j] = S[j + 1];
-}
-
-/* Convert 3-letter residue system to 1-letter residue system */
-char convertRES(char RES[RES_SIZE]) {
-
-  if (!strcmp(RES, "ALA"))
-    return 'A';
-  if (!strcmp(RES, "ARG"))
-    return 'R';
-  if (!strcmp(RES, "ASN"))
-    return 'N';
-  if (!strcmp(RES, "ASP"))
-    return 'D';
-  if (!strcmp(RES, "CYS"))
-    return 'C';
-  if (!strcmp(RES, "GLN"))
-    return 'Q';
-  if (!strcmp(RES, "GLU"))
-    return 'E';
-  if (!strcmp(RES, "GLY"))
-    return 'G';
-  if (!strcmp(RES, "HIS"))
-    return 'H';
-  if (!strcmp(RES, "ILE"))
-    return 'I';
-  if (!strcmp(RES, "LEU"))
-    return 'L';
-  if (!strcmp(RES, "LYS"))
-    return 'K';
-  if (!strcmp(RES, "MET"))
-    return 'M';
-  if (!strcmp(RES, "PHE"))
-    return 'F';
-  if (!strcmp(RES, "PRO"))
-    return 'P';
-  if (!strcmp(RES, "SER"))
-    return 'S';
-  if (!strcmp(RES, "THR"))
-    return 'T';
-  if (!strcmp(RES, "TRP"))
-    return 'W';
-  if (!strcmp(RES, "TYR"))
-    return 'Y';
-  if (!strcmp(RES, "VAL"))
-    return 'V';
-
-  return 'X';
-}
-
 /* Read dictionary file and saves residue names inside TABLE matrix and return
  * number of residues */
 int define_table(char TABLE[TABLE_SIZE][RES_SIZE],
@@ -147,8 +89,6 @@ int dictionary_load(dict *DIC[TABLE_SIZE], int tablesize,
 
       /* Allocate a dict space for p in memory */
       p = malloc(sizeof(dict));
-      /* Eliminate whitespaces between symbol and its radius value */
-      trim(AUX, ' ');
       /* Read radius value and save inside struct p inside radius */
       fscanf(dictionary_file, "%lf", &p->radius);
       /* Copy AUX string and paste inside struct p inside symbol */

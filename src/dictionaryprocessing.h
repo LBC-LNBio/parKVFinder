@@ -17,7 +17,6 @@ typedef struct DICTIONARY {
 void trim(char S[50], char c);
 void resolution_input(char flag_in[7], double *Vvoxel, int *resolution_mode,
                       double *h);
-char convertRES(char RES[RES_SIZE]);
 int dictionary_load(dict *DIC[TABLE_SIZE], int tablesize,
                     char dictionary_name[DIC_NAME_MAX]);
 int define_table(char TABLE[TABLE_SIZE][RES_SIZE],

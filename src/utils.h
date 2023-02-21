@@ -7,5 +7,7 @@ double min(double a, double b);
 int _read_line(FILE *arq, char LINE[], int size);
 void _extract(char FROM[], int nF, char TO[], int nT, int start, int end);
 void _remove_char(char FROM[], int nF, char c);
+char _convert_residue_code(char RESIDUE[]);
+
 
 #endif

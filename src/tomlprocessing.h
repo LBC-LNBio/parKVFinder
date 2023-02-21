@@ -22,7 +22,6 @@ toml *param;
 toml *readTOML(toml *p, char *path);
 int TF_input(char flag_in[6]);
 void init500(char S[500]);
-void trim2(char S[500], char c);
 void extract_toml_line(char LINE[500], int a, int b, char S[500]);
 int get_toml_line(FILE *arq, char LINE[500]);
 

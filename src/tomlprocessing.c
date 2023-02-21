@@ -29,18 +29,6 @@ void extract_toml_line(char LINE[500], int a, int b, char S[500]) {
     S[i] = '\0';
 }
 
-/* Remove a char c from a string S[100] */
-void trim2(char S[500], char c) {
-  /* Declare variables */
-  int i, j;
-
-  for (i = 0; S[i] != '\0'; i++) {
-    if (S[i] == c)
-      for (j = i; S[j] != '\0'; j++)
-        S[j] = S[j + 1];
-  }
-}
-
 /* Fill string S[100] with 0s */
 void init500(char S[500]) {
   /* Declare variables */
@@ -88,9 +76,9 @@ toml *readTOML(toml *p, char *path) {
 
     HANDLE_LAST_LINE:
       /* Remove tabs */
-      trim2(LINE, '\t');
+      _remove_char(LINE, strlen(LINE), '\t');
       /* Remove whitespaces */
-      trim2(LINE, ' ');
+      _remove_char(LINE, strlen(LINE), ' ');
 
       /* If a '#' is found, ignore line */
       if (LINE[0] == '#' || LINE[0] == '\n' || LINE[0] == ' ')
@@ -265,8 +253,7 @@ toml *readTOML(toml *p, char *path) {
           } else {
 
             /* Remove quotation marks */
-            trim2(value, '\"');
-            trim2(value, '\"');
+            _remove_char(value, strlen(value), '\"');
 
             /* Save values inside struct TOML */
             if (strcmp(key, "output") == 0)

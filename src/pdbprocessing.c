@@ -148,7 +148,7 @@ int PDB_load(dict *DIC[TABLE_SIZE], int tablesize,
             z1 < (double)o + (probe + radius) / h) {
 
           /* Save coordinates (x,y,z), radius, residue number and chain */
-          insert_atom(x, y, z, radius, number, CHAIN[0], convertRES(RESIDUE));
+          insert_atom(x, y, z, radius, number, CHAIN[0], _convert_residue_code(RESIDUE));
         }
       }
     }
