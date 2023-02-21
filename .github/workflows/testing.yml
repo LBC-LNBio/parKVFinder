@@ -47,13 +47,12 @@ jobs:
                 make
                 sudo make link
               env:
-                CC: gcc-${{ matrix.gcc }}
+                CC: /usr/local/bin/gcc-${{ matrix.gcc }}
             - name: Integration testing
               run: |
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
-                ls -R
-                # cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
+                cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
 
 
          
