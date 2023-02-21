@@ -42,7 +42,7 @@ jobs:
             - name: Build parKVFinder
               run: |
                 brew install gcc@${{ matrix.gcc }}
-                gcc --version
+                ${CC} --version
                 make clean
                 make
                 sudo make link
