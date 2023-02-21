@@ -146,56 +146,144 @@ void _remove_char(char FROM[], int nF, char c)
 {
     int i, j;
 
-    for (i = 0; FROM[i] != '\0'; i++) {
+    for (i = 0; FROM[i] != '\0'; i++)
+    {
         if (FROM[i] == c)
             for (j = i; FROM[j] != '\0'; j++)
                 FROM[j] = FROM[j + 1];
-  }
+    }
 }
 
-/* Convert 3-letter residue system to 1-letter residue system */
-char _convert_residue_code(char RESIDUE[]) {
+/*
+ * Function: _convert_residue_code
+ * -------------------------------
+ *
+ * Covert 3-letter code to 1-letter code
+ *
+ * RESIDUE: residue in 3-letter code
+ *
+ * returns: residue in 1-letter code
+ *
+ */
+char _convert_residue_code(char RESIDUE[])
+{
 
-  if (!strcmp(RESIDUE, "ALA"))
-    return 'A';
-  if (!strcmp(RESIDUE, "ARG"))
-    return 'R';
-  if (!strcmp(RESIDUE, "ASN"))
-    return 'N';
-  if (!strcmp(RESIDUE, "ASP"))
-    return 'D';
-  if (!strcmp(RESIDUE, "CYS"))
-    return 'C';
-  if (!strcmp(RESIDUE, "GLN"))
-    return 'Q';
-  if (!strcmp(RESIDUE, "GLU"))
-    return 'E';
-  if (!strcmp(RESIDUE, "GLY"))
-    return 'G';
-  if (!strcmp(RESIDUE, "HIS"))
-    return 'H';
-  if (!strcmp(RESIDUE, "ILE"))
-    return 'I';
-  if (!strcmp(RESIDUE, "LEU"))
-    return 'L';
-  if (!strcmp(RESIDUE, "LYS"))
-    return 'K';
-  if (!strcmp(RESIDUE, "MET"))
-    return 'M';
-  if (!strcmp(RESIDUE, "PHE"))
-    return 'F';
-  if (!strcmp(RESIDUE, "PRO"))
-    return 'P';
-  if (!strcmp(RESIDUE, "SER"))
-    return 'S';
-  if (!strcmp(RESIDUE, "THR"))
-    return 'T';
-  if (!strcmp(RESIDUE, "TRP"))
-    return 'W';
-  if (!strcmp(RESIDUE, "TYR"))
-    return 'Y';
-  if (!strcmp(RESIDUE, "VAL"))
-    return 'V';
+    if (!strcmp(RESIDUE, "ALA"))
+        return 'A';
+    if (!strcmp(RESIDUE, "ARG"))
+        return 'R';
+    if (!strcmp(RESIDUE, "ASN"))
+        return 'N';
+    if (!strcmp(RESIDUE, "ASP"))
+        return 'D';
+    if (!strcmp(RESIDUE, "CYS"))
+        return 'C';
+    if (!strcmp(RESIDUE, "GLN"))
+        return 'Q';
+    if (!strcmp(RESIDUE, "GLU"))
+        return 'E';
+    if (!strcmp(RESIDUE, "GLY"))
+        return 'G';
+    if (!strcmp(RESIDUE, "HIS"))
+        return 'H';
+    if (!strcmp(RESIDUE, "ILE"))
+        return 'I';
+    if (!strcmp(RESIDUE, "LEU"))
+        return 'L';
+    if (!strcmp(RESIDUE, "LYS"))
+        return 'K';
+    if (!strcmp(RESIDUE, "MET"))
+        return 'M';
+    if (!strcmp(RESIDUE, "PHE"))
+        return 'F';
+    if (!strcmp(RESIDUE, "PRO"))
+        return 'P';
+    if (!strcmp(RESIDUE, "SER"))
+        return 'S';
+    if (!strcmp(RESIDUE, "THR"))
+        return 'T';
+    if (!strcmp(RESIDUE, "TRP"))
+        return 'W';
+    if (!strcmp(RESIDUE, "TYR"))
+        return 'Y';
+    if (!strcmp(RESIDUE, "VAL"))
+        return 'V';
 
-  return 'X';
+    return 'X';
+}
+
+/*
+ * Function: _initialize_string
+ * ----------------------------
+ *
+ * Fill string FROM[] with '\0'
+ *
+ * FROM: flexible array with a string
+ * nF: size of FROM
+ *
+ */
+void _initialize_string(char FROM[], int nF)
+{
+    int i;
+
+    for (i = 0; i < nF; i++)
+        FROM[i] = '\0';
+}
+
+/*
+ * Function: _toml2int
+ * -------------------
+ *
+ * Convert 'true' or 'false' to 1 or 0
+ *
+ * flag: TOML boolean
+ *
+ */
+/* Convert true or false input to int input */
+int _toml2int(char flag[6])
+{
+
+    if (strcmp(flag, "false") == 0 || strcmp(flag, "0") == 0)
+        return 0;
+    else
+        return 1;
+}
+
+/*
+ * Function: _int2toml
+ * -------------------
+ *
+ * Convert 1 or 0 to 'true' or 'false'
+ *
+ * boolean: 1 or 0
+ * flag: TOML boolean ('true' or 'false')
+ *
+ */
+int _int2toml(int boolean, char **flag)
+{
+
+    if (boolean)
+        *flag = "true";
+    else
+        *flag = "false";
+}
+
+/*
+ * Function: _get_file_extension
+ * -----------------------------
+ *
+ * Get file extension
+ *
+ * fn: filename
+ * 
+ * returns: file extension
+ *
+ */
+char *_get_file_extension(char *fn)
+{
+    char *dot = strrchr(fn, '.');
+
+    if (!dot || dot == fn)
+        return "";
+    return dot + 1;
 }

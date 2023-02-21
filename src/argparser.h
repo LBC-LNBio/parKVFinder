@@ -4,16 +4,11 @@
 #define ARGPARSER_H
 
 /* Define custom functions */
-char TF(int mode, char **tomlmode);
-char *get_file_extension(char *filename);
 void create_custom_box(char *box_name, double *Xmin, double *Xmax, double *Ymin,
                        double *Ymax, double *Zmin, double *Zmax);
 void create_residues_box(char *box_name, double *Xmin, double *Xmax,
                          double *Ymin, double *Ymax, double *Zmin, double *Zmax,
-                         double padding, char PDB_NAME[NAME_MAX]);
-void init25(char S[25]);
-void init75(char S[75]);
-void init80(char S[80]);
+                         double padding, char PDB_NAME[500]);
 void print_version();
 void print_header();
 void print_usage();

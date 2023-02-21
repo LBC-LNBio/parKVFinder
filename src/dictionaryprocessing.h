@@ -14,7 +14,6 @@ typedef struct DICTIONARY {
 } dict;
 
 /* Define custom functions */
-void trim(char S[50], char c);
 void resolution_input(char flag_in[7], double *Vvoxel, int *resolution_mode,
                       double *h);
 int dictionary_load(dict *DIC[TABLE_SIZE], int tablesize,

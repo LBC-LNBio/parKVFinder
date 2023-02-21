@@ -11,47 +11,12 @@
 #include "utils.h"
 #include "tomlprocessing.h"
 
-/* Extract from LINE[a] until LINE[b] to a char array S[100] of size b-a */
-void extract_toml_line(char LINE[500], int a, int b, char S[500]) {
-  /* Declare variables */
-  int i;
-
-  /* Tests inputs */
-  if (b > 500 || a > b)
-    return;
-
-  /* Extract process */
-  for (i = a; i < b; i++)
-    S[i - a] = LINE[i];
-
-  /* Mark last position in S[] */
-  if (i < 500)
-    S[i] = '\0';
-}
-
-/* Fill string S[100] with 0s */
-void init500(char S[500]) {
-  /* Declare variables */
-  int i;
-
-  for (i = 0; i < 500; i++)
-    S[i] = '\0';
-}
-
-/* Convert true or false input to int input */
-int TF_input(char flag_in[6]) {
-
-  if (strcmp(flag_in, "false") == 0 || strcmp(flag_in, "0") == 0)
-    return 0;
-  else
-    return 1;
-}
-
 /* Read TOML file and pass to struct TOML */
-toml *readTOML(toml *p, char *path) {
+toml *readTOML(toml *p, char *path)
+{
   /* Declare variables */
   FILE *parameters_file;
-  char LINE[500], config[500] = "", value[500] = "", key[500] = "";
+  char LINE[500], config[100] = "", value[500] = "", key[100] = "";
   char *vb, *ib, *p1, *p2, *p3, *p4;
   int i = 0, equal = 0, flag_visiblebox = 0, flag_internalbox = 0, count = 0;
   int config_bar[2];
@@ -63,16 +28,19 @@ toml *readTOML(toml *p, char *path) {
   parameters_file = fopen(path, "r");
 
   /* TOML file not found */
-  if (parameters_file == NULL) {
+  if (parameters_file == NULL)
+  {
 
     /* Print error and exit */
     printf("\033[0;31mError:\033[0m Invalid parameters file! Please select a "
            "valid parameters and try again.\n");
     exit(-1);
-
-  } else {
+  }
+  else
+  {
     /* While TOML file is not over, do... */
-    while (_read_line(parameters_file, LINE, 500)) {
+    while (_read_line(parameters_file, LINE, 500))
+    {
 
     HANDLE_LAST_LINE:
       /* Remove tabs */
@@ -83,9 +51,11 @@ toml *readTOML(toml *p, char *path) {
       /* If a '#' is found, ignore line */
       if (LINE[0] == '#' || LINE[0] == '\n' || LINE[0] == ' ')
         ;
-      else {
+      else
+      {
 
-        for (i = 0; i < strlen(LINE); i++) {
+        for (i = 0; i < strlen(LINE); i++)
+        {
 
           /* Get position of newline symbol in LINE */
           if (LINE[i] == '=')
@@ -101,40 +71,45 @@ toml *readTOML(toml *p, char *path) {
         }
 
         /* If vector config_bar are filled, do ... */
-        if (config_bar[1] != 0) {
+        if (config_bar[1] != 0)
+        {
 
           /* Restart string config[500] */
-          init500(config);
+          _initialize_string(config, strlen(config));
           /* Extract name of configuration */
-          extract_toml_line(LINE, config_bar[0] + 1, config_bar[1], config);
+          _extract(LINE, strlen(LINE), config, strlen(config), config_bar[0] + 1, config_bar[1]);
 
           vb = strstr(config, ".visiblebox.");
           ib = strstr(config, ".internalbox.");
 
           /* If configuration is visiblebox, do ... */
-          if (vb != NULL) {
+          if (vb != NULL)
+          {
             flag_visiblebox = 1;
             count = 0;
           }
 
           /* If configuration is internalbox, do ... */
-          if (ib != NULL) {
+          if (ib != NULL)
+          {
             flag_internalbox = 1;
             count = 0;
           }
         }
 
         /* If equal symbol is found, do ... */
-        if (equal != 0) {
+        if (equal != 0)
+        {
 
           /* Extract key */
-          extract_toml_line(LINE, 0, equal, key);
+          _extract(LINE, strlen(LINE), key, strlen(key), 0, equal);
 
           /* Extract value */
-          extract_toml_line(LINE, equal + 1, strlen(LINE) - 1, value);
+          _extract(LINE, strlen(LINE), value, strlen(value), equal + 1, strlen(LINE) - 1);
 
           /* If bracket is found, do ... */
-          if (flag_visiblebox || flag_internalbox) {
+          if (flag_visiblebox || flag_internalbox)
+          {
 
             p1 = strstr(config, ".p1");
             p2 = strstr(config, ".p2");
@@ -142,13 +117,15 @@ toml *readTOML(toml *p, char *path) {
             p4 = strstr(config, ".p4");
 
             /* Visible box */
-            if (flag_visiblebox) {
+            if (flag_visiblebox)
+            {
 
               /* Count number of coordinates read */
               count++;
 
               /* Visible point 1 : bP1 */
-              if (p1 != NULL) {
+              if (p1 != NULL)
+              {
 
                 /* Get x, y or z coordinates */
                 if (strcmp(key, "x") == 0)
@@ -160,7 +137,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Visible point 2 : bP2 */
-              if (p2 != NULL) {
+              if (p2 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->bX2) = atof(value);
@@ -171,7 +149,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Visible point 3 : bP3 */
-              if (p3 != NULL) {
+              if (p3 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->bX3) = atof(value);
@@ -182,7 +161,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Visible point 4 : bP4 */
-              if (p4 != NULL) {
+              if (p4 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->bX4) = atof(value);
@@ -197,12 +177,14 @@ toml *readTOML(toml *p, char *path) {
             }
 
             /* Visible box */
-            if (flag_internalbox) {
+            if (flag_internalbox)
+            {
 
               count++;
 
               /* Internal point 1 : P1 */
-              if (p1 != NULL) {
+              if (p1 != NULL)
+              {
 
                 /* Get x, y or z coordinates */
                 if (strcmp(key, "x") == 0)
@@ -214,7 +196,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Internal point 2 : P2 */
-              if (p2 != NULL) {
+              if (p2 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->X2) = atof(value);
@@ -225,7 +208,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Internal point 3 : P3 */
-              if (p3 != NULL) {
+              if (p3 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->X3) = atof(value);
@@ -236,7 +220,8 @@ toml *readTOML(toml *p, char *path) {
               }
 
               /* Internal point 4 : P4 */
-              if (p4 != NULL) {
+              if (p4 != NULL)
+              {
 
                 if (strcmp(key, "x") == 0)
                   (p->X4) = atof(value);
@@ -249,8 +234,9 @@ toml *readTOML(toml *p, char *path) {
               if (count == 3)
                 flag_internalbox = 0;
             }
-
-          } else {
+          }
+          else
+          {
 
             /* Remove quotation marks */
             _remove_char(value, strlen(value), '\"');
@@ -267,17 +253,17 @@ toml *readTOML(toml *p, char *path) {
             if (strcmp(key, "dictionary") == 0)
               strcpy((p->dictionary_name), value);
             if (strcmp(key, "whole_protein_mode") == 0)
-              (p->whole_protein_mode) = TF_input(value);
+              (p->whole_protein_mode) = _toml2int(value);
             if (strcmp(key, "resolution_mode") == 0)
               strcpy((p->resolution_flag), value);
             if (strcmp(key, "box_mode") == 0)
-              (p->box_mode) = TF_input(value);
+              (p->box_mode) = _toml2int(value);
             if (strcmp(key, "surface_mode") == 0)
-              (p->surface_mode) = TF_input(value);
+              (p->surface_mode) = _toml2int(value);
             if (strcmp(key, "kvp_mode") == 0)
-              (p->kvp_mode) = TF_input(value);
+              (p->kvp_mode) = _toml2int(value);
             if (strcmp(key, "ligand_mode") == 0)
-              (p->ligand_mode) = TF_input(value);
+              (p->ligand_mode) = _toml2int(value);
             if (strcmp(key, "step_size") == 0)
               (p->h) = atof(value);
             if (strcmp(key, "probe_in") == 0)
@@ -295,9 +281,9 @@ toml *readTOML(toml *p, char *path) {
       }
 
       /* Restart variables */
-      init500(LINE);
-      init500(key);
-      init500(value);
+      _initialize_string(LINE, strlen(LINE));
+      _initialize_string(key, strlen(key));
+      _initialize_string(value, strlen(value));
       equal = 0;
       config_bar[0] = 0;
       config_bar[1] = 0;
@@ -307,7 +293,8 @@ toml *readTOML(toml *p, char *path) {
   /* Check if last line read found EOF in the middle of the line */
   for (i = 0; LINE[i] != EOF; i++)
     ;
-  if (i > 0) {
+  if (i > 0)
+  {
     LINE[i] = '\n';
     goto HANDLE_LAST_LINE;
   }

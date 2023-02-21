@@ -20,7 +20,7 @@
  * residues box file */
 void create_residues_box(char *box_name, double *Xmin, double *Xmax,
                          double *Ymin, double *Ymax, double *Zmin, double *Zmax,
-                         double padding, char PDB_NAME[NAME_MAX])
+                         double padding, char PDB_NAME[500])
 {
   /* Declare variables */
   int resnum;
@@ -122,26 +122,6 @@ void create_custom_box(char *box_name, double *Xmin, double *Xmax, double *Ymin,
   *Zmax = coord[5];
 }
 
-/* Get file extension */
-char *get_file_extension(char *filename)
-{
-  /* Declare variables */
-  char *dot = strrchr(filename, '.');
-
-  if (!dot || dot == filename)
-    return "";
-  return dot + 1;
-}
-
-/* Convert int to true or false input */
-char TF(int mode, char **tomlmode)
-{
-  if (mode)
-    *tomlmode = "true";
-  else
-    *tomlmode = "false";
-}
-
 /* Print TOML file inside KV_Files folder */
 void print_toml(char *toml_name, char OUTPUT[500], char BASE_NAME[500],
                 char dictionary_name[500], char PDB_NAME[500],
@@ -192,11 +172,11 @@ void print_toml(char *toml_name, char OUTPUT[500], char BASE_NAME[500],
   fprintf(toml_file, "\n\t[SETTINGS.modes]\n");
   fprintf(toml_file, "\t# Whole Protein mode defines the search space as the "
                      "whole protein.\n");
-  TF(whole_protein_mode, &wpmode);
+  _int2toml(whole_protein_mode, &wpmode);
   fprintf(toml_file, "\twhole_protein_mode = %s\n", wpmode);
   fprintf(toml_file, "\t# Box Adjustment mode defines the search space as a "
                      "box that includes a specific region.\n");
-  TF(box_mode, &bmode);
+  _int2toml(box_mode, &bmode);
   fprintf(toml_file, "\tbox_mode = %s\n", bmode);
   fprintf(toml_file, "\t# Resolution mode implicitly sets the step size (grid "
                      "spacing) of the 3D grid.\n");
@@ -208,16 +188,16 @@ void print_toml(char *toml_name, char OUTPUT[500], char BASE_NAME[500],
   fprintf(toml_file, "\t# Surface mode defines the type of surface "
                      "representation to be applied, van der Waals molecular "
                      "surface (true) or solvent accessible surface (false).\n");
-  TF(surface_mode, &smode);
+  _int2toml(surface_mode, &smode);
   fprintf(toml_file, "\tsurface_mode = %s\n", smode);
   fprintf(toml_file, "\t# Cavity output mode defines whether cavities are "
                      "exported to the output PDB file as filled cavities "
                      "(true) or filtered cavities (false).\n");
-  TF(kvp_mode, &kmode);
+  _int2toml(kvp_mode, &kmode);
   fprintf(toml_file, "\tkvp_mode = %s\n", kmode);
   fprintf(toml_file, "\t# Ligand adjustment mode defines the search space "
                      "around the ligand.\n");
-  TF(ligand_mode, &lmode);
+  _int2toml(ligand_mode, &lmode);
   fprintf(toml_file, "\tligand_mode = %s\n", lmode);
 
   fprintf(toml_file, "\n\t[SETTINGS.step_size]\n");
@@ -327,33 +307,6 @@ int check_input(char *optarg, char *error)
 }
 
 void print_version() { printf("parKVFinder (parallel KVFinder) v1.1.4\n"); }
-
-void init25(char S[25])
-{
-  /* Declare variables */
-  int i;
-
-  for (i = 0; i < 25; i++)
-    S[i] = ' ';
-}
-
-void init55(char S[55])
-{
-  /* Declare variables */
-  int i;
-
-  for (i = 0; i < 55; i++)
-    S[i] = ' ';
-}
-
-void init80(char S[80])
-{
-  /* Declare variables */
-  int i;
-
-  for (i = 0; i < 80; i++)
-    S[i] = ' ';
-}
 
 void print_header()
 {
@@ -784,7 +737,7 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
         exit(-1);
       }
       /* Check parameters file extension*/
-      if (strcmp(get_file_extension(parameters_name), "toml"))
+      if (strcmp(_get_file_extension(parameters_name), "toml"))
       {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Wrong parameters file "
@@ -953,7 +906,7 @@ int argparser(int argc, char **argv, int *box_mode, int *kvp_mode,
         exit(-1);
       }
       /* Check PDB file extension*/
-      if (strcmp(get_file_extension(PDB_NAME), "pdb"))
+      if (strcmp(_get_file_extension(PDB_NAME), "pdb"))
       {
         fprintf(stderr,
                 "\033[0;31mError:\033[0m Wrong PDB file extension!\narg: "
