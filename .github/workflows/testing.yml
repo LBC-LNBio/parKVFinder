@@ -26,6 +26,7 @@ jobs:
               run: |
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
+                cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
 
 
          
