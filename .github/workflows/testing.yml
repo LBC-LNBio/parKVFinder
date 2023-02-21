@@ -10,7 +10,7 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                gcc: [8, 9, 10, 11, 12]
+                gcc: [9, 10, 11, 12]
         steps:
             - uses: actions/checkout@v3
             - name: Build parKVFinder
@@ -24,6 +24,7 @@ jobs:
                 CC: gcc-${{ matrix.gcc }}
             - name: Integration testing
               run: |
+                export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
 
 
