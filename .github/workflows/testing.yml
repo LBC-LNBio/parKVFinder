@@ -27,8 +27,7 @@ jobs:
               run: |
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
                 bash tests/testing.sh
-                ls -R
-                # cat ../input/KV_Files/1FMO/1FMO.KVFinder.results.toml
+                cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
     
     macos-testing:
         name: Test on macOS with gcc-${{ matrix.gcc }}
@@ -42,12 +41,11 @@ jobs:
             - name: Build parKVFinder
               run: |
                 brew install gcc@${{ matrix.gcc }}
-                ${CC} --version
+                sudo rm /usr/local/bin/gcc
+                sudo ln -s /usr/local/bin/gcc-${{ matrix.gcc }} /usr/local/bin/gcc 
                 make clean
                 make
                 sudo make link
-              env:
-                CC: /usr/local/bin/gcc-${{ matrix.gcc }}
             - name: Integration testing
               run: |
                 export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
