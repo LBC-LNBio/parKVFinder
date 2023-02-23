@@ -1544,7 +1544,7 @@ Citation for PyMOL may be found here:
         self.step_size_info.configure(
             text=u"Step Size ({}): {:.2f}".format(
                 chr(0x212b),
-                results['PARAMETERS']['STEP_SIZE']
+                results['PARAMETERS']['STEP']
             )
         )
 

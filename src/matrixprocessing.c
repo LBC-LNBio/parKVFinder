@@ -12,10 +12,10 @@ explained in the source code.*/
 
 /* Import custom modules */
 #include "utils.h"
-#include "dictionaryprocessing.h"
+#include "fileprocessing.h"
+
 #include "matrixprocessing.h"
-#include "pdbprocessing.h"
-#include "resultsprocessing.h"
+// #include "resultsprocessing.h"
 
 /* Check if a given cavity point on the grid is next to a protein point */
 int check_pos(int ***A, int i, int j, int k, int m, int n, int o) {
@@ -225,12 +225,12 @@ void Matrix_search(int ***A, int ***S, int m, int n, int o, double h,
                   /*Letters range from 65 to 90 in ASCII table*/
                   /*Residue number should be unique for specified cavity index
                    * (cont)*/
-                  if (oldnum != p->resnum && p->resnum <= 9999 &&
+                  if (oldnum != p->resnumber && p->resnumber <= 9999 &&
                       p->chain >= 65 && p->chain <= 90) {
                     /* Insert residue information inside KVFinder_results */
-                    insert_res(p->resnum, p->chain, p->res_name, cont - 2);
+                    _insert_residue(p->resnumber, p->chain, p->resname, cont - 2);
                   }
-                  oldnum = p->resnum;
+                  oldnum = p->resnumber;
                 }
               }
             }

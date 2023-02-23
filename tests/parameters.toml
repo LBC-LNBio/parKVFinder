@@ -12,7 +12,7 @@ output = "../input/"
 # Base name for output files.
 base_name = "1FMO"
 # Path for the ligand's PDB file.
-ligand = "�"�c"
+ligand = "-"
 
 [SETTINGS]
 # Settings for parKVFinder software

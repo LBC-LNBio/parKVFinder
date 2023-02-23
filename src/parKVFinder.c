@@ -18,12 +18,12 @@ parts may be found in the source code */
 /* Import custom modules */
 /* WARNING: keep this importing order */
 #include "utils.h"
-#include "dictionaryprocessing.h"
-#include "pdbprocessing.h"
-#include "matrixprocessing.h"
+
+#include "fileprocessing.h"
+
 #include "argparser.h"
-#include "tomlprocessing.h"
-#include "resultsprocessing.h"
+#include "matrixprocessing.h"
+// #include "resultsprocessing.h"
 
 /* Main function */
 int main(int argc, char **argv) {
@@ -52,13 +52,13 @@ int main(int argc, char **argv) {
       kvp_mode;
   static int verbose_flag = 0;
   int m, n, o, i, j, k, ncav, tablesize, iterator;
-  char TABLE[TABLE_SIZE][RES_SIZE], PDB_NAME[NAME_MAX], LIGAND_NAME[NAME_MAX],
-      dictionary_name[DIC_NAME_MAX], OUTPUT[NAME_MAX], BASE_NAME[NAME_MAX];
+  char TABLE[500][4], PDB_NAME[500], LIGAND_NAME[500], dictionary_name[500],
+      OUTPUT[500], BASE_NAME[500];
   char boxmode_flag[6], resolution_flag[7], whole_protein_flag[6], mode_flag[6],
       surface_flag[6], step_flag[6], kvpmode_flag[6];
   char log_buffer[4096], *output, *output_folder, *output_pdb, *output_results,
       *pdb_name;
-  dict *DIC[TABLE_SIZE];
+  vdw *DIC[500];
   FILE *parameters_file, *log_file;
   atom *p;
   int ***A, ***S;
@@ -76,8 +76,8 @@ int main(int argc, char **argv) {
       exit(-1);
     }
     /* Read parameters TOML files */
-    toml *parameters = readTOML(
-        param, "parameters.toml"); /* Read TOML file inside struct TOML */
+    parameters *parameters =
+        readTOML("parameters.toml"); /* Read TOML file inside struct TOML */
 
     /* Save TOML parameters from struct TOML parameters to KVFinder variables */
     X1 = parameters->X1;
@@ -123,7 +123,6 @@ int main(int argc, char **argv) {
     ligand_mode = parameters->ligand_mode;
 
     /* Free struct TOML */
-    free(param);
     free(parameters);
   } else {
     /* Save command line arguments inside KVFinder variables */
@@ -135,25 +134,31 @@ int main(int argc, char **argv) {
                   &Z1, &X2, &Y2, &Z2, &X3, &Y3, &Z3, &X4, &Y4, &Z4, &bX1, &bY1,
                   &bZ1, &bX2, &bY2, &bZ2, &bX3, &bY3, &bZ3, &bX4, &bY4, &bZ4);
   }
-  resolution_input(resolution_flag, &Vvoxel, &resolution_mode,
-                   &h); /*Set Vvoxel, step size and resolution_mode*/
-  tablesize = define_table(
-      TABLE,
-      dictionary_name); /*Read dictionary file and return number of residues*/
+  /* Set step size (h) and resolution_mode */
+  if (!strcmp(resolution_flag, "Off"))
+    resolution_mode = 0;
+  else
+    h = _resolution2step(resolution_flag);
+  resolution_mode = 1;
+
+  /* Load vdW dictionary */
+  tablesize = _get_residues_information(
+      dictionary_name,
+      TABLE); /*Read dictionary file and return number of residues*/
   if (verbose_flag)
     fprintf(stdout, "> Loading atomic dictionary file\n");
-  dictionary_load(DIC, tablesize, dictionary_name); /*Dictionary Loaded*/
+  read_vdw(dictionary_name, DIC, tablesize); /*Dictionary Loaded*/
 
   /* Preparing files paths */
   if (OUTPUT[strlen(OUTPUT) - 1] == '/') {
     if (OUTPUT[strlen(OUTPUT) - 2] == '/')
       OUTPUT[strlen(OUTPUT) - 1] = '\0';
-    output = combine(OUTPUT, "KV_Files/");
+    output = _combine(OUTPUT, "KV_Files/");
   } else {
     if (OUTPUT[0] == '\0')
-      output = combine(OUTPUT, "KV_Files/");
+      output = _combine(OUTPUT, "KV_Files/");
     else
-      output = combine(OUTPUT, "/KV_Files/");
+      output = _combine(OUTPUT, "/KV_Files/");
   }
   pdb_name = realpath(PDB_NAME, NULL);
 
@@ -161,7 +166,7 @@ int main(int argc, char **argv) {
   mkdir(output, S_IRWXU);
 
   /* Create log_file */
-  log_file = fopen(combine(output, "KVFinder.log"),
+  log_file = fopen(_combine(output, "KVFinder.log"),
                    "a+"); /* Open log file and append information */
   memset(log_buffer, '\0', sizeof(log_buffer)); /* Create buffer */
   setvbuf(log_file, log_buffer, _IOFBF,
@@ -169,19 +174,19 @@ int main(int argc, char **argv) {
 
   /* Create BASE_NAME folder for the running analysis */
   output =
-      combine(output, BASE_NAME); /* Include BASE_NAME folder in KV_Files */
-  mkdir(output, S_IRWXU);         /* Create BASE_NAME folder in KV_Files */
+      _combine(output, BASE_NAME); /* Include BASE_NAME folder in KV_Files */
+  mkdir(output, S_IRWXU);          /* Create BASE_NAME folder in KV_Files */
   output_folder =
-      combine(output, "/"); /* Include bar after appending BASE_NAME */
-  output = combine(
+      _combine(output, "/"); /* Include bar after appending BASE_NAME */
+  output = _combine(
       output_folder,
       BASE_NAME); /* Include BASE_NAME to output path in BASE_NAME folder */
 
   /* Create output PDB and results file names */
-  output_results = combine(
+  output_results = _combine(
       output,
       ".KVFinder.results.toml"); /* Create a output path to results file */
-  output_pdb = combine(
+  output_pdb = _combine(
       output,
       ".KVFinder.output.pdb"); /* Create a output path to output PDB file */
 
@@ -220,7 +225,7 @@ int main(int argc, char **argv) {
 
     /* Create a linked list (dictionary) for PDB file | saves only position
      * (x,y,z) and chain */
-    PDB_load2(PDB_NAME);
+    soft_read_pdb(PDB_NAME, 0, 0);
 
     /*Reduces box to protein size*/
     for (p = v; p != NULL; p = p->next) {
@@ -240,7 +245,7 @@ int main(int argc, char **argv) {
     }
 
     /* Free van der Waals radius dictionary from memory */
-    free_atom();
+    _free_atom();
 
   } /* If it will be used a user defined search space, without the Probe Out
        Adjustment define its limits */
@@ -286,19 +291,19 @@ int main(int argc, char **argv) {
 
   /* Grid steps based on distances */
   /*X axis*/
-  if (fmod(norm1,h) != 0) {
+  if (fmod(norm1, h) != 0) {
     m = (int)(norm1 / h) + 1;
   } else {
     m = (int)(norm1 / h);
   }
   /*Y axis*/
-  if (fmod(norm2,h) != 0) {
+  if (fmod(norm2, h) != 0) {
     n = (int)(norm2 / h) + 1;
   } else {
     n = (int)(norm2 / h);
   }
   /*Z axis*/
-  if (fmod(norm3,h) != 0) {
+  if (fmod(norm3, h) != 0) {
     o = (int)(norm3 / h) + 1;
   } else {
     o = (int)(norm3 / h);
@@ -327,7 +332,7 @@ int main(int argc, char **argv) {
   /* Protein Coordinates Extraction */
   /* Create a linked list for PDB information */
   /* Save coordinates (x,y,z), atom radius, residue number and chain */
-  if (PDB_load(DIC, tablesize, TABLE, PDB_NAME, probe_in, m, n, o, h, X1, Y1,
+  if (read_pdb(PDB_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file)) {
 
     if (verbose_flag)
@@ -383,18 +388,18 @@ int main(int argc, char **argv) {
       if (verbose_flag)
         fprintf(stdout, "> Adjusting ligand\n");
       /* Free linked list (dictionary) from memory */
-      free_atom();
+      _free_atom();
       /* Creates a linked list for Ligand information* | saves position (x,y,z),
        * atom radius, resnumber, chain */
-      PDB_load(DIC, tablesize, TABLE, LIGAND_NAME, probe_in, m, n, o, h, X1, Y1,
+      read_pdb(LIGAND_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file);
       /* Mark regions that do not belong to ligand_cutoff */
       Matrix_adjust(A, m, n, o, h, ligand_cutoff, X1, Y1, Z1);
       /* Free linked list (dictionary) from memory */
-      free_atom();
+      _free_atom();
       /* Create a linked list for PDB information* | saves position (x,y,z),
        * atom radius, resnumber, chain */
-      PDB_load(DIC, tablesize, TABLE, PDB_NAME, probe_in, m, n, o, h, X1, Y1,
+      read_pdb(PDB_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file);
     }
 
@@ -409,7 +414,7 @@ int main(int argc, char **argv) {
     /* Computing Volume and Grouping Cavities */
     if (verbose_flag)
       fprintf(stdout, "> Calculating volume\n");
-    
+
     /*Remove outlier points*/
     filter_outliers(A, m, n, o);
 
@@ -441,18 +446,24 @@ int main(int argc, char **argv) {
 
     /*Create coordinates for center of mass and depth*/
     /*Create max-min cavities and frontier coordinates struct*/
-    kvcoords = (coords*) calloc(ncav, sizeof(coords));
-    frontiercoords = (coords*) calloc(ncav, sizeof(coords));
-    for(int iterator = 0; iterator < ncav; iterator++){
+    kvcoords = (coords *)calloc(ncav, sizeof(coords));
+    frontiercoords = (coords *)calloc(ncav, sizeof(coords));
+    for (int iterator = 0; iterator < ncav; iterator++) {
       /*Start min and max cavities coordinates*/
-      kvcoords[iterator].Xmin = m; kvcoords[iterator].Xmax = 0;
-      kvcoords[iterator].Ymin = n; kvcoords[iterator].Ymax = 0;
-      kvcoords[iterator].Zmin = o; kvcoords[iterator].Zmax = 0;
+      kvcoords[iterator].Xmin = m;
+      kvcoords[iterator].Xmax = 0;
+      kvcoords[iterator].Ymin = n;
+      kvcoords[iterator].Ymax = 0;
+      kvcoords[iterator].Zmin = o;
+      kvcoords[iterator].Zmax = 0;
 
       /*Start min and max frontier coordinates*/
-      frontiercoords[iterator].Xmin = m; frontiercoords[iterator].Xmax = 0;
-      frontiercoords[iterator].Ymin = n; frontiercoords[iterator].Ymax = 0;
-      frontiercoords[iterator].Zmin = o; frontiercoords[iterator].Zmax = 0;
+      frontiercoords[iterator].Xmin = m;
+      frontiercoords[iterator].Xmax = 0;
+      frontiercoords[iterator].Ymin = n;
+      frontiercoords[iterator].Ymax = 0;
+      frontiercoords[iterator].Zmin = o;
+      frontiercoords[iterator].Zmax = 0;
     }
 
     /* Define surface points of each cavity */
@@ -474,7 +485,7 @@ int main(int argc, char **argv) {
 
   /* Free PDB linked list (dictionary) from memory */
   NOCAV:
-    free_atom();
+    _free_atom();
 
     /* Computing Depth */
     if (verbose_flag)
@@ -491,20 +502,19 @@ int main(int argc, char **argv) {
     if (verbose_flag)
       fprintf(stdout, "> Writing cavities PDB file\n");
     /* Export Cavities PDB */
-    Matrix_export(A, S, M, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1, Y1,
-                  Z1);
+    Matrix_export(A, S, M, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1,
+                  Y1, Z1);
   }
 
   /* Clean 3D-grids from memory */
-  free_matrix(A, m, n, o); /*Free int A grid from memory*/
-  free_matrix(S, m, n, o); /*Free int S grid from memory*/
+  free_matrix(A, m, n, o);  /*Free int A grid from memory*/
+  free_matrix(S, m, n, o);  /*Free int S grid from memory*/
   free_matrix2(M, m, n, o); /*Free double M grid from memory*/
 
   /* Write results file */
   if (verbose_flag)
     fprintf(stdout, "> Writing results file\n");
-  write_results(output_results, pdb_name, output_pdb, LIGAND_NAME,
-                resolution_flag, step_flag, ncav);
+  write_results(output_results, pdb_name, output_pdb, LIGAND_NAME, h, ncav);
 
   /*Evaluate elapsed time*/
   gettimeofday(&toc, NULL);
