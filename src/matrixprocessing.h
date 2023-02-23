@@ -3,18 +3,6 @@
 
 #define NAME_MAX 500
 
-/* Define type node for a NODE structure */
-typedef struct NODE {
-  double volume;
-  int pos;
-  struct NODE *next;
-} node;
-
-/* Declare structs */
-node *V;
-double volume;
-int flagr;
-
 /* Define custom functions */
 int check_pos(int ***A, int i, int j, int k, int m, int n, int o);
 int check_pos2(int ***A, int i, int j, int k, int m, int n, int o);

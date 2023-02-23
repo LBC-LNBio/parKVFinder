@@ -21,9 +21,10 @@ parts may be found in the source code */
 
 #include "fileprocessing.h"
 
-#include "argparser.h"
 #include "matrixprocessing.h"
-// #include "resultsprocessing.h"
+#include "gridprocessing.h"
+
+#include "argparser.h"
 
 /* Main function */
 int main(int argc, char **argv) {
@@ -365,7 +366,8 @@ int main(int argc, char **argv) {
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe in surface\n");
     /* Mark the grid with 0, leaving a small probe size around the protein */
-    Matrix_fill(A, m, n, o, h, probe_in, X1, Y1, Z1);
+    SAS(A, m, n, o, h, probe_in, X1, Y1, Z1);
+    // Matrix_fill(A, m, n, o, h, probe_in, X1, Y1, Z1);
 
     /* Mark space occupied by a small probe size from protein surface */
     if (surface_mode)
@@ -374,7 +376,8 @@ int main(int argc, char **argv) {
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe out surface\n");
     /* Mark the grid with 0, leaving a big probe size around the protein */
-    Matrix_fill(S, m, n, o, h, probe_out, X1, Y1, Z1);
+    SAS(S, m, n, o, h, probe_out, X1, Y1, Z1);
+    // Matrix_fill(S, m, n, o, h, probe_out, X1, Y1, Z1);
     /* Mark space occupied by a big probe size from protein surface */
     Matrix_surf(S, m, n, o, h, probe_out);
 

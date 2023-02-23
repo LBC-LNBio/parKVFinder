@@ -1,5 +1,5 @@
-parKVFinder: utils.o fileprocessing.o matrixprocessing.o argparser.o move src/parKVFinder.c requirements
-	gcc -fopenmp -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/matrixprocessing.o lib/argparser.o src/parKVFinder.c -lm -fcommon
+parKVFinder: utils.o fileprocessing.o matrixprocessing.o gridprocessing.o argparser.o move src/parKVFinder.c requirements
+	gcc -fopenmp -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/matrixprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -lm -fcommon
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
 		if [ -f ${HOME}/.bashrc ]; then \
@@ -23,12 +23,15 @@ fileprocessing.o: src/fileprocessing.c src/fileprocessing.h utils.o
 matrixprocessing.o: src/matrixprocessing.c src/matrixprocessing.h
 	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -fcommon
 
+gridprocessing.o: src/gridprocessing.c src/gridprocessing.h
+	gcc -fopenmp -O3 -Isrc -c src/gridprocessing.c -lm -fcommon
+
 argparser.o: src/argparser.c src/argparser.h
 	gcc -Isrc -c src/argparser.c -fcommon
 
-move: utils.o fileprocessing.o matrixprocessing.o argparser.o
+move: utils.o fileprocessing.o matrixprocessing.o gridprocessing.o argparser.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
-	mv utils.o fileprocessing.o matrixprocessing.o argparser.o lib/
+	mv utils.o fileprocessing.o matrixprocessing.o gridprocessing.o argparser.o lib/
 
 requirements: pip pip3
 

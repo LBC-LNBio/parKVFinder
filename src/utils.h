@@ -135,13 +135,20 @@ typedef struct KVFINDER_RESULTS {
   residues_info *res_info;
 } KVresults;
 
+typedef struct NODE {
+  double volume;
+  int pos;
+  struct NODE *next;
+} node;
+
 /* Global variables */
+double volume, sina, sinb, cosa, cosb;
+int flagr;
 atom *v;
-double sina, sinb, cosa, cosb;
+node *V;
 residues_info *t;
 KVresults *KVFinder_results;
-coords *kvcoords;
-coords *frontiercoords;
+coords *kvcoords, *frontiercoords;
 
 /* Functions */
 double max(double a, double b);
