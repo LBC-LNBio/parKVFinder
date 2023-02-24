@@ -1277,6 +1277,14 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 return False
         else:
             ligand = "-"
+        
+        if self.box_adjustment.isChecked():
+            if "box" not in cmd.get_names("selections"):
+                from PyQt5.QtWidgets import QMessageBox
+
+                QMessageBox.critical(self, "Error", "Draw a box in PyMOL!")
+                return False
+
 
         with open("parameters.toml", "w") as f:
             f.write("# TOML configuration file for parKVFinder software.\n")
