@@ -1697,11 +1697,11 @@ class PyMOL2parKVFinderTools(QMainWindow):
             return
 
         # Select residues
-        command = f"{self.input_pdb} and"
+        command = ""
         while len(residues) > 0:
             res, chain, _ = residues.pop(0)
             command = f"{command} (resid {res} and chain {chain}) or"
-        command = f"{command[:-3]}"
+        command = f"obj {self.input_pdb} and ({command[:-3]})"
         cmd.select("res", command)
 
         # Create residues object
@@ -1745,7 +1745,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
             return
 
         # Color filling cavity points as blue nonbonded
-        command = f"{self.cavity_pdb} and (resname "
+        command = f"obj {self.cavity_pdb} and (resname "
         while len(cavs) > 0:
             command = f"{command}{cavs.pop(0)},"
         command = f"{command[:-1]})"

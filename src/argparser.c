@@ -11,10 +11,7 @@
 
 /* Import customs modules */
 #include "utils.h"
-
 #include "fileprocessing.h"
-
-#include "matrixprocessing.h"
 
 /* Get residues box coordinates (Xmin, Xmax, Ymin, Ymax, Zmin, Zmax) from
  * residues box file */

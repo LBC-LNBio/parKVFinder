@@ -18,12 +18,8 @@ parts may be found in the source code */
 /* Import custom modules */
 /* WARNING: keep this importing order */
 #include "utils.h"
-
 #include "fileprocessing.h"
-
 #include "gridprocessing.h"
-#include "matrixprocessing.h"
-
 #include "argparser.h"
 
 /* Main function */
