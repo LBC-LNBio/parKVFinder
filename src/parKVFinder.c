@@ -134,9 +134,10 @@ int main(int argc, char **argv) {
   /* Set step size (h) and resolution_mode */
   if (!strcmp(resolution_flag, "Off"))
     resolution_mode = 0;
-  else
+  else {
     h = _resolution2step(resolution_flag);
-  resolution_mode = 1;
+    resolution_mode = 1;
+  }
 
   /* Load vdW dictionary */
   tablesize = _get_residues_information(

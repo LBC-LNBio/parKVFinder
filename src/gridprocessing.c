@@ -751,16 +751,11 @@ void filter_surface(int ***A, int ***S, int m, int n, int o) {
     /* Loop around the search box */
     for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
-        for (k = 0; k < o; k++) {
-
-          /* A[i][j][k] has an integer tag (cavity tag) */
+        for (k = 0; k < o; k++)
           if (A[i][j][k] > 1) {
-
             /* Define surface cavity points (tag) */
             S[i][j][k] = define_surface_points(A, m, n, o, i, j, k);
-
           } else {
-
             /* Define protein point (0) */
             if (A[i][j][k] == 0)
               S[i][j][k] = 0;
@@ -768,7 +763,6 @@ void filter_surface(int ***A, int ***S, int m, int n, int o) {
             else
               S[i][j][k] = -1;
           }
-        }
   }
 }
 
@@ -787,7 +781,7 @@ void filter_surface(int ***A, int ***S, int m, int n, int o) {
  */
 double check_voxel_class(int ***S, int i, int j, int k) {
   int contacts = 0;
-  double weight = 0.0;
+  double weight = 1.0;
 
   /* If face accessible to protein point, increment contacts */
   if (S[i - 1][j][k] == 0)

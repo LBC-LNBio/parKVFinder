@@ -10,29 +10,59 @@
 
 /* parKVFinder parameter file processing */
 
-/*
- * Function: readTOML
- * ------------------
- *
- * Read TOML-formatted parameters file of parKVFinder into a struct parameters.
- *
- * path: a path to a TOML-formatted parameters file of parKVFinder
- * (parameters.toml)
- *
- * returns: a struct parameters loaded with parKVFinder parameters
- *
- */
+/*Reads TOML file inside LINE*/
+int get_toml_line(FILE *arq, char LINE[500]) {
+  /* Declare variables */
+  int i;
+
+  /* Read PDB file inside LINE[500] */
+  for (i = 0, LINE[i] = getc(arq); LINE[i] != EOF && LINE[i] != '\n' && i < 500;
+       i++, LINE[i] = getc(arq))
+    ;
+
+  /* If LINE[500] is not \n, read PDB file until LINE[100] assume \n or EOF
+   * value */
+  if (i == 500 && LINE[i] != '\n')
+    for (; LINE[i] != '\n' && LINE[i] != EOF; LINE[i] = getc(arq))
+      ;
+
+  /* If PDB file is over, return False */
+  if (LINE[i] == EOF)
+    return 0;
+  /* If PDB file is not over, return True */
+  else
+    return 1;
+}
+
+/* Extract from LINE[a] until LINE[b] to a char array S[100] of size b-a */
+void extract_toml_line(char LINE[500], int a, int b, char S[500]) {
+  /* Declare variables */
+  int i;
+
+  /* Tests inputs */
+  if (b > 500 || a > b)
+    return;
+
+  /* Extract process */
+  for (i = a; i < b; i++)
+    S[i - a] = LINE[i];
+
+  /* Mark last position in S[] */
+  if (i < 500)
+    S[i] = '\0';
+}
+
+/* Read TOML file and pass to struct TOML */
 parameters *readTOML(char *path) {
   /* Declare variables */
   FILE *parameters_file;
-  char LINE[500], config[100] = "", value[500] = "", key[100] = "";
+  char LINE[500], config[500] = "", value[500] = "", key[500] = "";
   char *vb, *ib, *p1, *p2, *p3, *p4;
   int i = 0, equal = 0, flag_visiblebox = 0, flag_internalbox = 0, count = 0;
   int config_bar[2];
 
   /* Allocate memory to struct TOML */
-  parameters *p;
-  p = (parameters *)malloc(sizeof(parameters));
+  parameters *p = (parameters *)malloc(sizeof(parameters));
 
   /* Open parameters TOML file */
   parameters_file = fopen(path, "r");
@@ -44,9 +74,10 @@ parameters *readTOML(char *path) {
     printf("\033[0;31mError:\033[0m Invalid parameters file! Please select a "
            "valid parameters and try again.\n");
     exit(-1);
+
   } else {
     /* While TOML file is not over, do... */
-    while (_read_line(parameters_file, LINE, 500)) {
+    while (get_toml_line(parameters_file, LINE)) {
 
     HANDLE_LAST_LINE:
       /* Remove tabs */
@@ -77,11 +108,10 @@ parameters *readTOML(char *path) {
         /* If vector config_bar are filled, do ... */
         if (config_bar[1] != 0) {
 
-          /* Restart string config[500] */
+          /* Restart string config[100] */
           _initialize_string(config, strlen(config));
           /* Extract name of configuration */
-          _extract(LINE, strlen(LINE), config, strlen(config),
-                   config_bar[0] + 1, config_bar[1]);
+          extract_toml_line(LINE, config_bar[0] + 1, config_bar[1], config);
 
           vb = strstr(config, ".visiblebox.");
           ib = strstr(config, ".internalbox.");
@@ -103,11 +133,10 @@ parameters *readTOML(char *path) {
         if (equal != 0) {
 
           /* Extract key */
-          _extract(LINE, strlen(LINE), key, strlen(key), 0, equal);
+          extract_toml_line(LINE, 0, equal, key);
 
           /* Extract value */
-          _extract(LINE, strlen(LINE), value, strlen(value), equal + 1,
-                   strlen(LINE) - 1);
+          extract_toml_line(LINE, equal + 1, strlen(LINE) - 1, value);
 
           /* If bracket is found, do ... */
           if (flag_visiblebox || flag_internalbox) {
@@ -225,9 +254,11 @@ parameters *readTOML(char *path) {
               if (count == 3)
                 flag_internalbox = 0;
             }
+
           } else {
 
             /* Remove quotation marks */
+            _remove_char(value, strlen(value), '\"');
             _remove_char(value, strlen(value), '\"');
 
             /* Save values inside struct TOML */
@@ -897,10 +928,12 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
         /* Get atom type */
         _extract(LINE, strlen(LINE), ATOM_TYPE, strlen(ATOM_TYPE), 12, 17);
         _remove_char(ATOM_TYPE, strlen(ATOM_TYPE), ' ');
+        _remove_char(ATOM_TYPE, strlen(ATOM_TYPE), ' ');
 
         /* Get residue name */
         _extract(LINE, strlen(LINE), RESIDUE, strlen(RESIDUE), 17, 20);
         _remove_char(RESIDUE, strlen(RESIDUE), ' ');
+        _remove_char(ATOM_TYPE, strlen(ATOM_TYPE), ' ');
 
         /* Get residue sequence number */
         _extract(LINE, strlen(LINE), AUX, strlen(AUX), 22, 26);
