@@ -135,6 +135,17 @@ typedef struct KVFINDER_RESULTS {
   residues_info *res_info;
 } KVresults;
 
+/*
+ * Struct: node
+ * ------------
+ *
+ * A struct containing volume information
+ * 
+ * volume: cavity volume
+ * pos: cavity index
+ * struct node* next: pointer to next linked list node
+ *
+ */
 typedef struct NODE {
   double volume;
   int pos;
@@ -142,13 +153,13 @@ typedef struct NODE {
 } node;
 
 /* Global variables */
-double volume, sina, sinb, cosa, cosb;
-int flagr;
+double sina, sinb, cosa, cosb;
+int big, volume;
 atom *v;
 node *V;
 residues_info *t;
 KVresults *KVFinder_results;
-coords *kvcoords, *frontiercoords;
+coords *cavity, *boundary;
 
 /* Functions */
 double max(double a, double b);

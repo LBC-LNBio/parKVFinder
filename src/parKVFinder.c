@@ -21,8 +21,8 @@ parts may be found in the source code */
 
 #include "fileprocessing.h"
 
-#include "matrixprocessing.h"
 #include "gridprocessing.h"
+#include "matrixprocessing.h"
 
 #include "argparser.h"
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   int ligand_mode, surface_mode, whole_protein_mode, resolution_mode, box_mode,
       kvp_mode;
   static int verbose_flag = 0;
-  int m, n, o, i, j, k, ncav, tablesize, iterator;
+  int m, n, o, i, j, k, ncav, tablesize;
   char TABLE[500][4], PDB_NAME[500], LIGAND_NAME[500], dictionary_name[500],
       OUTPUT[500], BASE_NAME[500];
   char boxmode_flag[6], resolution_flag[7], whole_protein_flag[6], mode_flag[6],
@@ -367,24 +367,23 @@ int main(int argc, char **argv) {
       fprintf(stdout, "> Filling grid with probe in surface\n");
     /* Mark the grid with 0, leaving a small probe size around the protein */
     SAS(A, m, n, o, h, probe_in, X1, Y1, Z1);
-    // Matrix_fill(A, m, n, o, h, probe_in, X1, Y1, Z1);
 
     /* Mark space occupied by a small probe size from protein surface */
-    if (surface_mode)
-      Matrix_surf(A, m, n, o, h, probe_in);
+    if (surface_mode) {
+      SES(A, m, n, o, h, probe_in);
+    }
 
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe out surface\n");
     /* Mark the grid with 0, leaving a big probe size around the protein */
     SAS(S, m, n, o, h, probe_out, X1, Y1, Z1);
-    // Matrix_fill(S, m, n, o, h, probe_out, X1, Y1, Z1);
     /* Mark space occupied by a big probe size from protein surface */
-    Matrix_surf(S, m, n, o, h, probe_out);
+    SES(S, m, n, o, h, probe_out);
 
     if (verbose_flag)
       fprintf(stdout, "> Defining biomolecular cavities\n");
     /* Mark points where small probe passed and big probe did not */
-    Matrix_subtract(S, A, m, n, o, h, removal_distance);
+    subtract(A, S, m, n, o, h, removal_distance);
 
     /* Ligand adjustment mode */
     if (ligand_mode) {
@@ -397,7 +396,7 @@ int main(int argc, char **argv) {
       read_pdb(LIGAND_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file);
       /* Mark regions that do not belong to ligand_cutoff */
-      Matrix_adjust(A, m, n, o, h, ligand_cutoff, X1, Y1, Z1);
+      adjust2ligand(A, m, n, o, h, ligand_cutoff, X1, Y1, Z1);
       /* Free linked list (dictionary) from memory */
       _free_atom();
       /* Create a linked list for PDB information* | saves position (x,y,z),
@@ -406,118 +405,77 @@ int main(int argc, char **argv) {
                Z1, &log_file);
     }
 
-    /* Box adjustment mode is ON */
+    /* The points outside the user defined search space are excluded here */
     if (box_mode) {
       if (verbose_flag)
         fprintf(stdout, "> Filtering grid points\n");
-      /* The points outside the user defined search space are excluded here */
-      Matrix_filter(A, S, m, n, o, h, bX1, bY1, bZ1, bX2, bY2, bZ2, norm1);
-    }
 
-    /* Computing Volume and Grouping Cavities */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating volume\n");
+      filter2box(A, m, n, o, h, bX1, bY1, bZ1, bX2, bY2, bZ2, norm1);
+    }
 
     /*Remove outlier points*/
-    filter_outliers(A, m, n, o);
+    filter_noise(A, m, n, o);
 
-    /* Return tag (number of cavities) with volume lower than volume_cutoff and,
-    also, creates a linked list containing volume of each tag. tag starts at
-    integer 2 */
-    ncav = DFS_search(A, m, n, o, h, volume_cutoff) - 1;
+    /* Grouping Cavities and calculating Volume and */
+    if (verbose_flag)
+      fprintf(stdout, "> Clustering cavities and calculating volume\n");
+    ncav = clustering(A, m, n, o, h, volume_cutoff);
 
-    /* If KVFinder have not found cavities, go to end of script and finish
-     * execution */
-    if (ncav == 0) {
+    if (ncav > 0) {
+      /* Create KVFinder_results structure */
+      KVFinder_results = (KVresults *)calloc(ncav, sizeof(KVresults));
+      cavity = (coords *)calloc(ncav, sizeof(coords));
+      boundary = (coords *)calloc(ncav, sizeof(coords));
+
+      /* Pass volume to KVFinder_results structure */
+      node *p;
+      for (p = V; p != NULL; p = p->next)
+        KVFinder_results[(p->pos)].volume = p->volume;
+      free_node();
+      free(p);
+      free(V);
+
+      /* Defining surface points and calculating area*/
+      if (verbose_flag)
+        fprintf(stdout, "> Defining surface points and calculating area\n");
+      filter_surface(A, S, m, n, o);
+      area(S, m, n, o, h, ncav);
+
+      /* Define interface residues for each cavity */
+      if (verbose_flag)
+        fprintf(stdout, "> Retrieving interface residues\n");
+      interface(A, m, n, o, h, probe_in, ncav, X1, Y1, Z1);
+
+      /* Computing depth */
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Defining cavity-bulk boundary and calculating depth\n");
+      filter_boundary(A, m, n, o, ncav);
+      depth(A, M, m, n, o, h, ncav);
+
+      /* Turn ON(1) filled cavities option */
+      if (verbose_flag)
+        fprintf(stdout, "> Writing cavities PDB file\n");
+      /* Export Cavities PDB */
+      export(output_pdb, A, S, M, kvp_mode, m, n, o, h, ncav, X1, Y1, Z1);
+
+      /* Write results file */
+      if (verbose_flag)
+        fprintf(stdout, "> Writing results file\n");
+      write_results(output_results, pdb_name, output_pdb, LIGAND_NAME, h, ncav);
+
+    } else {
       fprintf(stdout, "> parKVFinder found no cavities!\n");
-      goto NOCAV;
     }
-
-    /* Create KVFinder_results structure */
-    /* Allocate memory for KVresults structure */
-    KVFinder_results = (KVresults *)calloc(ncav, sizeof(KVresults));
-
-    /* Save volume data inside linked list (node) in KVFinder_results structure
-     */
-    node *p;
-    for (p = V; p != NULL; p = p->next)
-      KVFinder_results[(p->pos) - 2].volume = p->volume;
-    /* Free linked list for cavities volume from memory */
-    free_node();
-    free(p);
-    free(V);
-
-    /*Create coordinates for center of mass and depth*/
-    /*Create max-min cavities and frontier coordinates struct*/
-    kvcoords = (coords *)calloc(ncav, sizeof(coords));
-    frontiercoords = (coords *)calloc(ncav, sizeof(coords));
-    for (int iterator = 0; iterator < ncav; iterator++) {
-      /*Start min and max cavities coordinates*/
-      kvcoords[iterator].Xmin = m;
-      kvcoords[iterator].Xmax = 0;
-      kvcoords[iterator].Ymin = n;
-      kvcoords[iterator].Ymax = 0;
-      kvcoords[iterator].Zmin = o;
-      kvcoords[iterator].Zmax = 0;
-
-      /*Start min and max frontier coordinates*/
-      frontiercoords[iterator].Xmin = m;
-      frontiercoords[iterator].Xmax = 0;
-      frontiercoords[iterator].Ymin = n;
-      frontiercoords[iterator].Ymax = 0;
-      frontiercoords[iterator].Zmin = o;
-      frontiercoords[iterator].Zmax = 0;
-    }
-
-    /* Define surface points of each cavity */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating surface points\n");
-    /* Mark surface points inside S, and remove unnecessary points inside S */
-    Matrix_surface(A, S, m, n, o, h, X1, Y1, Z1);
-
-    /* Computing Surface Area */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating area\n");
-    /* Calculate surface area of each cavity and return number of cavities */
-    Area_search(S, m, n, o, h, ncav);
-
-    if (verbose_flag)
-      fprintf(stdout, "> Retrieving residues surrounding cavities\n");
-    /* Define interface residues for each cavity */
-    Matrix_search(A, S, m, n, o, h, probe_in, X1, Y1, Z1, ncav);
-
-  /* Free PDB linked list (dictionary) from memory */
-  NOCAV:
-    _free_atom();
-
-    /* Computing Depth */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating depth\n");
-    filter_boundary(A, m, n, o);
-    Depth_search(A, M, m, n, o, h, ncav);
-    remove_boundary(A, m, n, o, ncav);
 
     /*Free data structures used for depth calculation*/
-    free(kvcoords);
-    free(frontiercoords);
-
-    /* Turn ON(1) filled cavities option */
-    if (verbose_flag)
-      fprintf(stdout, "> Writing cavities PDB file\n");
-    /* Export Cavities PDB */
-    Matrix_export(A, S, M, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1,
-                  Y1, Z1);
+    _free_atom();
+    free(cavity);
+    free(boundary);
+    free_igrid(A, m, n, o);
+    free_igrid(S, m, n, o);
+    free_dgrid(M, m, n, o);
   }
-
-  /* Clean 3D-grids from memory */
-  free_matrix(A, m, n, o);  /*Free int A grid from memory*/
-  free_matrix(S, m, n, o);  /*Free int S grid from memory*/
-  free_matrix2(M, m, n, o); /*Free double M grid from memory*/
-
-  /* Write results file */
-  if (verbose_flag)
-    fprintf(stdout, "> Writing results file\n");
-  write_results(output_results, pdb_name, output_pdb, LIGAND_NAME, h, ncav);
 
   /*Evaluate elapsed time*/
   gettimeofday(&toc, NULL);

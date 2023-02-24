@@ -1,6 +1,6 @@
-#include <stdio.h>  //FILE, EOF
-#include <stdlib.h> //malloc, calloc
-#include <string.h> //memcpy, size_t, strlen
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Functions */
 

@@ -24,8 +24,9 @@ int _get_residues_information(char dictionary_name[500], char TABLE[500][4]);
 int read_vdw(char dictionary_name[500], vdw *DIC[500], int tablesize);
 
 /* Protein DataBank (PDB) file processing */
-void _insert_atom(double x, double y, double z, double radius, int resnumber,
-                  char resname, char chain);
+void _insert_atom(atom **head, atom *new);
+atom *_create_atom(double x, double y, double z, double radius, int resnumber,
+                   char resname, char chain);
 int soft_read_pdb(char PDB_NAME[500], int has_resnum, int has_chain);
 int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
              char TABLE[500][4], double probe, int m, int n, int o, double h,
@@ -33,7 +34,6 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
 void _free_atom();
 
 /* parKVFinder results file processing */
-void _insert_residue(int resnum, char chain, char resname, int kvnum);
 void write_results(char *output_results, char *pdb_name, char *output_pdb,
                    char LIGAND_NAME[500], double h, int ncav);
 

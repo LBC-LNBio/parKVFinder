@@ -700,10 +700,10 @@ int read_vdw(char dictionary_name[500], vdw *DIC[500], int tablesize) {
 /* Protein DataBank (PDB) file processing */
 
 /*
- * Function: _insert_atom
+ * Function: _create_atom
  * ----------------------
  *
- * Add an atom struct to a linked list with PDB atomic information
+ * Create a atom node
  *
  * x: X-axis coordinate
  * y: Y-axis coordinate
@@ -712,34 +712,49 @@ int read_vdw(char dictionary_name[500], vdw *DIC[500], int tablesize) {
  * resnumber: residue number
  * resname: residue name
  * chain: chain identifier
+ * next: pointer to next ATOM struct
+ *
+ * returns: atom node with atomic information
+ */
+atom *_create_atom(double x, double y, double z, double radius, int resnumber,
+                   char resname, char chain) {
+  atom *new = (atom *)malloc(sizeof(atom));
+
+  new->x = x;
+  new->y = y;
+  new->z = z;
+  new->radius = radius;
+  new->resnumber = resnumber;
+  new->chain = chain;
+  new->resname = resname;
+  new->next = NULL;
+
+  return new;
+}
+
+/*
+ * Function: _insert_atom
+ * ----------------------
+ *
+ * Insert atom node in linked list
+ *
+ * head: pointer to linked list head
+ * new: atom node
  *
  */
-void _insert_atom(double x, double y, double z, double radius, int resnumber,
-                  char resname, char chain) {
-  /* Declare variables */
-  atom *p;
+void _insert_atom(atom **head, atom *new) {
+  atom *current;
 
-  if (v == NULL) {
-    v = malloc(sizeof(atom));
-    v->x = x;
-    v->y = y;
-    v->z = z;
-    v->radius = radius;
-    v->resnumber = resnumber;
-    v->chain = chain;
-    v->resname = resname;
-    v->next = NULL;
+  if (*head == NULL || (*head)->resnumber >= new->resnumber) {
+    new->next = *head;
+    *head = new;
   } else {
-    p = malloc(sizeof(atom));
-    p->x = x;
-    p->y = y;
-    p->z = z;
-    p->radius = radius;
-    p->resnumber = resnumber;
-    p->chain = chain;
-    p->resname = resname;
-    p->next = v->next;
-    v->next = p;
+    current = *head;
+    while (current->next != NULL && current->next->resnumber < new->resnumber) {
+      current = current->next;
+    }
+    new->next = current->next;
+    current->next = new;
   }
 }
 
@@ -760,6 +775,7 @@ int soft_read_pdb(char PDB_NAME[500], int has_resnumber, int has_chain) {
   double x, y, z;
   char AUX[10] = "", X[10] = "", Y[10] = "", Z[10] = "", LINE[100],
        CHAIN[10] = "";
+  atom *new;
   FILE *arqPDB;
 
   /* NULL pointer to last item in PDB information linked list */
@@ -807,10 +823,11 @@ int soft_read_pdb(char PDB_NAME[500], int has_resnumber, int has_chain) {
           _extract(LINE, strlen(LINE), CHAIN, strlen(CHAIN), 21, 22);
 
         /* Save coordinate (x,y,z), residue number and chain */
+        new = _create_atom(x, y, z, 0.0, resnumber, 0, CHAIN[0]);
         if (has_resnumber && has_chain)
-          _insert_atom(x, y, z, 0.0, resnumber, 0, CHAIN[0]);
+          _insert_atom(&v, new);
         else
-          _insert_atom(x, y, z, 0.0, 0, 0, 0);
+          _insert_atom(&v, new);
       }
     }
   }
@@ -852,6 +869,7 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
        RESIDUE[10] = "", ATOM_TYPE[10] = "", ATOM_SYMBOL[10] = "",
        CHAIN[10] = "";
   double x, y, z, x1, y1, z1, xaux, yaux, zaux, radius;
+  atom *new;
   FILE *arqPDB;
 
   /* Open PDB file */
@@ -930,8 +948,9 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
             z1 < (double)o + (probe + radius) / h) {
 
           /* Save coordinates (x,y,z), radius, residue number and chain */
-          _insert_atom(x, y, z, radius, number, _convert_residue_code(RESIDUE),
-                       CHAIN[0]);
+          new = _create_atom(x, y, z, radius, number,
+                             _convert_residue_code(RESIDUE), CHAIN[0]);
+          _insert_atom(&v, new);
         }
       }
     }
@@ -964,52 +983,6 @@ void _free_atom() {
 /* parKVFinder results file processing */
 
 /*
- * Function: _insert_residue
- * -------------------------
- *
- * Add residue in cavity linked list for interface residues
- *
- * resnumber: residue number
- * chain: chain identifier
- * resname: residue name
- * kvnum: number of cavity (tag)
- *
- */
-void _insert_residue(int resnumber, char chain, char resname, int kvnum) {
-  /* Declare variables */
-  residues_info *res_info;
-
-  /* Special case I: Create data structure */
-  if (KVFinder_results[kvnum].res_info == NULL) {
-
-    /* Allocate memory */
-    KVFinder_results[kvnum].res_info = malloc(sizeof(residues_info));
-
-    /* Save residue information */
-    KVFinder_results[kvnum].res_info->resnumber = resnumber;
-    KVFinder_results[kvnum].res_info->chain = chain;
-    KVFinder_results[kvnum].res_info->resname = resname;
-
-    /* Identify head */
-    KVFinder_results[kvnum].res_info->next = NULL;
-
-  } else {
-
-    /* Allocate memory for generic structure */
-    res_info = malloc(sizeof(residues_info));
-
-    /* Save residue information in generic structure*/
-    res_info->resnumber = resnumber;
-    res_info->chain = chain;
-    res_info->resname = resname;
-
-    /* Pass generic structure to linked list */
-    res_info->next = KVFinder_results[kvnum].res_info->next;
-    KVFinder_results[kvnum].res_info->next = res_info;
-  }
-}
-
-/*
  * Function: write_results
  * -----------------------
  *
@@ -1031,95 +1004,94 @@ void write_results(char *output_results, char *pdb_name, char *output_pdb,
   char results[1024];
   int kvnum, iterator;
 
-    /* Open KVFinder.results.toml */#pragma omp for schedule(dynamic)
-	results_file = fopen (output_results, "w");
-    /* Save memory for buffer */
-    memset(results, '\0', sizeof(results));
-    /* Create buffer */
-    setvbuf(results_file, results, _IOFBF, 1024);
+  /* Open KVFinder.results.toml */
+  results_file = fopen(output_results, "w");
+  /* Save memory for buffer */
+  memset(results, '\0', sizeof(results));
+  /* Create buffer */
+  setvbuf(results_file, results, _IOFBF, 1024);
 
-    /* Write results file */
-    /* File header */
-    fprintf(results_file,
-            "# TOML results file for parKVFinder software\n\ntitle = "
-            "\"parKVFinder results file\"\n\n");
+  /* Write results file */
+  /* File header */
+  fprintf(results_file,
+          "# TOML results file for parKVFinder software\n\ntitle = "
+          "\"parKVFinder results file\"\n\n");
 
-    /* Files paths */
-    fprintf(
-        results_file,
-        "[FILES_PATH]\nINPUT = \"%s\"\nOUTPUT = \"%s\"\nLIGAND = \"%s\"\n\n",
-        pdb_name, output_pdb, LIGAND_NAME);
+  /* Files paths */
+  fprintf(results_file,
+          "[FILES_PATH]\nINPUT = \"%s\"\nOUTPUT = \"%s\"\nLIGAND = \"%s\"\n\n",
+          pdb_name, output_pdb, LIGAND_NAME);
 
-    /* Parameters */
-    fprintf(results_file, "[PARAMETERS]\nSTEP = %.2lf\n\n", h);
+  /* Parameters */
+  fprintf(results_file, "[PARAMETERS]\nSTEP = %.2lf\n\n", h);
 
-    /* Results header */
-    fprintf(results_file,
-            "[RESULTS]\n# Volume, area, depth and interface residues "
-            "information for each cavity\n");
+  /* Results header */
+  fprintf(results_file,
+          "[RESULTS]\n# Volume, area, depth and interface residues "
+          "information for each cavity\n");
 
-    /* Volume */
-    fprintf(results_file,
-            "\n\t[RESULTS.VOLUME]\n\t# Volume unit is cubic angstrom\n");
-    for (kvnum = 0; kvnum < ncav; kvnum++) {
+  /* Volume */
+  fprintf(results_file,
+          "\n\t[RESULTS.VOLUME]\n\t# Volume unit is cubic angstrom\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
 
-      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
-              65 + ((kvnum) % 26), KVFinder_results[kvnum].volume);
+    fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26), KVFinder_results[kvnum].volume);
+  }
+
+  /* Surface Area */
+  fprintf(results_file,
+          "\n\t[RESULTS.AREA]\n\t# Area unit is square angstrom\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
+
+    fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26), KVFinder_results[kvnum].area);
+  }
+
+  /* Maximum Depth */
+  fprintf(results_file,
+          "\n\t[RESULTS.MAX_DEPTH]\n\t# Maximum depth unit is angstrom\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
+
+    fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26), KVFinder_results[kvnum].max_depth);
+  }
+
+  /* Average Depth */
+  fprintf(results_file,
+          "\n\t[RESULTS.AVG_DEPTH]\n\t# Average depth unit is angstrom\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
+    fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_depth);
+  }
+
+  /* Interface Residues */
+  fprintf(results_file,
+          "\n\t[RESULTS.RESIDUES]\n\t# Interface residues for each cavity\n");
+  fprintf(results_file,
+          "\t# [\"residue number\",\"chain identifier\",\"residue name\"]\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
+
+    fprintf(results_file, "\tK%c%c = [", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26));
+
+    for (t = KVFinder_results[kvnum].res_info; t != NULL; t = t->next) {
+
+      if (t->next != NULL)
+        fprintf(results_file, "[\"%d\",\"%c\",\"%c\"],", t->resnumber, t->chain,
+                t->resname);
+
+      else
+        fprintf(results_file, "[\"%d\",\"%c\",\"%c\"]", t->resnumber, t->chain,
+                t->resname);
     }
 
-    /* Surface Area */
-    fprintf(results_file,
-            "\n\t[RESULTS.AREA]\n\t# Area unit is square angstrom\n");
-    for (kvnum = 0; kvnum < ncav; kvnum++) {
+    fprintf(results_file, "]\n");
+  }
 
-      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
-              65 + ((kvnum) % 26), KVFinder_results[kvnum].area);
-    }
+  /* Print KVFinder.results.toml */
+  fflush(results_file);
 
-    /* Maximum Depth */
-    fprintf(results_file,
-            "\n\t[RESULTS.MAX_DEPTH]\n\t# Maximum depth unit is angstrom\n");
-    for (kvnum = 0; kvnum < ncav; kvnum++) {
-
-      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
-              65 + ((kvnum) % 26), KVFinder_results[kvnum].max_depth);
-    }
-
-    /* Average Depth */
-    fprintf(results_file,
-            "\n\t[RESULTS.AVG_DEPTH]\n\t# Average depth unit is angstrom\n");
-    for (kvnum = 0; kvnum < ncav; kvnum++) {
-      fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
-              65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_depth);
-    }
-
-    /* Interface Residues */
-    fprintf(results_file,
-            "\n\t[RESULTS.RESIDUES]\n\t# Interface residues for each cavity\n");
-    fprintf(results_file,
-            "\t# [\"residue number\",\"chain identifier\",\"residue name\"]\n");
-    for (kvnum = 0; kvnum < ncav; kvnum++) {
-
-      fprintf(results_file, "\tK%c%c = [", 65 + (((kvnum) / 26) % 26),
-              65 + ((kvnum) % 26));
-
-      for (t = KVFinder_results[kvnum].res_info; t != NULL; t = t->next) {
-
-        if (t->next != NULL)
-          fprintf(results_file, "[\"%d\",\"%c\",\"%c\"],", t->resnumber,
-                  t->chain, t->resname);
-
-        else
-          fprintf(results_file, "[\"%d\",\"%c\",\"%c\"]", t->resnumber,
-                  t->chain, t->resname);
-      }
-
-      fprintf(results_file, "]\n");
-    }
-
-    /* Print KVFinder.results.toml */
-    fflush(results_file);
-
-    /* Close KVFinder.results.toml */
-    fclose(results_file);
+  /* Close KVFinder.results.toml */
+  fclose(results_file);
 }
