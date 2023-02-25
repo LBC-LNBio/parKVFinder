@@ -478,10 +478,10 @@ int main(int argc, char **argv) {
   gettimeofday(&toc, NULL);
   printf("done!\n");
   printf(
-      "Elapsed time: %.2lf seconds\n",
+      "[ \033[1mElapsed time:\033[0m %.4lfs ]\n",
       (double)(toc.tv_sec - tic.tv_sec) +
           ((toc.tv_usec - tic.tv_usec) / 1000000.0)); /*Print the elapsed time*/
-  fprintf(log_file, "Elapsed time: %.2lf seconds\n",
+  fprintf(log_file, "[ \033[1mElapsed time:\033[0m %.4lfs ]\n",
           (double)(toc.tv_sec - tic.tv_sec) +
               ((toc.tv_usec - tic.tv_usec) /
                1000000.0)); /*Print the elapsed time for the run inside log*/
