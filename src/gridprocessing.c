@@ -7,6 +7,65 @@
 
 #include "utils.h"
 
+/* Grid initialization */
+
+/*
+ * Function: igrid
+ * ---------------
+ *
+ * Fill integer grid with 1
+ *
+ * grid: empty 3D grid
+ * m: x grid units
+ * n: y grid units
+ * o: z grid units
+ *
+ */
+int ***igrid(int m, int n, int o) {
+  int i, j, k, ***A;
+
+  A = (int ***)calloc(m, sizeof(int **));
+  for (i = 0; i < m; i++) {
+    A[i] = (int **)calloc(n, sizeof(int *));
+    for (j = 0; j < n; j++) {
+      A[i][j] = (int *)calloc(o, sizeof(int));
+      for (k = 0; k < o; k++) {
+        A[i][j][k] = 1;
+      }
+    }
+  }
+  return A;
+}
+
+/*
+ * Function: dgrid
+ * ---------------
+ *
+ * Fill double grid with 0.0
+ *
+ * grid: empty 3D grid
+ * m: x grid units
+ * n: y grid units
+ * o: z grid units
+ *
+ */
+double ***dgrid(int m, int n, int o) {
+  int i, j, k;
+  double ***M;
+
+  M = (double ***)calloc(m, sizeof(double **));
+  for (i = 0; i < m; i++) {
+    M[i] = (double **)calloc(n, sizeof(double *));
+    for (j = 0; j < n; j++) {
+      M[i][j] = (double *)calloc(o, sizeof(double));
+      for (k = 0; k < o; k++) {
+        M[i][j][k] = 0.0;
+      }
+    }
+  }
+  return M;
+}
+
 /* Molecular representation */
 
 /*

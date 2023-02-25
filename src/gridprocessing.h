@@ -1,6 +1,10 @@
 #ifndef GRIDPROCESSING_H
 #define GRIDPROCESSING_H
 
+/* Grid initialization */
+int ***igrid(int m, int n, int o);
+double ***dgrid(int m, int n, int o);
+
 /* Molecular representation */
 int check_protein_neighbours(int ***A, int i, int j, int k, int m, int n,
                              int o);

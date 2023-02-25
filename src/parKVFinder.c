@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
   FILE *parameters_file, *log_file;
   atom *p;
   int ***A, ***S;
-  double ***M;
+  double ***M, ***H;
 
   if (argc == 1) {
     /* Check if parameters.toml exists */
@@ -341,24 +341,10 @@ int main(int argc, char **argv) {
     by small probe int ***S: Grid representing empty spaces and surface points
     along marked by big probe double ***M: Grid representing depth in each
     cavity point */
-    A = (int ***)calloc(m, sizeof(int **));
-    S = (int ***)calloc(m, sizeof(int **));
-    M = (double ***)calloc(m, sizeof(double **));
-    for (i = 0; i < m; i++) {
-      A[i] = (int **)calloc(n, sizeof(int *));
-      S[i] = (int **)calloc(n, sizeof(int *));
-      M[i] = (double **)calloc(n, sizeof(double *));
-      for (j = 0; j < n; j++) {
-        A[i][j] = (int *)calloc(o, sizeof(int));
-        S[i][j] = (int *)calloc(o, sizeof(int));
-        M[i][j] = (double *)calloc(o, sizeof(double));
-        for (k = 0; k < o; k++) {
-          A[i][j][k] = 1;
-          S[i][j][k] = 1;
-          M[i][j][k] = 0.0;
-        }
-      }
-    }
+    A = igrid(m, n, o);
+    S = igrid(m, n, o);
+    M = dgrid(m, n, o);
+    H = dgrid(m, n, o);
 
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe in surface\n");
