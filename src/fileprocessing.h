@@ -1,6 +1,8 @@
 #ifndef FILEPROCESSING_H
 #define FILEPROCESSING_H
 
+#include "utils.h"
+
 /* parKVFinder parameter file processing */
 void extract_toml_line(char LINE[500], int a, int b, char S[500]);
 int get_toml_line(FILE *arq, char LINE[500]);

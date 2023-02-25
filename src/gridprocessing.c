@@ -813,10 +813,11 @@ double check_voxel_class(int ***S, int i, int j, int k) {
   case 3:
     if ((S[i + 1][j][k] == 0 && S[i - 1][j][k] == 0) ||
         (S[i][j + 1][k] == 0 && S[i][j - 1][k] == 0) ||
-        (S[i][j][k + 1] == 0 && S[i][j][k - 1] == 0))
+        (S[i][j][k + 1] == 0 && S[i][j][k - 1] == 0)) {
       weight = 2;
-    else
+    } else {
       weight = 1.5879;
+    }
     break;
 
     /* Four consecutive faces accessible to protein */
@@ -834,8 +835,8 @@ double check_voxel_class(int ***S, int i, int j, int k) {
 }
 
 /*
- * Function: _area
- * ---------------
+ * Function: area
+ * --------------
  *
  * Calculate area of cavities, using Mullikin and Verbeek method.
  *
@@ -872,8 +873,9 @@ void area(int ***S, int m, int n, int o, double h, int ncav) {
       }
 
   /* Save area in KVFinder results struct */
-  for (i = 0; i < ncav; i++)
+  for (i = 0; i < ncav; i++) {
     KVFinder_results[i].area = area[i];
+  }
 
   /* Free area object from memory */
   free(area);
@@ -1318,27 +1320,29 @@ void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
 
               /* Write each cavity point */
               fprintf(output,
-                      "ATOM  %5.d  HA  K%c%c   259    %8.3lf%8.3lf%8.3lf  "
-                      "1.00%6.2lf\n",
-                      count, 65 + (((S[i][j][k] - 2) / 26) % 26),
-                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux,
+                      "ATOM  %5.d  HA  K%c%c   259    %8.3lf%8.3lf%8.3lf"
+                      "%6.2lf%6.2lf\n",
+                      count % 100000, 65 + (((S[i][j][k] - 2) / 26) % 26),
+                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux, 1.0,
                       M[i][j][k]);
 
             } else {
               if (kvp_mode)
                 fprintf(output,
-                        "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf  "
-                        "1.00%6.2lf\n",
-                        count, 65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
+                        "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf"
+                        "%6.2lf%6.2lf\n",
+                        count % 100000,
+                        65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        M[i][j][k]);
+                        1.0, M[i][j][k]);
               else if (_filter_cavity(A, m, n, o, i, j, k) != 0)
                 fprintf(output,
-                        "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf  "
-                        "1.00%6.2lf\n",
-                        count, 65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
+                        "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf"
+                        "%6.2lf%6.2lf\n",
+                        count % 100000,
+                        65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        M[i][j][k]);
+                        1.0, M[i][j][k]);
             }
             count++;
           }

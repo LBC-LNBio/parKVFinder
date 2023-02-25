@@ -17,10 +17,10 @@ parts may be found in the source code */
 
 /* Import custom modules */
 /* WARNING: keep this importing order */
-#include "utils.h"
+#include "argparser.h"
 #include "fileprocessing.h"
 #include "gridprocessing.h"
-#include "argparser.h"
+#include "utils.h"
 
 /* Main function */
 int main(int argc, char **argv) {
