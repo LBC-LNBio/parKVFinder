@@ -13,6 +13,8 @@
 #include "utils.h"
 #include "fileprocessing.h"
 
+#define VERSION "1.2.0"
+
 /* Get residues box coordinates (Xmin, Xmax, Ymin, Ymax, Zmin, Zmax) from
  * residues box file */
 void create_residues_box(char *box_name, double *Xmin, double *Xmax,
@@ -141,7 +143,7 @@ int check_input(char *optarg, char *error) {
   return 1;
 }
 
-void print_version() { printf("parKVFinder (parallel KVFinder) v1.2.0\n"); }
+void print_version() { printf("parKVFinder (parallel KVFinder) v%s\n", VERSION); }
 
 void print_header() {
 
