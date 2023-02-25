@@ -742,7 +742,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         from pymol import cmd
 
         # Delete Box object in PyMOL
-        if "box" in cmd.get_names("selections"):
+        if "box" in cmd.get_names("all"):
             cmd.delete("box")
         # Get dimensions of selected residues
         selection = "sele"
@@ -972,7 +972,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Create box object
         pymol.stored.list = []
-        if "box" in cmd.get_names("selections"):
+        if "box" in cmd.get_names("all"):
             cmd.iterate("box", "stored.list.append((name, color))", quiet=1)
         list_color = pymol.stored.list
         cmd.delete("box")
@@ -1279,7 +1279,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
             ligand = "-"
         
         if self.box_adjustment.isChecked():
-            if "box" not in cmd.get_names("selections"):
+            if "box" not in cmd.get_names("all"):
                 from PyQt5.QtWidgets import QMessageBox
 
                 QMessageBox.critical(self, "Error", "Draw a box in PyMOL!")

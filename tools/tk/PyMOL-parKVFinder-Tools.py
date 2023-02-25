@@ -802,7 +802,7 @@ Citation for PyMOL may be found here:
             :param padding: box padding value.
             """
             # Delete Box object in PyMOL
-            if "box" in cmd.get_names("selections"):
+            if "box" in cmd.get_names("all"):
                 cmd.delete(self.box_name)
             # Get dimensions of selected residues
             selection = "sele"
@@ -979,7 +979,7 @@ Citation for PyMOL may be found here:
 
             # Create box object
             pymol.stored.list = []
-            if self.box_name in cmd.get_names("selections"):
+            if self.box_name in cmd.get_names("all"):
                 cmd.iterate(self.box_name, "stored.list.append((name, color))", quiet=1)
             list_color = pymol.stored.list
             cmd.delete(self.box_name)
@@ -1727,7 +1727,7 @@ Citation for PyMOL may be found here:
                 return
         # Box mode
         if self.search_procedure.getvalue() == "Box Adjustment":
-            if "box" not in cmd.get_names("selections"):
+            if "box" not in cmd.get_names("all"):
                 tkMessageBox.showerror("Error",
                                        "Draw a box in PyMOL!",
                                        parent=self.parent)
