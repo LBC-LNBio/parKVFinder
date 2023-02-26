@@ -17,12 +17,10 @@ parts may be found in the source code */
 
 /* Import custom modules */
 /* WARNING: keep this importing order */
-#include "dictionaryprocessing.h"
-#include "pdbprocessing.h"
-#include "matrixprocessing.h"
 #include "argparser.h"
-#include "tomlprocessing.h"
-#include "resultsprocessing.h"
+#include "fileprocessing.h"
+#include "gridprocessing.h"
+#include "utils.h"
 
 /* Main function */
 int main(int argc, char **argv) {
@@ -50,17 +48,18 @@ int main(int argc, char **argv) {
   int ligand_mode, surface_mode, whole_protein_mode, resolution_mode, box_mode,
       kvp_mode;
   static int verbose_flag = 0;
-  int m, n, o, i, j, k, ncav, tablesize, iterator;
-  char TABLE[TABLE_SIZE][RES_SIZE], PDB_NAME[NAME_MAX], LIGAND_NAME[NAME_MAX],
-      dictionary_name[DIC_NAME_MAX], OUTPUT[NAME_MAX], BASE_NAME[NAME_MAX];
+  int m, n, o, i, j, k, ncav, tablesize;
+  char TABLE[500][4], PDB_NAME[500], LIGAND_NAME[500], dictionary_name[500],
+      OUTPUT[500], BASE_NAME[500];
   char boxmode_flag[6], resolution_flag[7], whole_protein_flag[6], mode_flag[6],
       surface_flag[6], step_flag[6], kvpmode_flag[6];
   char log_buffer[4096], *output, *output_folder, *output_pdb, *output_results,
       *pdb_name;
-  dict *DIC[TABLE_SIZE];
+  vdw *DIC[500];
   FILE *parameters_file, *log_file;
   atom *p;
   int ***A, ***S;
+  double ***M, ***HP;
 
   if (argc == 1) {
     /* Check if parameters.toml exists */
@@ -74,8 +73,8 @@ int main(int argc, char **argv) {
       exit(-1);
     }
     /* Read parameters TOML files */
-    toml *parameters = readTOML(
-        param, "parameters.toml"); /* Read TOML file inside struct TOML */
+    parameters *parameters =
+        readTOML("parameters.toml"); /* Read TOML file inside struct TOML */
 
     /* Save TOML parameters from struct TOML parameters to KVFinder variables */
     X1 = parameters->X1;
@@ -121,7 +120,6 @@ int main(int argc, char **argv) {
     ligand_mode = parameters->ligand_mode;
 
     /* Free struct TOML */
-    free(param);
     free(parameters);
   } else {
     /* Save command line arguments inside KVFinder variables */
@@ -133,25 +131,32 @@ int main(int argc, char **argv) {
                   &Z1, &X2, &Y2, &Z2, &X3, &Y3, &Z3, &X4, &Y4, &Z4, &bX1, &bY1,
                   &bZ1, &bX2, &bY2, &bZ2, &bX3, &bY3, &bZ3, &bX4, &bY4, &bZ4);
   }
-  resolution_input(resolution_flag, &Vvoxel, &resolution_mode,
-                   &h); /*Set Vvoxel, step size and resolution_mode*/
-  tablesize = define_table(
-      TABLE,
-      dictionary_name); /*Read dictionary file and return number of residues*/
+  /* Set step size (h) and resolution_mode */
+  if (!strcmp(resolution_flag, "Off"))
+    resolution_mode = 0;
+  else {
+    h = _resolution2step(resolution_flag);
+    resolution_mode = 1;
+  }
+
+  /* Load vdW dictionary */
+  tablesize = _get_residues_information(
+      dictionary_name,
+      TABLE); /*Read dictionary file and return number of residues*/
   if (verbose_flag)
     fprintf(stdout, "> Loading atomic dictionary file\n");
-  dictionary_load(DIC, tablesize, dictionary_name); /*Dictionary Loaded*/
+  read_vdw(dictionary_name, DIC, tablesize); /*Dictionary Loaded*/
 
   /* Preparing files paths */
   if (OUTPUT[strlen(OUTPUT) - 1] == '/') {
     if (OUTPUT[strlen(OUTPUT) - 2] == '/')
       OUTPUT[strlen(OUTPUT) - 1] = '\0';
-    output = combine(OUTPUT, "KV_Files/");
+    output = _combine(OUTPUT, "KV_Files/");
   } else {
     if (OUTPUT[0] == '\0')
-      output = combine(OUTPUT, "KV_Files/");
+      output = _combine(OUTPUT, "KV_Files/");
     else
-      output = combine(OUTPUT, "/KV_Files/");
+      output = _combine(OUTPUT, "/KV_Files/");
   }
   pdb_name = realpath(PDB_NAME, NULL);
 
@@ -159,7 +164,7 @@ int main(int argc, char **argv) {
   mkdir(output, S_IRWXU);
 
   /* Create log_file */
-  log_file = fopen(combine(output, "KVFinder.log"),
+  log_file = fopen(_combine(output, "KVFinder.log"),
                    "a+"); /* Open log file and append information */
   memset(log_buffer, '\0', sizeof(log_buffer)); /* Create buffer */
   setvbuf(log_file, log_buffer, _IOFBF,
@@ -167,19 +172,19 @@ int main(int argc, char **argv) {
 
   /* Create BASE_NAME folder for the running analysis */
   output =
-      combine(output, BASE_NAME); /* Include BASE_NAME folder in KV_Files */
-  mkdir(output, S_IRWXU);         /* Create BASE_NAME folder in KV_Files */
+      _combine(output, BASE_NAME); /* Include BASE_NAME folder in KV_Files */
+  mkdir(output, S_IRWXU);          /* Create BASE_NAME folder in KV_Files */
   output_folder =
-      combine(output, "/"); /* Include bar after appending BASE_NAME */
-  output = combine(
+      _combine(output, "/"); /* Include bar after appending BASE_NAME */
+  output = _combine(
       output_folder,
       BASE_NAME); /* Include BASE_NAME to output path in BASE_NAME folder */
 
   /* Create output PDB and results file names */
-  output_results = combine(
+  output_results = _combine(
       output,
       ".KVFinder.results.toml"); /* Create a output path to results file */
-  output_pdb = combine(
+  output_pdb = _combine(
       output,
       ".KVFinder.output.pdb"); /* Create a output path to output PDB file */
 
@@ -218,7 +223,7 @@ int main(int argc, char **argv) {
 
     /* Create a linked list (dictionary) for PDB file | saves only position
      * (x,y,z) and chain */
-    PDB_load2(PDB_NAME);
+    soft_read_pdb(PDB_NAME, 0, 0);
 
     /*Reduces box to protein size*/
     for (p = v; p != NULL; p = p->next) {
@@ -238,99 +243,45 @@ int main(int argc, char **argv) {
     }
 
     /* Free van der Waals radius dictionary from memory */
-    free_atom();
+    _free_atom();
 
-  } /* If it will be used a user defined search space, without the Probe Out
-       Adjustment define its limits */
-  else if (box_mode) {
-  };
-
-  /* Resizing step: increases the grid step size until the number of points on
-   * the grid be smaller than Vvoxel */
-  if (resolution_mode) {
-    /* Defines the grid inside the search space | Point 1 is the reference of
-     * our grid */
-    /* Calculate distances between points in box and reference */
-    norm1 = sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1) +
-                 (Z2 - Z1) * (Z2 - Z1));
-    norm2 = sqrt((X3 - X1) * (X3 - X1) + (Y3 - Y1) * (Y3 - Y1) +
-                 (Z3 - Z1) * (Z3 - Z1));
-    norm3 = sqrt((X4 - X1) * (X4 - X1) + (Y4 - Y1) * (Y4 - Y1) +
-                 (Z4 - Z1) * (Z4 - Z1));
-
-    /*Grid steps based on distances*/
-    m = (int)(norm1 / h); /* X axis */
-    n = (int)(norm2 / h); /* Y axis */
-    o = (int)(norm3 / h); /* Z axis */
-
-    /* While volume of unitary box is less than Vlim, increment h and
-     * recalculate box sizes */
-    while ((norm1 / m) * (norm2 / n) * (norm3 / o) < Vvoxel) {
-      h += 0.05;
-      m = (int)(norm1 / h);
-      n = (int)(norm2 / h);
-      o = (int)(norm3 / h);
-      fprintf(log_file,
-              "Step size too small! Resizing... New step size = %.2lf\n", h);
-    }
-    fprintf(log_file, "Chosen step size = %.2lf\n", h);
-  }
-  /* Convert step size to string */
-  sprintf(step_flag, "%.2lf", h);
-
-  if (whole_protein_mode) {
-
-    /*Transforms coordinates to step size multiples*/
-    X1 =
-        roundf((X1 + fabs((double)((int)(X1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    Y1 =
-        roundf((Y1 + fabs((double)((int)(Y1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    Z1 =
-        roundf((Z1 + fabs((double)((int)(Z1 * 1000) % (int)(h * 1000)) / 1000) -
-                h) *
-               1000) /
-        1000;
-    X2 =
-        roundf((X2 - fabs((double)((int)(X2 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-    Y3 =
-        roundf((Y3 - fabs((double)((int)(Y3 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-    Z4 =
-        roundf((Z4 - fabs((double)((int)(Z4 * 1000) % (int)(h * 1000)) / 1000) +
-                h) *
-               1000) /
-        1000;
-
-    /* Increase box for probe_out in step size multiple value */
-    multiple =
-        roundf((probe_out -
-                ((double)((int)(probe_out * 1000) % (int)(h * 1000)) / 1000)) *
-               1000) /
-        1000;
-    X1 -= (multiple);
-    Y1 -= (multiple);
-    Z1 -= (multiple);
-    X2 += (multiple);
-    Y3 += (multiple);
-    Z4 += (multiple);
+    /* Prepare vertices */
+    X1 = X1 - probe_out - h;
+    Y1 = Y1 - probe_out - h;
+    Z1 = Z1 - probe_out - h;
+    X2 = X2 + probe_out + h;
+    Y3 = Y3 + probe_out + h;
+    Z4 = Z4 + probe_out + h;
     X3 = X1;
     X4 = X1;
     Y2 = Y1;
     Y4 = Y1;
     Z2 = Z1;
     Z3 = Z1;
+
+    fprintf(log_file, "p1: [%.3lf %.3lf %.3lf]\n", X1, Y1, Z1);
+    fprintf(log_file, "p2: [%.3lf %.3lf %.3lf]\n", X2, Y1, Z1);
+    fprintf(log_file, "p3: [%.3lf %.3lf %.3lf]\n", X1, Y3, Z1);
+    fprintf(log_file, "p4: [%.3lf %.3lf %.3lf]\n", X1, Y1, Z4);
+
+  } /* If it will be used a user defined search space, without the Probe Out
+       Adjustment define its limits */
+  else if (box_mode) {
+    fprintf(log_file, "p1: [%.3lf %.3lf %.3lf]\n", bX1, bY1, bZ1);
+    fprintf(log_file, "p2: [%.3lf %.3lf %.3lf]\n", bX2, bY1, bZ1);
+    fprintf(log_file, "p3: [%.3lf %.3lf %.3lf]\n", bX1, bY3, bZ1);
+    fprintf(log_file, "p4: [%.3lf %.3lf %.3lf]\n", bX1, bY1, bZ4);
+  };
+
+  /* Predefined resolution:
+  - Low: h = 0.6A
+  - Medium: h = 0.5A
+  - High h = 0.25A */
+  if (resolution_mode) {
+    fprintf(log_file, "Chosen step size = %.2lf\n", h);
   }
+  /* Convert step size to string */
+  sprintf(step_flag, "%.2lf", h);
 
   /* Defines the grid inside the search space | Point 1 is the reference of our
    * grid */
@@ -343,15 +294,30 @@ int main(int argc, char **argv) {
                (Z4 - Z1) * (Z4 - Z1));
 
   /* Grid steps based on distances */
-  m = (int)(norm1 / h) + 1; /*X axis*/
-  n = (int)(norm2 / h) + 1; /*Y axis*/
-  o = (int)(norm3 / h) + 1; /*Z axis*/
+  /*X axis*/
+  if (fmod(norm1, h) != 0) {
+    m = (int)(norm1 / h) + 1;
+  } else {
+    m = (int)(norm1 / h);
+  }
+  /*Y axis*/
+  if (fmod(norm2, h) != 0) {
+    n = (int)(norm2 / h) + 1;
+  } else {
+    n = (int)(norm2 / h);
+  }
+  /*Z axis*/
+  if (fmod(norm3, h) != 0) {
+    o = (int)(norm3 / h) + 1;
+  } else {
+    o = (int)(norm3 / h);
+  }
 
   /* Calculate data used on the spatial manipulation of the protein */
   sina = (Y4 - Y1) / norm3;
   cosa = (Y3 - Y1) / norm2;
-  cosb = (X2 - X1) / norm1;
   sinb = (Z2 - Z1) / norm1;
+  cosb = (X2 - X1) / norm1;
 
   /* Calculate Voxel volume */
   Vvoxel = h * h * h;
@@ -370,7 +336,7 @@ int main(int argc, char **argv) {
   /* Protein Coordinates Extraction */
   /* Create a linked list for PDB information */
   /* Save coordinates (x,y,z), atom radius, residue number and chain */
-  if (PDB_load(DIC, tablesize, TABLE, PDB_NAME, probe_in, m, n, o, h, X1, Y1,
+  if (read_pdb(PDB_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file)) {
 
     if (verbose_flag)
@@ -381,150 +347,143 @@ int main(int argc, char **argv) {
     by small probe int ***S: Grid representing empty spaces and surface points
     along marked by big probe double ***M: Grid representing depth in each
     cavity point */
-    A = (int ***)calloc(m, sizeof(int **));
-    S = (int ***)calloc(m, sizeof(int **));
-    for (i = 0; i < m; i++) {
-      A[i] = (int **)calloc(n, sizeof(int *));
-      S[i] = (int **)calloc(n, sizeof(int *));
-      for (j = 0; j < n; j++) {
-        A[i][j] = (int *)calloc(o, sizeof(int));
-        S[i][j] = (int *)calloc(o, sizeof(int));
-        for (k = 0; k < o; k++) {
-          A[i][j][k] = 1;
-          S[i][j][k] = 1;
-        }
-      }
-    }
+    A = igrid(m, n, o);
+    S = igrid(m, n, o);
+    M = dgrid(m, n, o);
+    HP = dgrid(m, n, o);
 
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe in surface\n");
     /* Mark the grid with 0, leaving a small probe size around the protein */
-    Matrix_fill(A, m, n, o, h, probe_in, X1, Y1, Z1);
+    SAS(A, m, n, o, h, probe_in, X1, Y1, Z1);
 
     /* Mark space occupied by a small probe size from protein surface */
-    if (surface_mode)
-      Matrix_surf(A, m, n, o, h, probe_in);
+    if (surface_mode) {
+      SES(A, m, n, o, h, probe_in);
+    }
 
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe out surface\n");
     /* Mark the grid with 0, leaving a big probe size around the protein */
-    Matrix_fill(S, m, n, o, h, probe_out, X1, Y1, Z1);
+    SAS(S, m, n, o, h, probe_out, X1, Y1, Z1);
     /* Mark space occupied by a big probe size from protein surface */
-    Matrix_surf(S, m, n, o, h, probe_out);
+    SES(S, m, n, o, h, probe_out);
 
     if (verbose_flag)
       fprintf(stdout, "> Defining biomolecular cavities\n");
     /* Mark points where small probe passed and big probe did not */
-    Matrix_subtract(S, A, m, n, o, h, removal_distance);
+    subtract(A, S, m, n, o, h, removal_distance);
 
     /* Ligand adjustment mode */
     if (ligand_mode) {
       if (verbose_flag)
         fprintf(stdout, "> Adjusting ligand\n");
       /* Free linked list (dictionary) from memory */
-      free_atom();
+      _free_atom();
       /* Creates a linked list for Ligand information* | saves position (x,y,z),
        * atom radius, resnumber, chain */
-      PDB_load(DIC, tablesize, TABLE, LIGAND_NAME, probe_in, m, n, o, h, X1, Y1,
+      read_pdb(LIGAND_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file);
       /* Mark regions that do not belong to ligand_cutoff */
-      Matrix_adjust(A, m, n, o, h, ligand_cutoff, X1, Y1, Z1);
+      adjust2ligand(A, m, n, o, h, ligand_cutoff, X1, Y1, Z1);
       /* Free linked list (dictionary) from memory */
-      free_atom();
+      _free_atom();
       /* Create a linked list for PDB information* | saves position (x,y,z),
        * atom radius, resnumber, chain */
-      PDB_load(DIC, tablesize, TABLE, PDB_NAME, probe_in, m, n, o, h, X1, Y1,
+      read_pdb(PDB_NAME, DIC, tablesize, TABLE, probe_in, m, n, o, h, X1, Y1,
                Z1, &log_file);
     }
 
-    /* Box adjustment mode is ON */
+    /* The points outside the user defined search space are excluded here */
     if (box_mode) {
       if (verbose_flag)
         fprintf(stdout, "> Filtering grid points\n");
-      /* The points outside the user defined search space are excluded here */
-      Matrix_filter(A, S, m, n, o, h, bX1, bY1, bZ1, bX2, bY2, bZ2, norm1);
-    }
 
-    /* Computing Volume and Grouping Cavities */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating volume\n");
+      filter2box(A, m, n, o, h, bX1, bY1, bZ1, bX2, bY2, bZ2, norm1);
+    }
 
     /*Remove outlier points*/
-    filter_outliers(A, m, n, o);
+    filter_noise(A, m, n, o);
 
-    /* Return tag (number of cavities) with volume lower than volume_cutoff and,
-    also, creates a linked list containing volume of each tag. tag starts at
-    integer 2 */
-    ncav = DFS_search(A, m, n, o, h, volume_cutoff) - 1;
+    /* Grouping Cavities and calculating Volume and */
+    if (verbose_flag)
+      fprintf(stdout, "> Clustering cavities and calculating volume\n");
+    ncav = clustering(A, m, n, o, h, volume_cutoff);
 
-    /* If KVFinder have not found cavities, go to end of script and finish
-     * execution */
-    if (ncav == 0) {
+    if (ncav > 0) {
+      /* Create KVFinder_results structure */
+      KVFinder_results = (KVresults *)calloc(ncav, sizeof(KVresults));
+      cavity = (coords *)calloc(ncav, sizeof(coords));
+      boundary = (coords *)calloc(ncav, sizeof(coords));
+
+      /* Pass volume to KVFinder_results structure */
+      node *p;
+      for (p = V; p != NULL; p = p->next)
+        KVFinder_results[(p->pos)].volume = p->volume;
+      free_node();
+      free(p);
+      free(V);
+
+      /* Defining surface points and calculating area*/
+      if (verbose_flag)
+        fprintf(stdout, "> Defining surface points and calculating area\n");
+      filter_surface(A, S, m, n, o);
+      area(S, m, n, o, h, ncav);
+
+      /* Define interface residues for each cavity */
+      if (verbose_flag)
+        fprintf(stdout, "> Retrieving interface residues\n");
+      interface(A, m, n, o, h, probe_in, ncav, X1, Y1, Z1);
+
+      /* Computing depth */
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Defining cavity-bulk boundary and calculating depth\n");
+      filter_boundary(A, m, n, o, ncav);
+      depth(A, M, m, n, o, h, ncav);
+
+      /* Computing hydropathy */
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Mapping hydrophobicity scale at surface points\n");
+      project_hydropathy(HP, S, m, n, o, h, probe_in, X1, Y1, Z1);
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Estimating average hydropathy\n");
+      estimate_average_hydropathy(HP, S, m, n, o, ncav);
+
+      /* Turn ON(1) filled cavities option */
+      if (verbose_flag)
+        fprintf(stdout, "> Writing cavities PDB file\n");
+      /* Export Cavities PDB */
+      export(output_pdb, A, S, M, HP, kvp_mode, m, n, o, h, ncav, X1, Y1, Z1);
+
+      /* Write results file */
+      if (verbose_flag)
+        fprintf(stdout, "> Writing results file\n");
+      write_results(output_results, pdb_name, output_pdb, LIGAND_NAME, h, ncav);
+
+    } else {
       fprintf(stdout, "> parKVFinder found no cavities!\n");
-      goto NOCAV;
     }
 
-    /* Create KVFinder_results structure */
-    /* Allocate memory for KVresults structure */
-    KVFinder_results = (KVresults *)calloc(ncav, sizeof(KVresults));
-
-    /* Save volume data inside linked list (node) in KVFinder_results structure
-     */
-    node *p;
-    for (p = V; p != NULL; p = p->next)
-      KVFinder_results[(p->pos) - 2].volume = p->volume;
-    /* Free linked list for cavities volume from memory */
-    free_node();
-    free(p);
-    free(V);
-
-    /* Define surface points of each cavity */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating surface points\n");
-    /* Mark surface points inside S, and remove unnecessary points inside S */
-    Matrix_surface(A, S, m, n, o, h, X1, Y1, Z1);
-
-    /* Computing Surface Area */
-    if (verbose_flag)
-      fprintf(stdout, "> Calculating area\n");
-    /* Calculate surface area of each cavity and return number of cavities */
-    Area_search(S, m, n, o, h, ncav);
-
-    if (verbose_flag)
-      fprintf(stdout, "> Retrieving residues surrounding cavities\n");
-    /* Define interface residues for each cavity */
-    Matrix_search(A, S, m, n, o, h, probe_in, X1, Y1, Z1, ncav);
-
-  /* Free PDB linked list (dictionary) from memory */
-  NOCAV:
-    free_atom();
-
-    /* Turn ON(1) filled cavities option */
-    if (verbose_flag)
-      fprintf(stdout, "> Writing cavities PDB file\n");
-    /* Export Cavities PDB */
-    Matrix_export(A, S, kvp_mode, m, n, o, h, ncav, output, output_pdb, X1, Y1,
-                  Z1);
+    /*Free data structures used for depth calculation*/
+    _free_atom();
+    free(cavity);
+    free(boundary);
+    free_igrid(A, m, n, o);
+    free_igrid(S, m, n, o);
+    free_dgrid(M, m, n, o);
   }
-
-  /* Clean 3D-grids from memory */
-  free_matrix(A, m, n, o); /*Free int A grid from memory*/
-  free_matrix(S, m, n, o); /*Free int S grid from memory*/
-
-  /* Write results file */
-  if (verbose_flag)
-    fprintf(stdout, "> Writing results file\n");
-  write_results(output_results, pdb_name, output_pdb, LIGAND_NAME,
-                resolution_flag, step_flag, ncav);
 
   /*Evaluate elapsed time*/
   gettimeofday(&toc, NULL);
   printf("done!\n");
   printf(
-      "Elapsed time: %.2lf seconds\n",
+      "[ \033[1mElapsed time:\033[0m %.4lfs ]\n",
       (double)(toc.tv_sec - tic.tv_sec) +
           ((toc.tv_usec - tic.tv_usec) / 1000000.0)); /*Print the elapsed time*/
-  fprintf(log_file, "Elapsed time: %.2lf seconds\n",
+  fprintf(log_file, "[ Elapsed time: %.4lfs ]\n",
           (double)(toc.tv_sec - tic.tv_sec) +
               ((toc.tv_usec - tic.tv_usec) /
                1000000.0)); /*Print the elapsed time for the run inside log*/

@@ -1,0 +1,31 @@
+name: Integration testing
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  ubuntu-testing:
+    name: Test on Ubuntu with gcc-${{ matrix.gcc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        gcc: [9, 10, 11, 12]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build parKVFinder
+        run: |
+          sudo apt install gcc-${{ matrix.gcc }}
+          make clean
+          make
+          sudo make link
+        env:
+          CC: gcc-${{ matrix.gcc }}
+      - name: Integration testing
+        run: |
+          export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
+          bash tests/testing.sh
+          cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml

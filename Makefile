@@ -1,5 +1,5 @@
-parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o move src/parKVFinder.c requirements
-	gcc -fopenmp -Isrc -o parKVFinder lib/dictionaryprocessing.o lib/matrixprocessing.o lib/pdbprocessing.o lib/argparser.o lib/tomlprocessing.o lib/resultsprocessing.o src/parKVFinder.c -lm -fcommon
+parKVFinder: utils.o fileprocessing.o gridprocessing.o argparser.o move src/parKVFinder.c requirements
+	gcc -fopenmp -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -lm -fcommon
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
 		if [ -f ${HOME}/.bashrc ]; then \
@@ -14,27 +14,21 @@ parKVFinder: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser
 		fi \
 	fi
 
-matrixprocessing.o: src/matrixprocessing.c src/matrixprocessing.h
-	gcc -fopenmp -O3 -Isrc -c src/matrixprocessing.c -lm -fcommon
+utils.o: src/utils.c src/utils.h
+	gcc -Isrc -c src/utils.c -fcommon
 
-dictionaryprocessing.o: src/dictionaryprocessing.c src/dictionaryprocessing.h
-	gcc -Isrc -c src/dictionaryprocessing.c -fcommon
+fileprocessing.o: src/fileprocessing.c src/fileprocessing.h utils.o
+	gcc -Isrc -c src/fileprocessing.c -fcommon
 
-pdbprocessing.o: src/pdbprocessing.c src/pdbprocessing.h
-	gcc -Isrc -c src/pdbprocessing.c -fcommon
+gridprocessing.o: src/gridprocessing.c src/gridprocessing.h
+	gcc -fopenmp -O3 -Isrc -c src/gridprocessing.c -lm -fcommon
 
 argparser.o: src/argparser.c src/argparser.h
 	gcc -Isrc -c src/argparser.c -fcommon
 
-tomlprocessing.o: src/tomlprocessing.c src/tomlprocessing.h
-	gcc -Isrc -c src/tomlprocessing.c -fcommon
-
-resultsprocessing.o: src/resultsprocessing.c src/resultsprocessing.h
-	gcc -Isrc -c src/resultsprocessing.c -fcommon
-
-move: dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o
+move: utils.o fileprocessing.o gridprocessing.o argparser.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
-	mv dictionaryprocessing.o matrixprocessing.o pdbprocessing.o argparser.o tomlprocessing.o resultsprocessing.o lib/
+	mv utils.o fileprocessing.o gridprocessing.o argparser.o lib/
 
 requirements: pip pip3
 

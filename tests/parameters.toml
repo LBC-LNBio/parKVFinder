@@ -1,0 +1,99 @@
+# TOML configuration file for parKVFinder software.
+
+title = "parKVFinder parameters file"
+
+[FILES_PATH]
+# The path of van der Waals radii dictionary for parKVFinder.
+dictionary = "../dictionary"
+# The path of the input PDB file.
+pdb = "../input/1FMO.pdb"
+# The path of the output directory.
+output = "../input/"
+# Base name for output files.
+base_name = "1FMO"
+# Path for the ligand's PDB file.
+ligand = "-"
+
+[SETTINGS]
+# Settings for parKVFinder software
+
+	[SETTINGS.modes]
+	# Whole Protein mode defines the search space as the whole protein.
+	whole_protein_mode = true
+	# Box Adjustment mode defines the search space as a box that includes a specific region.
+	box_mode = false
+	# Resolution mode implicitly sets the step size (grid spacing) of the 3D grid.
+	# If set to High, sets a voxel volume of 0.2. If set to Medium, sets a voxel volume of 0.1. If set to Low, sets a voxel volume of 0.01. If set to Off, the step size must be set explicitly.
+	resolution_mode = "Low"
+	# Surface mode defines the type of surface representation to be applied, van der Waals molecular surface (true) or solvent accessible surface (false).
+	surface_mode = true
+	# Cavity output mode defines whether cavities are exported to the output PDB file as filled cavities (true) or filtered cavities (false).
+	kvp_mode = false
+	# Ligand adjustment mode defines the search space around the ligand.
+	ligand_mode = false
+
+	[SETTINGS.step_size]
+	# Sets the 3D grid spacing. It directly affects accuracy and runtime.
+	step_size = 0.00
+
+	[SETTINGS.probes]
+	# parKVFinder works with a two sized probe system. A smaller probe, called Probe In, and a bigger one, called Probe Out, rolls around the protein.
+	# Points reached by the Probe In, but not the Probe Out are considered cavity points.
+	# Sets Probe In diameter. Default: 1.4 angstroms.
+	probe_in = 1.40
+	# Sets Probe Out diameter. Default: 4.0 angstroms.
+	probe_out = 4.00
+
+	[SETTINGS.cutoffs]
+	# Sets a volume cutoff for the detected cavities. Default: 5.0 angstroms.
+	volume_cutoff = 5.00
+	# Sets a distance cutoff for a search space around the ligand in ligand adjustment mode. Default: 5.0 angstroms.
+	ligand_cutoff = 5.00
+	# Sets a removal distance for the cavity frontier, which is defined by comparing Probe In and Probe Out surfaces. Default: 2.4 angstroms.
+	removal_distance = 2.40
+
+	[SETTINGS.visiblebox]
+	# Coordinates of the vertices that define the visible 3D grid. Only four points are required to define the search space.
+
+	[SETTINGS.visiblebox.p1]
+	x = 0.00
+	y = 0.00
+	z = 0.00
+
+	[SETTINGS.visiblebox.p2]
+	x = 0.00
+	y = 0.00
+	z = 0.00
+
+	[SETTINGS.visiblebox.p3]
+	x = 0.00
+	y = 0.00
+	z = 0.00
+
+	[SETTINGS.visiblebox.p4]
+	x = 0.00
+	y = 0.00
+	z = 0.00
+
+	[SETTINGS.internalbox]
+	# Coordinates of the internal 3D grid. Used for calculations.
+
+	[SETTINGS.internalbox.p1]
+	x = -4.00
+	y = -4.00
+	z = -4.00
+
+	[SETTINGS.internalbox.p2]
+	x = 4.00
+	y = -4.00
+	z = -4.00
+
+	[SETTINGS.internalbox.p3]
+	x = -4.00
+	y = 4.00
+	z = -4.00
+
+	[SETTINGS.internalbox.p4]
+	x = -4.00
+	y = -4.00
+	z = 4.00

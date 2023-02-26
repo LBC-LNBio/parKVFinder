@@ -36,14 +36,13 @@ dialog = None
 
 ########## Relevant information ##########
 # parKVFinder executable (Ubuntu/macOS)  #
-executable = 'parKVFinder'               #
+executable = "parKVFinder"  #
 # parKVFinder executable (Windows)       #
 # executable = 'parKVFinder-win64.exe'   #
 ##########################################
 
 
 class _Default(object):
-
     def __init__(self):
         super(_Default, self).__init__()
         #######################
@@ -87,17 +86,18 @@ class _Default(object):
 
 
 def __init_plugin__(app=None):
-    '''
+    """
     Add an entry to the PyMOL v2.x "Plugin" menu
-    '''
+    """
     from pymol.plugins import addmenuitemqt
-    addmenuitemqt('PyMOL2 parKVFinder Tools', run_plugin_gui)
+
+    addmenuitemqt("PyMOL2 parKVFinder Tools", run_plugin_gui)
 
 
 def run_plugin_gui():
-    '''
+    """
     Open our custom dialog
-    '''
+    """
     global dialog
 
     if dialog is None:
@@ -125,7 +125,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Define Default Parameters
         self._default = _Default()
         self._default.parKVFinder = os.path.join(KVFinder_PATH, executable)
-        self._default.dictionary = os.path.join(KVFinder_PATH, 'dictionary')
+        self._default.dictionary = os.path.join(KVFinder_PATH, "dictionary")
 
         # Initialize PyMOL2parKVFinderTools GUI
         self.initialize_gui()
@@ -144,7 +144,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.ligand_pdb = None
         self.cavity_pdb = None
 
-
     def initialize_gui(self) -> None:
         """
         Qt elements are located in self
@@ -152,10 +151,11 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # pymol.Qt provides the PyQt5 interface
         from PyQt5 import QtWidgets
         from PyQt5.uic import loadUi
+
         # from pymol.Qt.utils import loadUi
 
         # populate the QMainWindow from our *.ui file
-        uifile = os.path.join(os.path.dirname(__file__), 'PyMOL2-parKVFinder-Tools.ui')
+        uifile = os.path.join(os.path.dirname(__file__), "PyMOL2-parKVFinder-Tools.ui")
         loadUi(uifile, self)
 
         # ScrollBars binded to QListWidgets in Descriptors
@@ -179,9 +179,23 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # hook up Browse buttons callbacks
         self.button_browse.clicked.connect(self.select_directory)
-        self.button_browse2.clicked.connect(lambda: self.select_file("Choose parKVFinder executable", self.parKVFinder, "*"))
-        self.button_browse3.clicked.connect(lambda: self.select_file("Choose van der Waals radii dictionary", self.dictionary, "*"))
-        self.button_browse4.clicked.connect(lambda: self.select_file("Choose KVFinder Results File", self.results_file_entry, "KVFinder Results File (*.toml);;All files (*)"))
+        self.button_browse2.clicked.connect(
+            lambda: self.select_file(
+                "Choose parKVFinder executable", self.parKVFinder, "*"
+            )
+        )
+        self.button_browse3.clicked.connect(
+            lambda: self.select_file(
+                "Choose van der Waals radii dictionary", self.dictionary, "*"
+            )
+        )
+        self.button_browse4.clicked.connect(
+            lambda: self.select_file(
+                "Choose KVFinder Results File",
+                self.results_file_entry,
+                "KVFinder Results File (*.toml);;All files (*)",
+            )
+        )
 
         # hook up Refresh buttons callback
         self.refresh_input.clicked.connect(lambda: self.refresh(self.input))
@@ -201,10 +215,17 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # hook up methods to results tab
         self.button_load_results.clicked.connect(self.load_results)
-        self.volume_list.itemSelectionChanged.connect(lambda list1=self.volume_list, list2=self.area_list: self.show_cavities(list1, list2))
-        self.area_list.itemSelectionChanged.connect(lambda list1=self.area_list, list2=self.volume_list: self.show_cavities(list1, list2))
+        self.volume_list.itemSelectionChanged.connect(
+            lambda list1=self.volume_list, list2=self.area_list: self.show_cavities(
+                list1, list2
+            )
+        )
+        self.area_list.itemSelectionChanged.connect(
+            lambda list1=self.area_list, list2=self.volume_list: self.show_cavities(
+                list1, list2
+            )
+        )
         self.residues_list.itemSelectionChanged.connect(self.show_residues)
-
 
     def check_resolution(self):
         if self.resolution_label.isChecked():
@@ -220,7 +241,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
             self.step_size.setEnabled(True)
             self.step_size.setValue(0.6)
 
-
     def check_step_size(self):
         if self.step_size_label.isChecked():
             self.resolution_label.setChecked(False)
@@ -235,7 +255,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
             self.step_size.setEnabled(False)
             self.step_size.setValue(self._default.step)
 
-
     def get_KVFinder_PATH(self) -> str:
         """
         Get KVFinder_PATH environment variable
@@ -243,26 +262,33 @@ class PyMOL2parKVFinderTools(QMainWindow):
         from PyQt5.QtWidgets import QMessageBox
 
         # Get KVFinder_PATH
-        KVFinder_PATH = os.getenv('KVFinder_PATH')
+        KVFinder_PATH = os.getenv("KVFinder_PATH")
 
         # Check if KVFinder_PATH was found by os.getenv()
         if KVFinder_PATH is None:
             # Check configuration files
-            for fn in ['.bash_profile', '.bashrc', '.zshrc']:
-                fn = os.path.join(os.getenv('HOME'), fn)
+            for fn in [".bash_profile", ".bashrc", ".zshrc"]:
+                fn = os.path.join(os.getenv("HOME"), fn)
                 if os.path.exists(fn):
-                    with open(fn, 'r') as envs:
+                    with open(fn, "r") as envs:
                         for line in envs:
-                            if line.find('export KVFinder_PATH') == 0:
-                                KVFinder_PATH = line.split("=")[1].rstrip('\n')
-                                QMessageBox.warning(self, "Warning", f"Check File Locations!\nKVFinder_PATH was foun in {fn}.")
+                            if line.find("export KVFinder_PATH") == 0:
+                                KVFinder_PATH = line.split("=")[1].rstrip("\n")
+                                QMessageBox.warning(
+                                    self,
+                                    "Warning",
+                                    f"Check File Locations!\nKVFinder_PATH was foun in {fn}.",
+                                )
                                 return KVFinder_PATH
             # KVFinder_PATH was not found
-            QMessageBox.warning(self, "Warning", f"KVFinder_PATH was not found!\nSet paths on File Locations!\nOtherwise, parKVFinder cannot be executed in PyMOL2 parKVFinder Tools.")
+            QMessageBox.warning(
+                self,
+                "Warning",
+                f"KVFinder_PATH was not found!\nSet paths on File Locations!\nOtherwise, parKVFinder cannot be executed in PyMOL2 parKVFinder Tools.",
+            )
             return ""
         else:
             return KVFinder_PATH
-
 
     def run(self) -> None:
         import subprocess, time
@@ -270,45 +296,67 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Create parameters.toml
         if self.save_parameters():
             # Running parKVFinder
-            print(f"\n[==> Running parKVFinder for: {os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.input.currentText()}.pdb')}")
+            print(
+                f"\n[==> Running parKVFinder for: {os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.input.currentText()}.pdb')}"
+            )
             start = time.time()
-            subprocess.call(self.parKVFinder.text().replace(' ', '\\ '), stdout=subprocess.PIPE)
+            subprocess.call(
+                self.parKVFinder.text().replace(" ", "\\ "), stdout=subprocess.PIPE
+            )
             ncavs = self.get_number_of_cavities()
             elapsed_time = time.time() - start
             print(f"> Cavities detected: {ncavs}")
             print(f"> Elapsed time: {elapsed_time:.2f} seconds")
 
             # Copy parameters file
-            if os.path.exists(f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}"):
-                os.remove(f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}")
-            os.rename("parameters.toml", f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}")
+            if os.path.exists(
+                f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}"
+            ):
+                os.remove(
+                    f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}"
+                )
+            os.rename(
+                "parameters.toml",
+                f"{os.path.join(self.output_dir_path.text(), 'KV_Files', f'parameters_{self.base_name.text()}.toml')}",
+            )
 
             # Load successfull run
-            self.results_file_entry.setText(f"{os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.base_name.text()}.KVFinder.results.toml')}")
+            self.results_file_entry.setText(
+                f"{os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.base_name.text()}.KVFinder.results.toml')}"
+            )
             if ncavs > 0:
                 self.tabs.setCurrentIndex(2)
                 self.load_results()
             elif ncavs == 0:
                 from PyQt5.QtWidgets import QMessageBox
+
                 QMessageBox.warning(self, "Warning!", "No cavities found!")
             else:
                 from PyQt5.QtWidgets import QMessageBox
-                QMessageBox.critical(self, "Error!", "An error occurred during cavity detection!")
+
+                QMessageBox.critical(
+                    self, "Error!", "An error occurred during cavity detection!"
+                )
                 return False
         else:
             from PyQt5.QtWidgets import QMessageBox
-            QMessageBox.critical(self, "Error", "An error occurred while creating the parameters file! Check the parKVFinder parameters!")
+
+            QMessageBox.critical(
+                self,
+                "Error",
+                "An error occurred while creating the parameters file! Check the parKVFinder parameters!",
+            )
             return False
 
         return True
 
-
     def get_number_of_cavities(self):
         # Read results (Ubuntu/macOS)
-        results = toml.load(f"{os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.base_name.text()}.KVFinder.results.toml')}")
+        results = toml.load(
+            f"{os.path.join(self.output_dir_path.text(), 'KV_Files', self.base_name.text(), f'{self.base_name.text()}.KVFinder.results.toml')}"
+        )
 
-        return len(results['RESULTS']['VOLUME'].keys())
-
+        return len(results["RESULTS"]["VOLUME"].keys())
 
     def show_grid(self) -> None:
         """
@@ -346,9 +394,9 @@ class PyMOL2parKVFinderTools(QMainWindow):
             self.draw_grid(min_x, max_x, min_y, max_y, min_z, max_z)
         else:
             from PyQt5.QtWidgets import QMessageBox
+
             QMessageBox.critical(self, "Error", "Select an input PDB!")
             return
-
 
     def draw_grid(self, min_x, max_x, min_y, max_y, min_z, max_z) -> None:
         """
@@ -376,61 +424,140 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Get positions of grid vertices
         # P1
-        x1 = -min_x * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + x
+        x1 = (
+            -min_x * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y1 = -min_y * cos(angle1) + (-min_z) * sin(angle1) + y
 
-        z1 = min_x * sin(angle2) + min_y * sin(angle1) * cos(angle2) - min_z * cos(angle1) * cos(angle2) + z
+        z1 = (
+            min_x * sin(angle2)
+            + min_y * sin(angle1) * cos(angle2)
+            - min_z * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P2
-        x2 = max_x * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + x
+        x2 = (
+            max_x * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y2 = (-min_y) * cos(angle1) + (-min_z) * sin(angle1) + y
 
-        z2 = (-max_x) * sin(angle2) - (-min_y) * sin(angle1) * cos(angle2) + (-min_z) * cos(angle1) * cos(angle2) + z
+        z2 = (
+            (-max_x) * sin(angle2)
+            - (-min_y) * sin(angle1) * cos(angle2)
+            + (-min_z) * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P3
-        x3 = (-min_x) * cos(angle2) - max_y * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + x
+        x3 = (
+            (-min_x) * cos(angle2)
+            - max_y * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y3 = max_y * cos(angle1) + (-min_z) * sin(angle1) + y
 
-        z3 = -(-min_x) * sin(angle2) - max_y * sin(angle1) * cos(angle2) + (-min_z) * cos(angle1) * cos(angle2) + z
+        z3 = (
+            -(-min_x) * sin(angle2)
+            - max_y * sin(angle1) * cos(angle2)
+            + (-min_z) * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P4
-        x4 = (-min_x) * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + max_z * cos(angle1) * sin(angle2) + x
+        x4 = (
+            (-min_x) * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + max_z * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y4 = (-min_y) * cos(angle1) + max_z * sin(angle1) + y
 
-        z4 = -(-min_x) * sin(angle2) - (-min_y) * sin(angle1) * cos(angle2) + max_z * cos(angle1) * cos(angle2) + z
-
+        z4 = (
+            -(-min_x) * sin(angle2)
+            - (-min_y) * sin(angle1) * cos(angle2)
+            + max_z * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P5
-        x5 = max_x * cos(angle2) - max_y * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + x
+        x5 = (
+            max_x * cos(angle2)
+            - max_y * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y5 = max_y * cos(angle1) + (-min_z) * sin(angle1) + y
 
-        z5 = (-max_x) * sin(angle2) - max_y * sin(angle1) * cos(angle2) + (-min_z) * cos(angle1) * cos(angle2) + z
+        z5 = (
+            (-max_x) * sin(angle2)
+            - max_y * sin(angle1) * cos(angle2)
+            + (-min_z) * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P6
-        x6 = max_x * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + max_z * cos(angle1) * sin(angle2) + x
+        x6 = (
+            max_x * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + max_z * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y6 = (-min_y) * cos(angle1) + max_z * sin(angle1) + y
 
-        z6 = (-max_x) * sin(angle2) - (-min_y) * sin(angle1) * cos(angle2) + max_z * cos(angle1) * cos(angle2) + z
+        z6 = (
+            (-max_x) * sin(angle2)
+            - (-min_y) * sin(angle1) * cos(angle2)
+            + max_z * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P7
-        x7 = (-min_x) * cos(angle2) - max_y * sin(angle1) * sin(angle2) + max_z * cos(angle1) * sin(angle2) + x
+        x7 = (
+            (-min_x) * cos(angle2)
+            - max_y * sin(angle1) * sin(angle2)
+            + max_z * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y7 = max_y * cos(angle1) + max_z * sin(angle1) + y
 
-        z7 = -(-min_x) * sin(angle2) - max_y * sin(angle1) * cos(angle2) + max_z * cos(angle1) * cos(angle2) + z
+        z7 = (
+            -(-min_x) * sin(angle2)
+            - max_y * sin(angle1) * cos(angle2)
+            + max_z * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # P8
-        x8 = max_x * cos(angle2) - max_y * sin(angle1) * sin(angle2) + max_z * cos(angle1) * sin(angle2) + x
+        x8 = (
+            max_x * cos(angle2)
+            - max_y * sin(angle1) * sin(angle2)
+            + max_z * cos(angle1) * sin(angle2)
+            + x
+        )
 
         y8 = max_y * cos(angle1) + max_z * sin(angle1) + y
 
-        z8 = (-max_x) * sin(angle2) - max_y * sin(angle1) * cos(angle2) + max_z * cos(angle1) * cos(angle2) + z
+        z8 = (
+            (-max_x) * sin(angle2)
+            - max_y * sin(angle1) * cos(angle2)
+            + max_z * cos(angle1) * cos(angle2)
+            + z
+        )
 
         # Create box object
         if "grid" in cmd.get_names("objects"):
@@ -464,20 +591,19 @@ class PyMOL2parKVFinderTools(QMainWindow):
         cmd.bond("vertices", "vertices")
         cmd.select("vertices", "(name v7,v8)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("grid", name="v1x", pos=[x1, y1, z1], color='white')
-        cmd.pseudoatom("grid", name="v2x", pos=[x2, y2, z2], color='white')
+        cmd.pseudoatom("grid", name="v1x", pos=[x1, y1, z1], color="white")
+        cmd.pseudoatom("grid", name="v2x", pos=[x2, y2, z2], color="white")
         cmd.select("vertices", "(name v1x,v2x)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("grid", name="v1y", pos=[x1, y1, z1], color='white')
-        cmd.pseudoatom("grid", name="v3y", pos=[x3, y3, z3], color='white')
+        cmd.pseudoatom("grid", name="v1y", pos=[x1, y1, z1], color="white")
+        cmd.pseudoatom("grid", name="v3y", pos=[x3, y3, z3], color="white")
         cmd.select("vertices", "(name v1y,v3y)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("grid", name="v4z", pos=[x4, y4, z4], color='white')
-        cmd.pseudoatom("grid", name="v1z", pos=[x1, y1, z1], color='white')
+        cmd.pseudoatom("grid", name="v4z", pos=[x4, y4, z4], color="white")
+        cmd.pseudoatom("grid", name="v1z", pos=[x1, y1, z1], color="white")
         cmd.select("vertices", "(name v1z,v4z)")
         cmd.bond("vertices", "vertices")
         cmd.delete("vertices")
-
 
     def restore(self, is_startup=False) -> None:
         """
@@ -491,7 +617,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
             reply = QMessageBox(self)
             reply.setText("Also restore Results Visualization tab?")
             reply.setWindowTitle("Restore Values")
-            reply.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
+            reply.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
             reply.setIcon(QMessageBox.Information)
             reply.checkbox = QCheckBox("Also remove input and ligand PDBs?")
             reply.layout = reply.layout()
@@ -548,7 +674,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.ligand.clear()
         self.ligand_cutoff.setValue(self._default.ligand_cutoff)
 
-
     def refresh(self, combo_box) -> None:
         """
         Callback for the "Refresh" button
@@ -557,17 +682,18 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         combo_box.clear()
         for item in cmd.get_names("all"):
-            if cmd.get_type(item) == "object:molecule" and \
-                item != "box" and \
-                item != "grid" and \
-                item != "cavities" and \
-                item != "residues" and \
-                item[-16:] != ".KVFinder.output" and \
-                item != "target_exclusive":
+            if (
+                cmd.get_type(item) == "object:molecule"
+                and item != "box"
+                and item != "grid"
+                and item != "cavities"
+                and item != "residues"
+                and item[-16:] != ".KVFinder.output"
+                and item != "target_exclusive"
+            ):
                 combo_box.addItem(item)
 
         return
-
 
     def select_directory(self) -> None:
         """
@@ -577,7 +703,9 @@ class PyMOL2parKVFinderTools(QMainWindow):
         from PyQt5.QtWidgets import QFileDialog
         from PyQt5.QtCore import QDir
 
-        fname = QFileDialog.getExistingDirectory(caption='Choose Output Directory', directory=os.getcwd())
+        fname = QFileDialog.getExistingDirectory(
+            caption="Choose Output Directory", directory=os.getcwd()
+        )
 
         if fname:
             fname = QDir.toNativeSeparators(fname)
@@ -585,7 +713,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 self.output_dir_path.setText(fname)
 
         return
-
 
     def select_file(self, caption, entry, filters) -> None:
         """
@@ -596,7 +723,9 @@ class PyMOL2parKVFinderTools(QMainWindow):
         from PyQt5.QtCore import QDir
 
         # Get results file
-        fname, _ = QFileDialog.getOpenFileName(self, caption=caption, directory=os.getcwd(), filter=filters)
+        fname, _ = QFileDialog.getOpenFileName(
+            self, caption=caption, directory=os.getcwd(), filter=filters
+        )
 
         if fname:
             fname = QDir.toNativeSeparators(fname)
@@ -604,7 +733,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 entry.setText(fname)
 
         return
-
 
     def set_box(self) -> None:
         """
@@ -614,7 +742,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         from pymol import cmd
 
         # Delete Box object in PyMOL
-        if "box" in cmd.get_names("selections"):
+        if "box" in cmd.get_names("all"):
             cmd.delete("box")
         # Get dimensions of selected residues
         selection = "sele"
@@ -664,11 +792,10 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.angle1.setEnabled(True)
         self.angle2.setEnabled(True)
 
-
     def draw_box(self) -> None:
         """
-            Draw box in PyMOL interface.
-            :return: box object.
+        Draw box in PyMOL interface.
+        :return: box object.
         """
         from math import pi, sin, cos
         import pymol
@@ -680,64 +807,172 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Get positions of box vertices
         # P1
-        x1 = -self.min_x.value() * cos(angle2) - (-self.min_y.value()) * sin(angle1) * sin(angle2) + (-self.min_z.value()) * cos(angle1) * sin(angle2) + self.x
+        x1 = (
+            -self.min_x.value() * cos(angle2)
+            - (-self.min_y.value()) * sin(angle1) * sin(angle2)
+            + (-self.min_z.value()) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y1 = -self.min_y.value() * cos(angle1) + (-self.min_z.value()) * sin(angle1) + self.y
+        y1 = (
+            -self.min_y.value() * cos(angle1)
+            + (-self.min_z.value()) * sin(angle1)
+            + self.y
+        )
 
-        z1 = self.min_x.value() * sin(angle2) + self.min_y.value() * sin(angle1) * cos(angle2) - self.min_z.value() * cos(angle1) * cos(angle2) + self.z
+        z1 = (
+            self.min_x.value() * sin(angle2)
+            + self.min_y.value() * sin(angle1) * cos(angle2)
+            - self.min_z.value() * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P2
-        x2 = self.max_x.value() * cos(angle2) - (-self.min_y.value()) * sin(angle1) * sin(angle2) + (-self.min_z.value()) * cos(angle1) * sin(angle2) + self.x
+        x2 = (
+            self.max_x.value() * cos(angle2)
+            - (-self.min_y.value()) * sin(angle1) * sin(angle2)
+            + (-self.min_z.value()) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y2 = (-self.min_y.value()) * cos(angle1) + (-self.min_z.value()) * sin(angle1) + self.y
+        y2 = (
+            (-self.min_y.value()) * cos(angle1)
+            + (-self.min_z.value()) * sin(angle1)
+            + self.y
+        )
 
-        z2 = (-self.max_x.value()) * sin(angle2) - (-self.min_y.value()) * sin(angle1) * cos(angle2) + (-self.min_z.value()) * cos(angle1) * cos(angle2) + self.z
+        z2 = (
+            (-self.max_x.value()) * sin(angle2)
+            - (-self.min_y.value()) * sin(angle1) * cos(angle2)
+            + (-self.min_z.value()) * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P3
-        x3 = (-self.min_x.value()) * cos(angle2) - self.max_y.value() * sin(angle1) * sin(angle2) + (-self.min_z.value()) * cos(angle1) * sin(angle2) + self.x
+        x3 = (
+            (-self.min_x.value()) * cos(angle2)
+            - self.max_y.value() * sin(angle1) * sin(angle2)
+            + (-self.min_z.value()) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y3 = self.max_y.value() * cos(angle1) + (-self.min_z.value()) * sin(angle1) + self.y
+        y3 = (
+            self.max_y.value() * cos(angle1)
+            + (-self.min_z.value()) * sin(angle1)
+            + self.y
+        )
 
-        z3 = -(-self.min_x.value()) * sin(angle2) - self.max_y.value() * sin(angle1) * cos(angle2) + (-self.min_z.value()) * cos(angle1) * cos(angle2) + self.z
+        z3 = (
+            -(-self.min_x.value()) * sin(angle2)
+            - self.max_y.value() * sin(angle1) * cos(angle2)
+            + (-self.min_z.value()) * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P4
-        x4 = (-self.min_x.value()) * cos(angle2) - (-self.min_y.value()) * sin(angle1) * sin(angle2) + self.max_z.value() * cos(angle1) * sin(angle2) + self.x
+        x4 = (
+            (-self.min_x.value()) * cos(angle2)
+            - (-self.min_y.value()) * sin(angle1) * sin(angle2)
+            + self.max_z.value() * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y4 = (-self.min_y.value()) * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        y4 = (
+            (-self.min_y.value()) * cos(angle1)
+            + self.max_z.value() * sin(angle1)
+            + self.y
+        )
 
-        z4 = -(-self.min_x.value()) * sin(angle2) - (-self.min_y.value()) * sin(angle1) * cos(angle2) + self.max_z.value() * cos(angle1) * cos(angle2) + self.z
+        z4 = (
+            -(-self.min_x.value()) * sin(angle2)
+            - (-self.min_y.value()) * sin(angle1) * cos(angle2)
+            + self.max_z.value() * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P5
-        x5 = self.max_x.value() * cos(angle2) - self.max_y.value() * sin(angle1) * sin(angle2) + (-self.min_z.value()) * cos(angle1) * sin(angle2) + self.x
+        x5 = (
+            self.max_x.value() * cos(angle2)
+            - self.max_y.value() * sin(angle1) * sin(angle2)
+            + (-self.min_z.value()) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y5 = self.max_y.value() * cos(angle1) + (-self.min_z.value()) * sin(angle1) + self.y
+        y5 = (
+            self.max_y.value() * cos(angle1)
+            + (-self.min_z.value()) * sin(angle1)
+            + self.y
+        )
 
-        z5 = (-self.max_x.value()) * sin(angle2) - self.max_y.value() * sin(angle1) * cos(angle2) + (-self.min_z.value()) * cos(angle1) * cos(angle2) + self.z
+        z5 = (
+            (-self.max_x.value()) * sin(angle2)
+            - self.max_y.value() * sin(angle1) * cos(angle2)
+            + (-self.min_z.value()) * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P6
-        x6 = self.max_x.value() * cos(angle2) - (-self.min_y.value()) * sin(angle1) * sin(angle2) + self.max_z.value() * cos(angle1) * sin(angle2) + self.x
+        x6 = (
+            self.max_x.value() * cos(angle2)
+            - (-self.min_y.value()) * sin(angle1) * sin(angle2)
+            + self.max_z.value() * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y6 = (-self.min_y.value()) * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        y6 = (
+            (-self.min_y.value()) * cos(angle1)
+            + self.max_z.value() * sin(angle1)
+            + self.y
+        )
 
-        z6 = (-self.max_x.value()) * sin(angle2) - (-self.min_y.value()) * sin(angle1) * cos(angle2) + self.max_z.value() * cos(angle1) * cos(angle2) + self.z
+        z6 = (
+            (-self.max_x.value()) * sin(angle2)
+            - (-self.min_y.value()) * sin(angle1) * cos(angle2)
+            + self.max_z.value() * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P7
-        x7 = (-self.min_x.value()) * cos(angle2) - self.max_y.value() * sin(angle1) * sin(angle2) + self.max_z.value() * cos(angle1) * sin(angle2) + self.x
+        x7 = (
+            (-self.min_x.value()) * cos(angle2)
+            - self.max_y.value() * sin(angle1) * sin(angle2)
+            + self.max_z.value() * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y7 = self.max_y.value() * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        y7 = (
+            self.max_y.value() * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        )
 
-        z7 = -(-self.min_x.value()) * sin(angle2) - self.max_y.value() * sin(angle1) * cos(angle2) + self.max_z.value() * cos(angle1) * cos(angle2) + self.z
+        z7 = (
+            -(-self.min_x.value()) * sin(angle2)
+            - self.max_y.value() * sin(angle1) * cos(angle2)
+            + self.max_z.value() * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P8
-        x8 = self.max_x.value() * cos(angle2) - self.max_y.value() * sin(angle1) * sin(angle2) + self.max_z.value() * cos(angle1) * sin(angle2) + self.x
+        x8 = (
+            self.max_x.value() * cos(angle2)
+            - self.max_y.value() * sin(angle1) * sin(angle2)
+            + self.max_z.value() * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
-        y8 = self.max_y.value() * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        y8 = (
+            self.max_y.value() * cos(angle1) + self.max_z.value() * sin(angle1) + self.y
+        )
 
-        z8 = (-self.max_x.value()) * sin(angle2) - self.max_y.value() * sin(angle1) * cos(angle2) + self.max_z.value() * cos(angle1) * cos(angle2) + self.z
+        z8 = (
+            (-self.max_x.value()) * sin(angle2)
+            - self.max_y.value() * sin(angle1) * cos(angle2)
+            + self.max_z.value() * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # Create box object
         pymol.stored.list = []
-        if "box" in cmd.get_names("selections"):
+        if "box" in cmd.get_names("all"):
             cmd.iterate("box", "stored.list.append((name, color))", quiet=1)
         list_color = pymol.stored.list
         cmd.delete("box")
@@ -747,7 +982,21 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 at_c = item[1]
                 cmd.set_color(at_name + "color", cmd.get_color_tuple(at_c))
         else:
-            for at_name in ["v2", "v3", "v4", "v5", "v6", "v7", "v8", "v1x", "v1y", "v1z", "v2x", "v3y", "v4z"]:
+            for at_name in [
+                "v2",
+                "v3",
+                "v4",
+                "v5",
+                "v6",
+                "v7",
+                "v8",
+                "v1x",
+                "v1y",
+                "v1z",
+                "v2x",
+                "v3y",
+                "v4z",
+            ]:
                 cmd.set_color(at_name + "color", [0.86, 0.86, 0.86])
 
         # Create vertices
@@ -778,20 +1027,19 @@ class PyMOL2parKVFinderTools(QMainWindow):
         cmd.bond("vertices", "vertices")
         cmd.select("vertices", "(name v7,v8)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("box", name="v1x", pos=[x1, y1, z1], color='red')
-        cmd.pseudoatom("box", name="v2x", pos=[x2, y2, z2], color='red')
+        cmd.pseudoatom("box", name="v1x", pos=[x1, y1, z1], color="red")
+        cmd.pseudoatom("box", name="v2x", pos=[x2, y2, z2], color="red")
         cmd.select("vertices", "(name v1x,v2x)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("box", name="v1y", pos=[x1, y1, z1], color='forest')
-        cmd.pseudoatom("box", name="v3y", pos=[x3, y3, z3], color='forest')
+        cmd.pseudoatom("box", name="v1y", pos=[x1, y1, z1], color="forest")
+        cmd.pseudoatom("box", name="v3y", pos=[x3, y3, z3], color="forest")
         cmd.select("vertices", "(name v1y,v3y)")
         cmd.bond("vertices", "vertices")
-        cmd.pseudoatom("box", name="v4z", pos=[x4, y4, z4], color='blue')
-        cmd.pseudoatom("box", name="v1z", pos=[x1, y1, z1], color='blue')
+        cmd.pseudoatom("box", name="v4z", pos=[x4, y4, z4], color="blue")
+        cmd.pseudoatom("box", name="v1z", pos=[x1, y1, z1], color="blue")
         cmd.select("vertices", "(name v1z,v4z)")
         cmd.bond("vertices", "vertices")
         cmd.delete("vertices")
-
 
     def delete_box(self) -> None:
         """
@@ -839,7 +1087,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.angle1.setEnabled(False)
         self.angle2.setEnabled(False)
 
-
     def redraw_box(self) -> None:
         """
         Redraw box in PyMOL interface.
@@ -853,7 +1100,16 @@ class PyMOL2parKVFinderTools(QMainWindow):
             # Get dimensions of selected residues
             ([min_x, min_y, min_z], [max_x, max_y, max_z]) = cmd.get_extent("sele")
 
-            if self.min_x.value() != self.min_x_set or self.max_x.value() != self.max_x_set or self.min_y.value() != self.min_y_set or self.max_y.value() != self.max_y_set or self.min_z.value() != self.min_z_set or self.max_z.value() != self.max_z_set or self.angle1.value() != self.angle1_set or self.angle2.value() != self.angle2_set:
+            if (
+                self.min_x.value() != self.min_x_set
+                or self.max_x.value() != self.max_x_set
+                or self.min_y.value() != self.min_y_set
+                or self.max_y.value() != self.max_y_set
+                or self.min_z.value() != self.min_z_set
+                or self.max_z.value() != self.max_z_set
+                or self.angle1.value() != self.angle1_set
+                or self.angle2.value() != self.angle2_set
+            ):
                 self.min_x_set = self.min_x.value()
                 self.max_x_set = self.max_x.value()
                 self.min_y_set = self.min_y.value()
@@ -870,18 +1126,51 @@ class PyMOL2parKVFinderTools(QMainWindow):
                 self.z = (min_z + max_z) / 2
 
                 # Set background box values
-                self.min_x_set = round(self.x - (min_x - self.padding.value()), 1) + self.min_x.value() - self.min_x_set
-                self.max_x_set = round((max_x + self.padding.value()) - self.x, 1) + self.max_x.value() - self.max_x_set
-                self.min_y_set = round(self.y - (min_y - self.padding.value()), 1) + self.min_y.value() - self.min_y_set
-                self.max_y_set = round((max_y + self.padding.value()) - self.y, 1) + self.max_y.value() - self.max_y_set
-                self.min_z_set = round(self.z - (min_z - self.padding.value()), 1) + self.min_z.value() - self.min_z_set
-                self.max_z_set = round((max_z + self.padding.value()) - self.z, 1) + self.max_z.value() - self.max_z_set
+                self.min_x_set = (
+                    round(self.x - (min_x - self.padding.value()), 1)
+                    + self.min_x.value()
+                    - self.min_x_set
+                )
+                self.max_x_set = (
+                    round((max_x + self.padding.value()) - self.x, 1)
+                    + self.max_x.value()
+                    - self.max_x_set
+                )
+                self.min_y_set = (
+                    round(self.y - (min_y - self.padding.value()), 1)
+                    + self.min_y.value()
+                    - self.min_y_set
+                )
+                self.max_y_set = (
+                    round((max_y + self.padding.value()) - self.y, 1)
+                    + self.max_y.value()
+                    - self.max_y_set
+                )
+                self.min_z_set = (
+                    round(self.z - (min_z - self.padding.value()), 1)
+                    + self.min_z.value()
+                    - self.min_z_set
+                )
+                self.max_z_set = (
+                    round((max_z + self.padding.value()) - self.z, 1)
+                    + self.max_z.value()
+                    - self.max_z_set
+                )
                 self.angle1_set = 0 + self.angle1.value()
                 self.angle2_set = 0 + self.angle2.value()
                 self.padding_set = self.padding.value()
         # Not provided a selection
         else:
-            if self.min_x.value() != self.min_x_set or self.max_x.value() != self.max_x_set or self.min_y.value() != self.min_y_set or self.max_y.value() != self.max_y_set or self.min_z.value() != self.min_z_set or self.max_z.value() != self.max_z_set or self.angle1.value() != self.angle1_set or self.angle2.value() != self.angle2_set:
+            if (
+                self.min_x.value() != self.min_x_set
+                or self.max_x.value() != self.max_x_set
+                or self.min_y.value() != self.min_y_set
+                or self.max_y.value() != self.max_y_set
+                or self.min_z.value() != self.min_z_set
+                or self.max_z.value() != self.max_z_set
+                or self.angle1.value() != self.angle1_set
+                or self.angle2.value() != self.angle2_set
+            ):
                 self.min_x_set = self.min_x.value()
                 self.max_x_set = self.max_x.value()
                 self.min_y_set = self.min_y.value()
@@ -929,22 +1218,25 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Redraw box
         self.draw_box()
 
-
     def box_adjustment_help(self) -> None:
         from PyQt5 import QtWidgets, QtCore
-        text = QtCore.QCoreApplication.translate("parKVFinder", u"<html><head/><body><p align=\"justify\"><span style=\" font-weight:600; text-decoration: underline;\">Box Adjustment mode:</span></p><p align=\"justify\">- Create a selection (optional);</p><p align=\"justify\">- Define a <span style=\" font-weight:600;\">Padding</span> (optional);</p><p align=\"justify\">- Click on <span style=\" font-weight:600;\">Draw Box</span> button.</p><p align=\"justify\"><br/><span style=\"text-decoration: underline;\">Customize your <span style=\" font-weight:600;\">box</span></span>:</p><p align=\"justify\">- Change one item at a time (e.g. <span style=\" font-style:italic;\">Padding</span>, <span style=\" font-style:italic;\">Minimum X</span>, <span style=\" font-style:italic;\">Maximum X</span>, ...);</p><p align=\"justify\">- Click on <span style=\" font-weight:600;\">Redraw Box</span> button.<br/></p><p><span style=\" font-weight:400; text-decoration: underline;\">Delete </span><span style=\" text-decoration: underline;\">box</span><span style=\" font-weight:400; text-decoration: underline;\">:</span></p><p align=\"justify\">- Click on <span style=\" font-weight:600;\">Delete Box</span> button.<br/></p><p align=\"justify\"><span style=\"text-decoration: underline;\">Colors of the <span style=\" font-weight:600;\">box</span> object:</span></p><p align=\"justify\">- <span style=\" font-weight:600;\">Red</span> corresponds to <span style=\" font-weight:600;\">X</span> axis;</p><p align=\"justify\">- <span style=\" font-weight:600;\">Green</span> corresponds to <span style=\" font-weight:600;\">Y</span> axis;</p><p align=\"justify\">- <span style=\" font-weight:600;\">Blue</span> corresponds to <span style=\" font-weight:600;\">Z</span> axis.</p></body></html>", None)
+
+        text = QtCore.QCoreApplication.translate(
+            "parKVFinder",
+            '<html><head/><body><p align="justify"><span style=" font-weight:600; text-decoration: underline;">Box Adjustment mode:</span></p><p align="justify">- Create a selection (optional);</p><p align="justify">- Define a <span style=" font-weight:600;">Padding</span> (optional);</p><p align="justify">- Click on <span style=" font-weight:600;">Draw Box</span> button.</p><p align="justify"><br/><span style="text-decoration: underline;">Customize your <span style=" font-weight:600;">box</span></span>:</p><p align="justify">- Change one item at a time (e.g. <span style=" font-style:italic;">Padding</span>, <span style=" font-style:italic;">Minimum X</span>, <span style=" font-style:italic;">Maximum X</span>, ...);</p><p align="justify">- Click on <span style=" font-weight:600;">Redraw Box</span> button.<br/></p><p><span style=" font-weight:400; text-decoration: underline;">Delete </span><span style=" text-decoration: underline;">box</span><span style=" font-weight:400; text-decoration: underline;">:</span></p><p align="justify">- Click on <span style=" font-weight:600;">Delete Box</span> button.<br/></p><p align="justify"><span style="text-decoration: underline;">Colors of the <span style=" font-weight:600;">box</span> object:</span></p><p align="justify">- <span style=" font-weight:600;">Red</span> corresponds to <span style=" font-weight:600;">X</span> axis;</p><p align="justify">- <span style=" font-weight:600;">Green</span> corresponds to <span style=" font-weight:600;">Y</span> axis;</p><p align="justify">- <span style=" font-weight:600;">Blue</span> corresponds to <span style=" font-weight:600;">Z</span> axis.</p></body></html>',
+            None,
+        )
         help_information = QtWidgets.QMessageBox(self)
         help_information.setText(text)
         help_information.setWindowTitle("Help")
         help_information.setStyleSheet("QLabel{min-width:500 px;}")
         help_information.exec_()
 
-
     def save_parameters(self) -> None:
         from pymol import cmd
 
         # Create base directory
-        basedir = os.path.join(self.output_dir_path.text(), 'KV_Files')
+        basedir = os.path.join(self.output_dir_path.text(), "KV_Files")
         if not os.path.isdir(basedir):
             os.mkdir(basedir)
 
@@ -954,100 +1246,157 @@ class PyMOL2parKVFinderTools(QMainWindow):
             os.mkdir(basedir)
 
         # Save input pdb
-        if self.input.currentText() != '':
+        if self.input.currentText() != "":
             for x in cmd.get_names("all"):
                 if x == self.input.currentText():
-                    pdb = os.path.join(os.path.join(basedir, f'{self.input.currentText()}.pdb'))
+                    pdb = os.path.join(
+                        os.path.join(basedir, f"{self.input.currentText()}.pdb")
+                    )
                     cmd.save(pdb, self.input.currentText(), 0, "pdb")
         else:
             from PyQt5.QtWidgets import QMessageBox
+
             QMessageBox.critical(self, "Error", "Select an input PDB!")
             return False
 
         # Save ligand pdb
         if self.ligand_adjustment.isChecked():
-            if self.ligand.currentText() != '':
+            if self.ligand.currentText() != "":
                 for x in cmd.get_names("all"):
                     if x == self.ligand.currentText():
-                        ligand = os.path.join(os.path.join(basedir, f'{self.ligand.currentText()}.ligand.pdb'))
+                        ligand = os.path.join(
+                            os.path.join(
+                                basedir, f"{self.ligand.currentText()}.ligand.pdb"
+                            )
+                        )
                         cmd.save(ligand, self.ligand.currentText(), 0, "pdb")
             else:
                 from PyQt5.QtWidgets import QMessageBox
+
                 QMessageBox.critical(self, "Error", "Select an ligand PDB!")
                 return False
         else:
             ligand = "-"
+        
+        if self.box_adjustment.isChecked():
+            if "box" not in cmd.get_names("all"):
+                from PyQt5.QtWidgets import QMessageBox
 
-        with open("parameters.toml", 'w') as f:
+                QMessageBox.critical(self, "Error", "Draw a box in PyMOL!")
+                return False
+
+
+        with open("parameters.toml", "w") as f:
             f.write("# TOML configuration file for parKVFinder software.\n")
-            f.write("\ntitle = \"parKVFinder parameters file\"\n")
+            f.write('\ntitle = "parKVFinder parameters file"\n')
 
             f.write("\n[FILES_PATH]\n")
             f.write("# The path of van der Waals radii dictionary for parKVFinder.\n")
-            f.write(f"dictionary = \"{self.dictionary.text()}\"\n")
+            f.write(f'dictionary = "{self.dictionary.text()}"\n')
             f.write("# The path of the input PDB file.\n")
-            f.write(f"pdb = \"{pdb}\"\n")
+            f.write(f'pdb = "{pdb}"\n')
             f.write("# The path of the output directory.\n")
-            f.write(f"output = \"{self.output_dir_path.text()}\"\n")
+            f.write(f'output = "{self.output_dir_path.text()}"\n')
             f.write("# Base name for output files.\n")
-            f.write(f"base_name = \"{self.base_name.text()}\"\n")
+            f.write(f'base_name = "{self.base_name.text()}"\n')
             f.write("# Path for the ligand's PDB file.\n")
-            f.write(f"ligand = \"{ligand}\"\n")
+            f.write(f'ligand = "{ligand}"\n')
 
             f.write("\n[SETTINGS]\n")
             f.write("# Settings for parKVFinder software.\n")
             f.write("\n[SETTINGS.modes]\n")
-            f.write("# Whole protein mode defines the search space as the whole protein.\n")
-            f.write(f"whole_protein_mode = {'true' if not self.box_adjustment.isChecked() else 'false'}\n")
-            f.write("# Box adjustment mode defines the search space as the box drawn in PyMOL.\n")
-            f.write(f"box_mode = {'true' if self.box_adjustment.isChecked() else 'false'}\n")
-            f.write("# Resolution mode implicitly sets the step size (grid spacing) of the 3D grid.\n")
-            f.write("# If set to High, sets a voxel volume of 0.2. If set to Medium, sets a voxel volume of 0.1. If set to Low, it sets a voxel volume of 0.01. If set to Off, the step size must be set explicitly.\n")
-            f.write(f"resolution_mode = \"{self.resolution.currentText() if self.resolution_label.isChecked() else 'Off'}\"\n")
-            f.write("# Surface mode defines the type of surface representation to be applied, van der Waals molecular surface (true) or solvent accessible surface (false).\n")
-            f.write(f"surface_mode = {'true' if self.surface.currentText() == 'Molecular Surface (VdW)' else 'false'}\n")
-            f.write("# Cavity representation defines whether cavities are exported to the output PDB file as filled cavities (true) or filtered cavities (false).\n")
-            f.write(f"kvp_mode = {'true' if self.cavity_representation.currentText() == 'Full' else 'false'}\n")
-            f.write("# Ligand adjustment mode defines the search space around the ligand.\n")
-            f.write(f"ligand_mode = {'true' if self.ligand_adjustment.isChecked() else 'false'}\n")
+            f.write(
+                "# Whole protein mode defines the search space as the whole protein.\n"
+            )
+            f.write(
+                f"whole_protein_mode = {'true' if not self.box_adjustment.isChecked() else 'false'}\n"
+            )
+            f.write(
+                "# Box adjustment mode defines the search space as the box drawn in PyMOL.\n"
+            )
+            f.write(
+                f"box_mode = {'true' if self.box_adjustment.isChecked() else 'false'}\n"
+            )
+            f.write(
+                "# Resolution mode implicitly sets the step size (grid spacing) of the 3D grid.\n"
+            )
+            f.write(
+                "# If set to High, sets a voxel volume of 0.2. If set to Medium, sets a voxel volume of 0.1. If set to Low, it sets a voxel volume of 0.01. If set to Off, the step size must be set explicitly.\n"
+            )
+            f.write(
+                f"resolution_mode = \"{self.resolution.currentText() if self.resolution_label.isChecked() else 'Off'}\"\n"
+            )
+            f.write(
+                "# Surface mode defines the type of surface representation to be applied, van der Waals molecular surface (true) or solvent accessible surface (false).\n"
+            )
+            f.write(
+                f"surface_mode = {'true' if self.surface.currentText() == 'Molecular Surface (VdW)' else 'false'}\n"
+            )
+            f.write(
+                "# Cavity representation defines whether cavities are exported to the output PDB file as filled cavities (true) or filtered cavities (false).\n"
+            )
+            f.write(
+                f"kvp_mode = {'true' if self.cavity_representation.currentText() == 'Full' else 'false'}\n"
+            )
+            f.write(
+                "# Ligand adjustment mode defines the search space around the ligand.\n"
+            )
+            f.write(
+                f"ligand_mode = {'true' if self.ligand_adjustment.isChecked() else 'false'}\n"
+            )
 
             f.write("\n[SETTINGS.step_size]\n")
-            f.write("# Sets the 3D grid spacing. It directly affects accuracy and runtime.\n")
+            f.write(
+                "# Sets the 3D grid spacing. It directly affects accuracy and runtime.\n"
+            )
             step = self.step_size.value() if self.step_size_label.isChecked() else 0.0
             f.write(f"step_size = {step:.2f}\n")
 
             f.write("\n[SETTINGS.probes]\n")
-            f.write("# parKVFinder works with a dual probe system. A smaller probe, called Probe In, and a bigger one, called Probe Out, rolls around the protein.\n")
-            f.write("# Points reached by the Probe In, but not the Probe Out are considered cavity points.\n")
+            f.write(
+                "# parKVFinder works with a dual probe system. A smaller probe, called Probe In, and a bigger one, called Probe Out, rolls around the protein.\n"
+            )
+            f.write(
+                "# Points reached by the Probe In, but not the Probe Out are considered cavity points.\n"
+            )
             f.write("# Sets the Probe In diameter. Default: 1.4 angstroms.\n")
             f.write(f"probe_in = {self.probe_in.value():.2f}\n")
             f.write("# Sets the Probe Out diameter. Default: 4.0 angstroms.\n")
             f.write(f"probe_out = {self.probe_out.value():.2f}\n")
 
             f.write("\n[SETTINGS.cutoffs]\n")
-            f.write("# Sets a volume cutoff for the detected cavities. Default: 5.0 angstroms.\n")
+            f.write(
+                "# Sets a volume cutoff for the detected cavities. Default: 5.0 angstroms.\n"
+            )
             f.write(f"volume_cutoff = {self.volume_cutoff.value():.2f}\n")
-            f.write("# Sets a distance cutoff for a search space around the ligand in ligand adjustment mode. Default: 5.0 angstroms.\n")
+            f.write(
+                "# Sets a distance cutoff for a search space around the ligand in ligand adjustment mode. Default: 5.0 angstroms.\n"
+            )
             f.write(f"ligand_cutoff = {self.ligand_cutoff.value():.2f}\n")
-            f.write("# Sets a removal distance for the cavity frontier, which is defined by comparing Probe In and Probe Out surfaces. Default: 2.4 angstroms.\n")
+            f.write(
+                "# Sets a removal distance for the cavity frontier, which is defined by comparing Probe In and Probe Out surfaces. Default: 2.4 angstroms.\n"
+            )
             f.write(f"removal_distance = {self.removal_distance.value():.2f}\n")
 
             f.write("\n[SETTINGS.visiblebox]\n")
-            f.write("# Coordinates of the vertices that define the visible 3D grid. Only four points are required to define the search space.\n\n")
+            f.write(
+                "# Coordinates of the vertices that define the visible 3D grid. Only four points are required to define the search space.\n\n"
+            )
             box = self.create_box_parameters()
-            d = {'SETTINGS': {'visiblebox': box}}
+            d = {"SETTINGS": {"visiblebox": box}}
             toml.dump(o=d, f=f)
 
             f.write("\n[SETTINGS.internalbox]\n")
             f.write("# Coordinates of the internal 3D grid. Used for calculations.\n\n")
             box = self.create_box_parameters(is_internal_box=True)
-            d = {'SETTINGS': {'internalbox': box}}
+            d = {"SETTINGS": {"internalbox": box}}
             toml.dump(o=d, f=f)
 
         return True
 
-
-    def create_box_parameters(self, is_internal_box=False) -> Dict[str, Dict[str, float]]:
+    def create_box_parameters(
+        self, is_internal_box=False
+    ) -> Dict[str, Dict[str, float]]:
         from math import pi, cos, sin
 
         # Get box parameters
@@ -1070,7 +1419,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
             angle1 = 0.0
             angle2 = 0.0
 
-
         # Add probe_out to internal box
         if is_internal_box:
             min_x += self.probe_out.value()
@@ -1086,42 +1434,81 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Get positions of box vertices
         # P1
-        x1 = -min_x * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + self.x
+        x1 = (
+            -min_x * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
         y1 = -min_y * cos(angle1) + (-min_z) * sin(angle1) + self.y
 
-        z1 = min_x * sin(angle2) + min_y * sin(angle1) * cos(angle2) - min_z * cos(angle1) * cos(angle2) + self.z
+        z1 = (
+            min_x * sin(angle2)
+            + min_y * sin(angle1) * cos(angle2)
+            - min_z * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P2
-        x2 = max_x * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + self.x
+        x2 = (
+            max_x * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
         y2 = (-min_y) * cos(angle1) + (-min_z) * sin(angle1) + self.y
 
-        z2 = (-max_x) * sin(angle2) - (-min_y) * sin(angle1) * cos(angle2) + (-min_z) * cos(angle1) * cos(angle2) + self.z
+        z2 = (
+            (-max_x) * sin(angle2)
+            - (-min_y) * sin(angle1) * cos(angle2)
+            + (-min_z) * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P3
-        x3 = (-min_x) * cos(angle2) - max_y * sin(angle1) * sin(angle2) + (-min_z) * cos(angle1) * sin(angle2) + self.x
+        x3 = (
+            (-min_x) * cos(angle2)
+            - max_y * sin(angle1) * sin(angle2)
+            + (-min_z) * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
         y3 = max_y * cos(angle1) + (-min_z) * sin(angle1) + self.y
 
-        z3 = -(-min_x) * sin(angle2) - max_y * sin(angle1) * cos(angle2) + (-min_z) * cos(angle1) * cos(angle2) + self.z
+        z3 = (
+            -(-min_x) * sin(angle2)
+            - max_y * sin(angle1) * cos(angle2)
+            + (-min_z) * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # P4
-        x4 = (-min_x) * cos(angle2) - (-min_y) * sin(angle1) * sin(angle2) + max_z * cos(angle1) * sin(angle2) + self.x
+        x4 = (
+            (-min_x) * cos(angle2)
+            - (-min_y) * sin(angle1) * sin(angle2)
+            + max_z * cos(angle1) * sin(angle2)
+            + self.x
+        )
 
         y4 = (-min_y) * cos(angle1) + max_z * sin(angle1) + self.y
 
-        z4 = -(-min_x) * sin(angle2) - (-min_y) * sin(angle1) * cos(angle2) + max_z * cos(angle1) * cos(angle2) + self.z
+        z4 = (
+            -(-min_x) * sin(angle2)
+            - (-min_y) * sin(angle1) * cos(angle2)
+            + max_z * cos(angle1) * cos(angle2)
+            + self.z
+        )
 
         # Create points
-        p1 = {'x': x1, 'y': y1, 'z': z1}
-        p2 = {'x': x2, 'y': y2, 'z': z2}
-        p3 = {'x': x3, 'y': y3, 'z': z3}
-        p4 = {'x': x4, 'y': y4, 'z': z4}
-        box = {'p1': p1, 'p2': p2, 'p3': p3, 'p4': p4}
+        p1 = {"x": x1, "y": y1, "z": z1}
+        p2 = {"x": x2, "y": y2, "z": z2}
+        p3 = {"x": x3, "y": y3, "z": z3}
+        p4 = {"x": x4, "y": y4, "z": z4}
+        box = {"p1": p1, "p2": p2, "p3": p3, "p4": p4}
 
         return box
-
 
     def closeEvent(self, event) -> None:
         """
@@ -1130,7 +1517,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         global dialog
         dialog = None
 
-
     def load_results(self) -> None:
         from pymol import cmd
 
@@ -1138,11 +1524,14 @@ class PyMOL2parKVFinderTools(QMainWindow):
         results_file = self.results_file_entry.text()
 
         # Check if results file exist
-        if os.path.exists(results_file) and results_file.endswith('.toml'):
+        if os.path.exists(results_file) and results_file.endswith(".toml"):
             print(f"> Loading results from: {self.results_file_entry.text()}")
         else:
             from PyQt5.QtWidgets import QMessageBox
-            error_msg = QMessageBox.critical(self, "Error", "Results file cannot be opened! Check results file path.")
+
+            error_msg = QMessageBox.critical(
+                self, "Error", "Results file cannot be opened! Check results file path."
+            )
             return False
 
         # Create global variable for results
@@ -1151,18 +1540,19 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Read results (Ubuntu/macOS)
         results = toml.load(results_file)
 
-        if 'FILES' in results.keys():
-            results['FILES_PATH'] = results.pop('FILES')
-        elif 'FILES_PATH' in results.keys():
+        if "FILES" in results.keys():
+            results["FILES_PATH"] = results.pop("FILES")
+        elif "FILES_PATH" in results.keys():
             pass
         else:
             from PyQt5.QtWidgets import QMessageBox
-            error_msg = QMessageBox.critical(self, "Error", "Results file has incorrect format! Please check your file.")
-            return False
 
-        if 'PARAMETERS' in results.keys():
-            if 'STEP' in results['PARAMETERS'].keys():
-                results['PARAMETERS']['STEP_SIZE'] = results['PARAMETERS'].pop('STEP')
+            error_msg = QMessageBox.critical(
+                self,
+                "Error",
+                "Results file has incorrect format! Please check your file.",
+            )
+            return False
 
         # Clean results
         self.clean_results()
@@ -1185,28 +1575,27 @@ class PyMOL2parKVFinderTools(QMainWindow):
         cmd.frame(1)
 
         # Load input
-        if 'INPUT' in results['FILES_PATH'].keys():
-            input_fn = results['FILES_PATH']['INPUT']
-            self.input_pdb = os.path.basename(input_fn.replace('.pdb', ''))
+        if "INPUT" in results["FILES_PATH"].keys():
+            input_fn = results["FILES_PATH"]["INPUT"]
+            self.input_pdb = os.path.basename(input_fn.replace(".pdb", ""))
             self.load_file(input_fn, self.input_pdb)
         else:
             self.input_pdb = None
 
         # Load ligand
-        if 'LIGAND' in results['FILES_PATH'].keys():
-            ligand_fn = results['FILES_PATH']['LIGAND']
-            self.ligand_pdb = os.path.basename(ligand_fn.replace('.pdb', ''))
+        if "LIGAND" in results["FILES_PATH"].keys():
+            ligand_fn = results["FILES_PATH"]["LIGAND"]
+            self.ligand_pdb = os.path.basename(ligand_fn.replace(".pdb", ""))
             self.load_file(ligand_fn, self.ligand_pdb)
         else:
             self.ligand_pdb = None
 
         # Load cavity
-        cavity_fn = results['FILES_PATH']['OUTPUT']
-        self.cavity_pdb = os.path.basename(cavity_fn.replace('.pdb', ''))
+        cavity_fn = results["FILES_PATH"]["OUTPUT"]
+        self.cavity_pdb = os.path.basename(cavity_fn.replace(".pdb", ""))
         self.load_cavity(cavity_fn, self.cavity_pdb)
 
         return
-
 
     @staticmethod
     def load_cavity(fname, name) -> None:
@@ -1220,9 +1609,8 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Load cavity filename
         if os.path.exists(fname):
             cmd.load(fname, name, zoom=0)
-            cmd.hide('everything', name)
-            cmd.show('nonbonded', name)
-
+            cmd.hide("everything", name)
+            cmd.show("nonbonded", name)
 
     @staticmethod
     def load_file(fname, name) -> None:
@@ -1237,16 +1625,15 @@ class PyMOL2parKVFinderTools(QMainWindow):
         if os.path.exists(fname):
             cmd.load(fname, name, zoom=0)
 
-
     def refresh_information(self) -> None:
         # Input File
-        if 'INPUT' in results['FILES_PATH'].keys():
+        if "INPUT" in results["FILES_PATH"].keys():
             self.input_file_entry.setText(f"{results['FILES_PATH']['INPUT']}")
         else:
             self.input_file_entry.setText(f"")
 
         # Ligand File
-        if 'LIGAND' in results['FILES_PATH'].keys():
+        if "LIGAND" in results["FILES_PATH"].keys():
             self.ligand_file_entry.setText(f"{results['FILES_PATH']['LIGAND']}")
         else:
             self.ligand_file_entry.setText(f"")
@@ -1255,41 +1642,37 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self.cavities_file_entry.setText(f"{results['FILES_PATH']['OUTPUT']}")
 
         # Step Size
-        if 'PARAMETERS' in results.keys():
-            if 'STEP_SIZE' in results['PARAMETERS'].keys():
-                self.step_size_entry.setText(f"{results['PARAMETERS']['STEP_SIZE']:.2f}")
+        if "PARAMETERS" in results.keys():
+            if "STEP" in results["PARAMETERS"].keys():
+                self.step_size_entry.setText(f"{results['PARAMETERS']['STEP']:.2f}")
 
         return
 
-
     def refresh_volume(self) -> None:
         # Get cavity indexes
-        indexes = sorted(results['RESULTS']['VOLUME'].keys())
+        indexes = sorted(results["RESULTS"]["VOLUME"].keys())
         # Include Volume
         for index in indexes:
             item = f"{index}: {results['RESULTS']['VOLUME'][index]}"
             self.volume_list.addItem(item)
         return
 
-
     def refresh_area(self) -> None:
         # Get cavity indexes
-        indexes = sorted(results['RESULTS']['AREA'].keys())
+        indexes = sorted(results["RESULTS"]["AREA"].keys())
         # Include Area
         for index in indexes:
             item = f"{index}: {results['RESULTS']['AREA'][index]}"
             self.area_list.addItem(item)
         return
 
-
     def refresh_residues(self) -> None:
         # Get cavity indexes
-        indexes = sorted(results['RESULTS']['RESIDUES'].keys())
+        indexes = sorted(results["RESULTS"]["RESIDUES"].keys())
         # Include Interface Residues
         for index in indexes:
             self.residues_list.addItem(index)
         return
-
 
     def show_residues(self) -> None:
         from pymol import cmd
@@ -1309,7 +1692,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         # Get residues from cavities selected
         residues = []
         for cav in cavs:
-            for residue in results['RESULTS']['RESIDUES'][cav]:
+            for residue in results["RESULTS"]["RESIDUES"][cav]:
                 if residue not in residues:
                     residues.append(residue)
 
@@ -1322,22 +1705,21 @@ class PyMOL2parKVFinderTools(QMainWindow):
             return
 
         # Select residues
-        command = f"{self.input_pdb} and"
+        command = ""
         while len(residues) > 0:
             res, chain, _ = residues.pop(0)
             command = f"{command} (resid {res} and chain {chain}) or"
-        command = f"{command[:-3]}"
+        command = f"obj {self.input_pdb} and ({command[:-3]})"
         cmd.select("res", command)
 
         # Create residues object
         cmd.create("residues", "res")
         cmd.delete("res")
         cmd.hide("everything", "residues")
-        cmd.show('sticks', 'residues')
+        cmd.show("sticks", "residues")
         cmd.disable(self.cavity_pdb)
         cmd.enable(self.cavity_pdb)
         cmd.set("auto_zoom", 1)
-
 
     def show_cavities(self, list1, list2) -> None:
         from pymol import cmd
@@ -1371,7 +1753,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
             return
 
         # Color filling cavity points as blue nonbonded
-        command = f"{self.cavity_pdb} and (resname "
+        command = f"obj {self.cavity_pdb} and (resname "
         while len(cavs) > 0:
             command = f"{command}{cavs.pop(0)},"
         command = f"{command[:-1]})"
@@ -1393,7 +1775,6 @@ class PyMOL2parKVFinderTools(QMainWindow):
         cmd.disable(self.cavity_pdb)
         cmd.enable(self.cavity_pdb)
         cmd.set("auto_zoom", 1)
-
 
     def clean_results(self) -> None:
         # Input File

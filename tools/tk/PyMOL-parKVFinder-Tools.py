@@ -802,7 +802,7 @@ Citation for PyMOL may be found here:
             :param padding: box padding value.
             """
             # Delete Box object in PyMOL
-            if "box" in cmd.get_names("selections"):
+            if "box" in cmd.get_names("all"):
                 cmd.delete(self.box_name)
             # Get dimensions of selected residues
             selection = "sele"
@@ -979,7 +979,7 @@ Citation for PyMOL may be found here:
 
             # Create box object
             pymol.stored.list = []
-            if self.box_name in cmd.get_names("selections"):
+            if self.box_name in cmd.get_names("all"):
                 cmd.iterate(self.box_name, "stored.list.append((name, color))", quiet=1)
             list_color = pymol.stored.list
             cmd.delete(self.box_name)
@@ -1544,7 +1544,7 @@ Citation for PyMOL may be found here:
         self.step_size_info.configure(
             text=u"Step Size ({}): {:.2f}".format(
                 chr(0x212b),
-                results['PARAMETERS']['STEP_SIZE']
+                results['PARAMETERS']['STEP']
             )
         )
 
@@ -1625,13 +1625,13 @@ Citation for PyMOL may be found here:
         # Select residues around chosen cavities
         # Create command
         command = StringVar()
-        command.set("{} and".format(self.last_input.get()))
+        command.set("obj {} and (".format(self.last_input.get()))
         while len(residues_list) > 1:
             command.set("{} (resid {} and chain {}) or".format(command.get(),
                                                                residues_list[0][0],
                                                                residues_list[0][1]))
             residues_list.remove(residues_list[0])
-        command.set("{} (resid {} and chain {})".format(command.get(),
+        command.set("{} (resid {} and chain {}))".format(command.get(),
                                                         residues_list[0][0],
                                                         residues_list[0][1]))
         residues_list.remove(residues_list[0])
@@ -1723,6 +1723,13 @@ Citation for PyMOL may be found here:
             if not self.ligand_file.curselection():
                 tkMessageBox.showerror("Error",
                                        "Select a ligand file",
+                                       parent=self.parent)
+                return
+        # Box mode
+        if self.search_procedure.getvalue() == "Box Adjustment":
+            if "box" not in cmd.get_names("all"):
+                tkMessageBox.showerror("Error",
+                                       "Draw a box in PyMOL!",
                                        parent=self.parent)
                 return
 
