@@ -467,7 +467,7 @@ int main(int argc, char **argv) {
       "[ \033[1mElapsed time:\033[0m %.4lfs ]\n",
       (double)(toc.tv_sec - tic.tv_sec) +
           ((toc.tv_usec - tic.tv_usec) / 1000000.0)); /*Print the elapsed time*/
-  fprintf(log_file, "[ \033[1mElapsed time:\033[0m %.4lfs ]\n",
+  fprintf(log_file, "[ Elapsed time: %.4lfs ]\n",
           (double)(toc.tv_sec - tic.tv_sec) +
               ((toc.tv_usec - tic.tv_usec) /
                1000000.0)); /*Print the elapsed time for the run inside log*/
