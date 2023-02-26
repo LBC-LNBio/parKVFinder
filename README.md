@@ -25,7 +25,7 @@ If you are planning on using parKVFinder on Windows, refer to this parKVFinder-w
 
 ## Citation
 
-If you use parKVFinder in your cavity analysis, please cite:
+If you use __parKVFinder__ in your cavity analysis, please cite:
 
 João Victor da Silva Guerra, Helder Veras Ribeiro Filho, Leandro Oliveira Bortot, Rodrigo Vargas Honorato, José Geraldo de Carvalho Pereira, Paulo Sergio Lopes de Oliveira, ParKVFinder: A thread-level parallel approach in biomolecular cavity detection, SoftwareX, 2020, https://doi.org/10.1016/j.softx.2020.100606.
 
