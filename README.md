@@ -8,9 +8,7 @@ Parallel KVFinder (parKVFinder) is open-source software designed for detection a
 
 ## Wiki
 
-Welcome to the **parallel KVFinder (_parKVFinder_)**
-[wiki](https://github.com/LBC-LNBio/parKVFinder/wiki), this page was
-built to help you get started with our cavity detection software.
+We provide a [wiki](https://github.com/LBC-LNBio/parKVFinder/wiki), this page was built to help you get started with our cavity detection software.
 
 1. [Download & Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/parKVFinder-Installation)
     - [GCC Installation](https://github.com/LBC-LNBio/parKVFinder/wiki/GCC-Installation)
