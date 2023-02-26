@@ -51,11 +51,18 @@ void filter_boundary(int ***A, int m, int n, int o, int ncav);
 void remove_boundary(int ***A, int m, int n, int o, int ncav);
 void depth(int ***A, double ***M, int m, int n, int o, double h, int ncav);
 
+/* Cavity hydropathy */
+double get_hydrophobicity_value(char *resname, char *resn[], double *scale);
+void project_hydropathy(double ***HP, int ***S, int m, int n, int o, double h,
+                        double probe, double X1, double Y1, double Z1);
+void estimate_average_hydropathy(double ***HP, int ***S, int m, int n, int o,
+                                 int ncav);
+
 /* Export cavity PDB file */
 int _filter_cavity(int ***A, int m, int n, int o, int i, int j, int k);
-void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
-            int m, int n, int o, double h, int ncav, double X1, double Y1,
-            double Z1);
+void export(char *output_pdb, int ***A, int ***S, double ***M, double ***HP,
+            int kvp_mode, int m, int n, int o, double h, int ncav, double X1,
+            double Y1, double Z1);
 
 /* Clean memory */
 void free_igrid(int ***A, int m, int n, int o);

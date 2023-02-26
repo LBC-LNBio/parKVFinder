@@ -101,8 +101,8 @@ char *_combine(const char *s1, const char *s2) {
 }
 
 /*
- * Function: _convert_residue_code
- * -------------------------------
+ * Function: _residue2code
+ * -----------------------
  *
  * Covert 3-letter code to 1-letter code
  *
@@ -111,7 +111,7 @@ char *_combine(const char *s1, const char *s2) {
  * returns: residue in 1-letter code
  *
  */
-char _convert_residue_code(char RESIDUE[]) {
+char _residue2code(char RESIDUE[]) {
 
   if (!strcmp(RESIDUE, "ALA"))
     return 'A';
@@ -155,6 +155,63 @@ char _convert_residue_code(char RESIDUE[]) {
     return 'V';
 
   return 'X';
+}
+
+/*
+ * Function: _code2residue
+ * -----------------------
+ *
+ * Covert 1-letter code to 3-letter code
+ *
+ * RESIDUE: residue in 1-letter code
+ *
+ * returns: residue in 3-letter code
+ *
+ */
+char *_code2residue(char RESIDUE) {
+
+  if (RESIDUE == 'A')
+    return "ALA";
+  if (RESIDUE == 'R')
+    return "ARG";
+  if (RESIDUE == 'N')
+    return "ASN";
+  if (RESIDUE == 'D')
+    return "ASP";
+  if (RESIDUE == 'C')
+    return "CYS";
+  if (RESIDUE == 'Q')
+    return "GLN";
+  if (RESIDUE == 'E')
+    return "GLU";
+  if (RESIDUE == 'G')
+    return "GLY";
+  if (RESIDUE == 'H')
+    return "HIS";
+  if (RESIDUE == 'I')
+    return "ILE";
+  if (RESIDUE == 'L')
+    return "LEU";
+  if (RESIDUE == 'K')
+    return "LYS";
+  if (RESIDUE == 'M')
+    return "MET";
+  if (RESIDUE == 'F')
+    return "PHE";
+  if (RESIDUE == 'P')
+    return "PRO";
+  if (RESIDUE == 'S')
+    return "SER";
+  if (RESIDUE == 'T')
+    return "THR";
+  if (RESIDUE == 'W')
+    return "TRP";
+  if (RESIDUE == 'Y')
+    return "TYR";
+  if (RESIDUE == 'V')
+    return "VAL";
+
+  return "XXX";
 }
 
 /*

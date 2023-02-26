@@ -1333,9 +1333,9 @@ int _filter_cavity(int ***A, int m, int n, int o, int i, int j, int k) {
  * Z1: z coordinate of P1
  *
  */
-void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
-            int m, int n, int o, double h, int ncav, double X1, double Y1,
-            double Z1) {
+void export(char *output_pdb, int ***A, int ***S, double ***M, double ***HP,
+            int kvp_mode, int m, int n, int o, double h, int ncav, double X1,
+            double Y1, double Z1) {
   /* Declare variables */
   int i, j, k, count, tag;
   double x, y, z, xaux, yaux, zaux;
@@ -1352,7 +1352,7 @@ void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
 
   for (count = 1, tag = 2; tag <= ncav + 2; tag++)
 #pragma omp parallel default(none)                                             \
-    shared(A, S, M, sina, sinb, cosa, cosb, h, ncav, tag, count, m, n, o,      \
+    shared(A, S, M, HP, sina, sinb, cosa, cosb, h, ncav, tag, count, m, n, o,  \
            output, kvp_mode, X1, Y1, Z1),                                      \
     private(i, j, k, x, y, z, xaux, yaux, zaux)
   {
@@ -1382,8 +1382,8 @@ void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
                       "ATOM  %5.d  HA  K%c%c   259    %8.3lf%8.3lf%8.3lf"
                       "%6.2lf%6.2lf\n",
                       count % 100000, 65 + (((S[i][j][k] - 2) / 26) % 26),
-                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux, 1.0,
-                      M[i][j][k]);
+                      65 + ((S[i][j][k] - 2) % 26), xaux, yaux, zaux,
+                      HP[i][j][k], M[i][j][k]);
 
             } else {
               if (kvp_mode)
@@ -1393,7 +1393,7 @@ void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
                         count % 100000,
                         65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        1.0, M[i][j][k]);
+                        HP[i][j][k], M[i][j][k]);
               else if (_filter_cavity(A, m, n, o, i, j, k) != 0)
                 fprintf(output,
                         "ATOM  %5.d  H   K%c%c   259    %8.3lf%8.3lf%8.3lf"
@@ -1401,7 +1401,7 @@ void export(char *output_pdb, int ***A, int ***S, double ***M, int kvp_mode,
                         count % 100000,
                         65 + (((abs(A[i][j][k]) - 2) / 26) % 26),
                         65 + ((abs(A[i][j][k]) - 2) % 26), xaux, yaux, zaux,
-                        1.0, M[i][j][k]);
+                        HP[i][j][k], M[i][j][k]);
             }
             count++;
           }
@@ -1482,4 +1482,166 @@ void free_node() {
     V = V->next;
     free(p);
   }
+}
+
+/* Cavity hydropathy */
+char *resn[] = {"ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU",
+                "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE",
+                "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
+double scale[20] = {-0.64, 2.6,  0.8,   0.92,  -0.3,  0.87,  0.76,
+                    -0.49, 0.41, -1.42, -1.09, 1.54,  -0.66, -1.22,
+                    -0.12, 0.18, 0.05,  -0.83, -0.27, -1.11};
+
+/*
+ * Function: get_hydrophobicity_value
+ * ----------------------------------
+ *
+ * Get hydrophobicity scale value for a target residue name
+ *
+ * resname: target residue name
+ * resn: 1D-array hydrophobicity scale residues names
+ * scale: 1D-array of hydrophocity scale values
+ *
+ */
+double get_hydrophobicity_value(char *resname, char *resn[], double *scale) {
+  int i;
+
+  // Get hydrophobicity value
+  for (i = 0; i < 20; i++)
+    if (strcmp(resname, resn[i]) == 0)
+      return scale[i];
+
+  return 0.0;
+}
+
+/*
+ * Function: project_hydropathy
+ * ---------------------------
+ *
+ * Map a hydrophobicity scale per surface point of detected cavities.
+ *
+ * HP: hydrophobicity scale 3D grid
+ * S: surface points 3D grid
+ * m: x grid units
+ * n: y grid units
+ * o: z grid units
+ * h: 3D grid spacing (A)
+ * probe: Probe In size (A)
+ * X1: x coordinate of P1
+ * Y1: y coordinate of P1
+ * Z1: z coordinate of P1
+ *
+ */
+void project_hydropathy(double ***HP, int ***S, int m, int n, int o, double h,
+                        double probe, double X1, double Y1, double Z1) {
+  int i, j, k;
+  double x, y, z, xaux, yaux, zaux, distance, H, ***ref;
+  atom *p;
+
+  // Initiliaze 3D grid for residues distances
+  ref = dgrid(m, n, o);
+
+  /* Loop around PDB linked list */
+  for (p = v; p != NULL; p = p->next) {
+
+    /* Standardize each position */
+    x = (p->x - X1) / h;
+    y = (p->y - Y1) / h;
+    z = (p->z - Z1) / h;
+    xaux = x * cosb + z * sinb;
+    yaux = y;
+    zaux = (-x) * sinb + z * cosb;
+    x = xaux;
+    y = yaux * cosa - zaux * sina;
+    z = yaux * sina + zaux * cosa;
+
+    /* Create a variable for space occupied by probe and radius of atom */
+    H = (probe + p->radius) / h;
+
+    for (i = floor(x - H); i <= ceil(x + H); i++)
+      for (j = floor(y - H); j <= ceil(y + H); j++)
+        for (k = floor(z - H); k <= ceil(z + H); k++) {
+          if (i < m && i >= 0 && j < n && j >= 0 && k < o && k >= 0)
+            // Found a surface point
+            if (S[i][j][k] > 1) {
+              // Calculate distance bewteen atom and surface point
+              distance = sqrt(pow(i - x, 2) + pow(j - y, 2) + pow(k - z, 2));
+              // Check if surface point was not checked before
+              if (ref[i][j][k] == 0.0) {
+                ref[i][j][k] = distance;
+                HP[i][j][k] = get_hydrophobicity_value(
+                    _code2residue(p->resname), resn, scale);
+              }
+              // Check if this atom is closer to the previous one assigned
+              else if (ref[i][j][k] > distance) {
+                ref[i][j][k] = distance;
+                HP[i][j][k] = get_hydrophobicity_value(
+                    _code2residue(p->resname), resn, scale);
+              }
+            }
+        }
+  }
+
+  // Free 3D grid for residues distances
+  free_dgrid(ref, m, n, o);
+}
+
+/*
+ * Function: estimate_average_hydropathy
+ * -------------------------------------
+ *
+ * Calculate average hydropathy of detected cavities.
+ *
+ * avgh: empty array of average hydropathy
+ * ncav: number of cavities
+ * hydropathy: hydrophobicity scale 3D grid
+ * surface: surface points 3D grid
+ * nx: x grid units
+ * ny: y grid units
+ * nz: z grid units
+ * nthreads: number of threads for OpenMP
+ *
+ */
+void estimate_average_hydropathy(double ***HP, int ***S, int m, int n, int o,
+                                 int ncav) {
+  int i, j, k, *pts;
+  double *avgh;
+
+  /* Set number of processes in OpenMP */
+  int ncores = omp_get_num_procs() - 1;
+  omp_set_num_threads(ncores);
+  omp_set_nested(1);
+
+  /* Initialize area object */
+  avgh = (double *)calloc(ncav, sizeof(double));
+  pts = (int *)calloc(ncav, sizeof(int));
+  for (i = 0; i < ncav; i++) {
+    pts[i] = 0;
+    avgh[i] = 0.0;
+  }
+
+#pragma omp parallel default(none),                                            \
+    shared(avgh, HP, S, pts, m, n, o), private(i, j, k)
+  {
+#pragma omp for collapse(3) ordered
+    for (i = 0; i < m; i++)
+      for (j = 0; j < n; j++)
+        for (k = 0; k < o; k++)
+          if (S[i][j][k] > 1) {
+            pts[S[i][j][k] - 2]++;
+            avgh[S[i][j][k] - 2] += HP[i][j][k];
+          }
+  }
+
+  for (i = 0; i < ncav; i++)
+    avgh[i] /= pts[i];
+
+  /* Save area in KVFinder results struct */
+  for (i = 0; i < ncav; i++) {
+    KVFinder_results[i].avg_hydropathy = avgh[i];
+  }
+
+  // Free array with number of points per cavity
+  free(pts);
+  free(avgh);
 }

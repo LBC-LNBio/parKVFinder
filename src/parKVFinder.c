@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
   FILE *parameters_file, *log_file;
   atom *p;
   int ***A, ***S;
-  double ***M, ***H;
+  double ***M, ***HP;
 
   if (argc == 1) {
     /* Check if parameters.toml exists */
@@ -245,23 +245,6 @@ int main(int argc, char **argv) {
     /* Free van der Waals radius dictionary from memory */
     _free_atom();
 
-  } /* If it will be used a user defined search space, without the Probe Out
-       Adjustment define its limits */
-  else if (box_mode) {
-  };
-
-  /* Predefined resolution:
-  - Low: h = 0.6A
-  - Medium: h = 0.5A
-  - High h = 0.25A */
-  if (resolution_mode) {
-    fprintf(log_file, "Chosen step size = %.2lf\n", h);
-  }
-  /* Convert step size to string */
-  sprintf(step_flag, "%.2lf", h);
-
-  if (whole_protein_mode) {
-
     /* Prepare vertices */
     X1 = X1 - probe_out - h;
     Y1 = Y1 - probe_out - h;
@@ -275,7 +258,30 @@ int main(int argc, char **argv) {
     Y4 = Y1;
     Z2 = Z1;
     Z3 = Z1;
+
+    fprintf(log_file, "p1: [%.3lf %.3lf %.3lf]\n", X1, Y1, Z1);
+    fprintf(log_file, "p2: [%.3lf %.3lf %.3lf]\n", X2, Y1, Z1);
+    fprintf(log_file, "p3: [%.3lf %.3lf %.3lf]\n", X1, Y3, Z1);
+    fprintf(log_file, "p4: [%.3lf %.3lf %.3lf]\n", X1, Y1, Z4);
+
+  } /* If it will be used a user defined search space, without the Probe Out
+       Adjustment define its limits */
+  else if (box_mode) {
+    fprintf(log_file, "p1: [%.3lf %.3lf %.3lf]\n", bX1, bY1, bZ1);
+    fprintf(log_file, "p2: [%.3lf %.3lf %.3lf]\n", bX2, bY1, bZ1);
+    fprintf(log_file, "p3: [%.3lf %.3lf %.3lf]\n", bX1, bY3, bZ1);
+    fprintf(log_file, "p4: [%.3lf %.3lf %.3lf]\n", bX1, bY1, bZ4);
+  };
+
+  /* Predefined resolution:
+  - Low: h = 0.6A
+  - Medium: h = 0.5A
+  - High h = 0.25A */
+  if (resolution_mode) {
+    fprintf(log_file, "Chosen step size = %.2lf\n", h);
   }
+  /* Convert step size to string */
+  sprintf(step_flag, "%.2lf", h);
 
   /* Defines the grid inside the search space | Point 1 is the reference of our
    * grid */
@@ -344,7 +350,7 @@ int main(int argc, char **argv) {
     A = igrid(m, n, o);
     S = igrid(m, n, o);
     M = dgrid(m, n, o);
-    H = dgrid(m, n, o);
+    HP = dgrid(m, n, o);
 
     if (verbose_flag)
       fprintf(stdout, "> Filling grid with probe in surface\n");
@@ -436,11 +442,21 @@ int main(int argc, char **argv) {
       filter_boundary(A, m, n, o, ncav);
       depth(A, M, m, n, o, h, ncav);
 
+      /* Computing hydropathy */
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Mapping hydrophobicity scale at surface points\n");
+      project_hydropathy(HP, S, m, n, o, h, probe_in, X1, Y1, Z1);
+      if (verbose_flag)
+        fprintf(stdout,
+                "> Estimating average hydropathy\n");
+      estimate_average_hydropathy(HP, S, m, n, o, ncav);
+
       /* Turn ON(1) filled cavities option */
       if (verbose_flag)
         fprintf(stdout, "> Writing cavities PDB file\n");
       /* Export Cavities PDB */
-      export(output_pdb, A, S, M, kvp_mode, m, n, o, h, ncav, X1, Y1, Z1);
+      export(output_pdb, A, S, M, HP, kvp_mode, m, n, o, h, ncav, X1, Y1, Z1);
 
       /* Write results file */
       if (verbose_flag)

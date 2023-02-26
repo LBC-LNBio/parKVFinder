@@ -982,7 +982,7 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
 
           /* Save coordinates (x,y,z), radius, residue number and chain */
           new = _create_atom(x, y, z, radius, number,
-                             _convert_residue_code(RESIDUE), CHAIN[0]);
+                             _residue2code(RESIDUE), CHAIN[0]);
           _insert_atom(&v, new);
         }
       }
@@ -1097,6 +1097,16 @@ void write_results(char *output_results, char *pdb_name, char *output_pdb,
     fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
             65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_depth);
   }
+
+  /* Average Hydropathy */
+  fprintf(results_file,
+          "\n\t[RESULTS.AVG_HYDROPATHY]\n\t# Average hydropathy has no unit\n");
+  for (kvnum = 0; kvnum < ncav; kvnum++) {
+    fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
+            65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_hydropathy);
+  }
+      fprintf(results_file,
+          "\tEisenbergWeiss = [ %.2lf, %.2lf,]\n", -1.42, 2.6);
 
   /* Interface Residues */
   fprintf(results_file,

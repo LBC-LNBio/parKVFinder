@@ -126,12 +126,11 @@ typedef struct RESIDUES_INFORMATION {
  *
  */
 typedef struct KVFINDER_RESULTS {
-  /* Geometric properties */
   double volume;
   double area;
   double max_depth;
   double avg_depth;
-  /* Residues */
+  double avg_hydropathy;
   residues_info *res_info;
 } KVresults;
 
@@ -166,7 +165,8 @@ double max(double a, double b);
 double min(double a, double b);
 double _resolution2step(char flag[]);
 char *_combine(const char *s1, const char *s2);
-char _convert_residue_code(char RESIDUE[]);
+char _residue2code(char RESIDUE[]);
+char *_code2residue(char RESIDUE);
 char *_get_file_extension(char *fn);
 int _int2toml(int boolean, char **flag);
 int _read_line(FILE *arq, char LINE[], int size);
