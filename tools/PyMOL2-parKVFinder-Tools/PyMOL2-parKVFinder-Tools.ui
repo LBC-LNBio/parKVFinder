@@ -2094,6 +2094,12 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>
                </property>
@@ -2127,6 +2133,12 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>
                </property>
@@ -2148,6 +2160,18 @@
              </item>
              <item>
               <widget class="QListWidget" name="avg_depth_list">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>
                </property>
@@ -2169,6 +2193,18 @@
              </item>
              <item>
               <widget class="QListWidget" name="max_depth_list">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>
                </property>
@@ -2190,6 +2226,18 @@
              </item>
              <item>
               <widget class="QListWidget" name="avg_hydropathy_list">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
+               </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>
                </property>
@@ -2222,6 +2270,12 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>153</width>
+                 <height>0</height>
+                </size>
                </property>
                <property name="selectionMode">
                 <enum>QAbstractItemView::MultiSelection</enum>

@@ -627,12 +627,10 @@ int _get_residues_information(char dictionary_name[500], char TABLE[500][4]) {
 
   /* File has not been found */
   if (arq == NULL) {
-
     /* Print error and exit */
     fprintf(stderr,
             "\033[0;31mError:\033[0m Residues dictionary file not found!\n");
     exit(-1);
-
   }
   /* File has been found */
   else
