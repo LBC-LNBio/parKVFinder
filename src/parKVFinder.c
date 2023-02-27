@@ -73,54 +73,54 @@ int main(int argc, char **argv) {
       exit(-1);
     }
     /* Read parameters TOML files */
-    parameters *parameters =
+    parameters *param =
         readTOML("parameters.toml"); /* Read TOML file inside struct TOML */
 
     /* Save TOML parameters from struct TOML parameters to KVFinder variables */
-    X1 = parameters->X1;
-    Y1 = parameters->Y1;
-    Z1 = parameters->Z1;
-    X2 = parameters->X2;
-    Y2 = parameters->Y2;
-    Z2 = parameters->Z2;
-    X3 = parameters->X3;
-    Y3 = parameters->Y3;
-    Z3 = parameters->Z3;
-    X4 = parameters->X4;
-    Y4 = parameters->Y4;
-    Z4 = parameters->Z4;
-    bX1 = parameters->bX1;
-    bY1 = parameters->bY1;
-    bZ1 = parameters->bZ1;
-    bX2 = parameters->bX2;
-    bY2 = parameters->bY2;
-    bZ2 = parameters->bZ2;
-    bX3 = parameters->bX3;
-    bY3 = parameters->bY3;
-    bZ3 = parameters->bZ3;
-    bX4 = parameters->bX4;
-    bY4 = parameters->bY4;
-    bZ4 = parameters->bZ4;
-    strcpy(PDB_NAME, parameters->PDB_NAME);
-    strcpy(OUTPUT, parameters->OUTPUT);
-    strcpy(BASE_NAME, parameters->BASE_NAME);
-    strcpy(LIGAND_NAME, parameters->LIGAND_NAME);
-    strcpy(dictionary_name, parameters->dictionary_name);
-    strcpy(resolution_flag, parameters->resolution_flag);
-    volume_cutoff = parameters->volume_cutoff;
-    ligand_cutoff = parameters->ligand_cutoff;
-    removal_distance = parameters->removal_distance;
-    probe_in = parameters->probe_in;
-    probe_out = parameters->probe_out;
-    h = parameters->h;
-    whole_protein_mode = parameters->whole_protein_mode;
-    box_mode = parameters->box_mode;
-    surface_mode = parameters->surface_mode;
-    kvp_mode = parameters->kvp_mode;
-    ligand_mode = parameters->ligand_mode;
+    X1 = param->X1;
+    Y1 = param->Y1;
+    Z1 = param->Z1;
+    X2 = param->X2;
+    Y2 = param->Y2;
+    Z2 = param->Z2;
+    X3 = param->X3;
+    Y3 = param->Y3;
+    Z3 = param->Z3;
+    X4 = param->X4;
+    Y4 = param->Y4;
+    Z4 = param->Z4;
+    bX1 = param->bX1;
+    bY1 = param->bY1;
+    bZ1 = param->bZ1;
+    bX2 = param->bX2;
+    bY2 = param->bY2;
+    bZ2 = param->bZ2;
+    bX3 = param->bX3;
+    bY3 = param->bY3;
+    bZ3 = param->bZ3;
+    bX4 = param->bX4;
+    bY4 = param->bY4;
+    bZ4 = param->bZ4;
+    strcpy(PDB_NAME, param->PDB_NAME);
+    strcpy(OUTPUT, param->OUTPUT);
+    strcpy(BASE_NAME, param->BASE_NAME);
+    strcpy(LIGAND_NAME, param->LIGAND_NAME);
+    strcpy(dictionary_name, param->dictionary_name);
+    strcpy(resolution_flag, param->resolution_flag);
+    volume_cutoff = param->volume_cutoff;
+    ligand_cutoff = param->ligand_cutoff;
+    removal_distance = param->removal_distance;
+    probe_in = param->probe_in;
+    probe_out = param->probe_out;
+    h = param->h;
+    whole_protein_mode = param->whole_protein_mode;
+    box_mode = param->box_mode;
+    surface_mode = param->surface_mode;
+    kvp_mode = param->kvp_mode;
+    ligand_mode = param->ligand_mode;
 
     /* Free struct TOML */
-    free(parameters);
+    free(param);
   } else {
     /* Save command line arguments inside KVFinder variables */
     verbose_flag =

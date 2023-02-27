@@ -10,6 +10,27 @@
 
 /* parKVFinder parameter file processing */
 
+/* Remove a char c from a string S[100] */
+void trim2(char S[500], char c) {
+  /* Declare variables */
+  int i, j;
+
+  for (i = 0; S[i] != '\0'; i++) {
+    if (S[i] == c)
+      for (j = i; S[j] != '\0'; j++)
+        S[j] = S[j + 1];
+  }
+}
+
+/* Fill string S[100] with 0s */
+void init500(char S[500]) {
+  /* Declare variables */
+  int i;
+
+  for (i = 0; i < 500; i++)
+    S[i] = '\0';
+}
+
 /*Reads TOML file inside LINE*/
 int get_toml_line(FILE *arq, char LINE[500]) {
   /* Declare variables */
@@ -81,9 +102,9 @@ parameters *readTOML(char *path) {
 
     HANDLE_LAST_LINE:
       /* Remove tabs */
-      _remove_char(LINE, strlen(LINE), '\t');
+      trim2(LINE, '\t');
       /* Remove whitespaces */
-      _remove_char(LINE, strlen(LINE), ' ');
+      trim2(LINE, ' ');
 
       /* If a '#' is found, ignore line */
       if (LINE[0] == '#' || LINE[0] == '\n' || LINE[0] == ' ')
@@ -109,7 +130,7 @@ parameters *readTOML(char *path) {
         if (config_bar[1] != 0) {
 
           /* Restart string config[100] */
-          _initialize_string(config, strlen(config));
+          init500(config);
           /* Extract name of configuration */
           extract_toml_line(LINE, config_bar[0] + 1, config_bar[1], config);
 
@@ -258,8 +279,8 @@ parameters *readTOML(char *path) {
           } else {
 
             /* Remove quotation marks */
-            _remove_char(value, strlen(value), '\"');
-            _remove_char(value, strlen(value), '\"');
+            trim2(value, '\"');
+            trim2(value, '\"');
 
             /* Save values inside struct TOML */
             if (strcmp(key, "output") == 0)
@@ -301,9 +322,9 @@ parameters *readTOML(char *path) {
       }
 
       /* Restart variables */
-      _initialize_string(LINE, strlen(LINE));
-      _initialize_string(key, strlen(key));
-      _initialize_string(value, strlen(value));
+      init500(LINE);
+      init500(key);
+      init500(value);
       equal = 0;
       config_bar[0] = 0;
       config_bar[1] = 0;
@@ -979,8 +1000,8 @@ int read_pdb(char PDB_NAME[500], vdw *DIC[500], int tablesize,
             z1 < (double)o + (probe + radius) / h) {
 
           /* Save coordinates (x,y,z), radius, residue number and chain */
-          new = _create_atom(x, y, z, radius, number,
-                             _residue2code(RESIDUE), CHAIN[0]);
+          new = _create_atom(x, y, z, radius, number, _residue2code(RESIDUE),
+                             CHAIN[0]);
           _insert_atom(&v, new);
         }
       }
@@ -1103,8 +1124,7 @@ void write_results(char *output_results, char *pdb_name, char *output_pdb,
     fprintf(results_file, "\tK%c%c = %.2lf\n", 65 + (((kvnum) / 26) % 26),
             65 + ((kvnum) % 26), KVFinder_results[kvnum].avg_hydropathy);
   }
-      fprintf(results_file,
-          "\tEisenbergWeiss = [ %.2lf, %.2lf,]\n", -1.42, 2.6);
+  fprintf(results_file, "\tEisenbergWeiss = [ %.2lf, %.2lf,]\n", -1.42, 2.6);
 
   /* Interface Residues */
   fprintf(results_file,
