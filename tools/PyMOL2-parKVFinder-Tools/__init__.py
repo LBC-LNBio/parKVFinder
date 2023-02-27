@@ -2037,7 +2037,7 @@ class PyMOL2KVFinderwebTools(QMainWindow):
 
         # Depth
         self.avg_depth_list.clear()
-        self.avg_depth_list.clear()
+        self.max_depth_list.clear()
 
         # Hydropathy
         self.avg_hydropathy_list.clear()

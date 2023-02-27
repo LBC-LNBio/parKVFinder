@@ -1620,17 +1620,19 @@ void estimate_average_hydropathy(double ***HP, int ***S, int m, int n, int o,
     avgh[i] = 0.0;
   }
 
-#pragma omp parallel default(none),                                            \
-    shared(avgh, HP, S, pts, m, n, o), private(i, j, k)
+#pragma omp parallel default(none), shared(avgh, HP, S, pts, m, n, o),         \
+    private(i, j, k)
   {
 #pragma omp for collapse(3) ordered
     for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
-        for (k = 0; k < o; k++)
+        for (k = 0; k < o; k++) {
+#pragma omp critical
           if (S[i][j][k] > 1) {
             pts[S[i][j][k] - 2]++;
             avgh[S[i][j][k] - 2] += HP[i][j][k];
           }
+        }
   }
 
   for (i = 0; i < ncav; i++)
