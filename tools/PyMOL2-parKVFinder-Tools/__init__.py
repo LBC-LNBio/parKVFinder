@@ -101,12 +101,12 @@ def run_plugin_gui():
     global dialog
 
     if dialog is None:
-        dialog = PyMOL2parKVFinderTools()
+        dialog = PyMOL2KVFinderwebTools()
 
     dialog.show()
 
 
-class PyMOL2parKVFinderTools(QMainWindow):
+class PyMOL2KVFinderwebTools(QMainWindow):
     """
     PyMOL KVFinder Web Tools
 
@@ -116,7 +116,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
     """
 
     def __init__(self, server="http://localhost", port="8081"):
-        super(PyMOL2parKVFinderTools, self).__init__()
+        super(PyMOL2KVFinderwebTools, self).__init__()
         from PyQt5.QtNetwork import QNetworkAccessManager
 
         # Get KVFinder_PATH
@@ -127,7 +127,7 @@ class PyMOL2parKVFinderTools(QMainWindow):
         self._default.parKVFinder = os.path.join(KVFinder_PATH, executable)
         self._default.dictionary = os.path.join(KVFinder_PATH, "dictionary")
 
-        # Initialize PyMOL2parKVFinderTools GUI
+        # Initialize PyMOL2KVFinderwebTools GUI
         self.initialize_gui()
 
         # Restore Default Parameters
@@ -2031,6 +2031,13 @@ class PyMOL2parKVFinderTools(QMainWindow):
 
         # Area
         self.area_list.clear()
+
+        # Depth
+        self.avg_depth_list.clear()
+        self.avg_depth_list.clear()
+
+        # Hydropathy
+        self.avg_hydropathy_list.clear()
 
         # Residues
         self.residues_list.clear()
