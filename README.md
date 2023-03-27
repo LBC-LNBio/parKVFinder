@@ -4,7 +4,11 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/LBC-LNBio/parKVFinder/total)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/LBC-LNBio/parKVFinder/testing.yml)
 
-Parallel KVFinder (parKVFinder) is open-source software designed for detection and spatial characterization of any type of biomolecular cavity.
+Parallel KVFinder (parKVFinder) is a powerful open-source software designed to detect and comprehensively characterize biomolecular cavities of any type. It provides detailed information on the spatial, depth, constitutional, and hydropathy characteristics of each cavity.
+
+The spatial characterization of each cavity includes information on its shape, volume, and surface area. The depth characterization determines the depth of each cavity point, shown in the B-factors, and calculates the average and maximum depth per cavity. The constitutional characterization identifies the amino acids that form the identified cavities. Lastly, the hydropathy characterization maps the Eisenberg & Weiss hydrophobicity scale onto the surface points of each cavity, shown in the Q-factor, and estimates the average hydropathy for each cavity.
+
+With its extensive range of features, parKVFinder is an invaluable tool for various biomolecular applications, such as drug discovery, durg design, and protein-protein interaction studies.
 
 ## Wiki
 
