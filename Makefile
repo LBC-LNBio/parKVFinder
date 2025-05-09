@@ -7,7 +7,7 @@ ifeq ($(UNAME_S), Linux)
 else ifeq ($(UNAME_S), Darwin)
 	CC := clang
 	CFLAGS := -Xpreprocessor -fopenmp=libomp -O3 -ffast-math
-	LDFLAGS := -L/usr/local/opt/libomp/lib -lomp
+	LDFLAGS := -L/opt/homebrew/opt/libomp/lib -lomp
 endif
 
 # General flags
@@ -33,13 +33,13 @@ utils.o: src/utils.c src/utils.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/utils.c $(LDFLAGS)
 
 fileprocessing.o: src/fileprocessing.c src/fileprocessing.h utils.o
-	$(CC) $(CFLAGS) -Wno-unused-result $(INCLUDES) -c src/fileprocessing.c $(LDFLAGS)
+	$(CC) $(INCLUDES) -c src/fileprocessing.c $(LDFLAGS)
 
 gridprocessing.o: src/gridprocessing.c src/gridprocessing.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/gridprocessing.c $(LDFLAGS)
 
 argparser.o: src/argparser.c src/argparser.h
-	$(CC) $(CFLAGS) -Wno-unused-result $(INCLUDES) -c src/argparser.c $(LDFLAGS)
+	$(CC) $(INCLUDES) -c src/argparser.c $(LDFLAGS)
 
 move: utils.o fileprocessing.o gridprocessing.o argparser.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
@@ -57,6 +57,9 @@ else
 endif
 
 link:
+	@if [ ! -d $(HOME)/.local/bin ]; then \
+		mkdir -p $(HOME)/.local/bin; \
+	fi
 	@if [ -f $(HOME)/.local/bin/parKVFinder ]; then \
 		printf "[==> parKVFinder symbolic link already exists ...\n"; \
 	else \
