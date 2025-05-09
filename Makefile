@@ -1,5 +1,20 @@
-parKVFinder: utils.o fileprocessing.o gridprocessing.o argparser.o move src/parKVFinder.c requirements
-	gcc -fopenmp -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -lm -fcommon
+# Detect OS and set compiler
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Linux)
+	CC := gcc
+	CFLAGS := -fopenmp -O3
+	LDFLAGS := -lm -fcommon
+else ifeq ($(UNAME_S), Darwin)
+	CC := clang
+	CFLAGS := -Xpreprocessor -fopenmp=libomp -O3 -ffast-math
+	LDFLAGS := -L/usr/local/opt/libomp/lib -lomp
+endif
+
+# General flags
+INCLUDES := -Isrc
+
+build: utils.o fileprocessing.o gridprocessing.o argparser.o move src/parKVFinder.c requirements
+	$(CC) $(CFLAGS) $(INCLUDES) -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c $(LDFLAGS)
 	@if [ ! "${KVFinder_PATH}" ]; then \
 		printf "\n\nKVFinder_PATH system variable not found. Export KVFinder_PATH to your system variables.\n"; \
 		if [ -f ${HOME}/.bashrc ]; then \
@@ -15,32 +30,24 @@ parKVFinder: utils.o fileprocessing.o gridprocessing.o argparser.o move src/parK
 	fi
 
 utils.o: src/utils.c src/utils.h
-	gcc -Isrc -c src/utils.c -fcommon
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/utils.c $(LDFLAGS)
 
 fileprocessing.o: src/fileprocessing.c src/fileprocessing.h utils.o
-	gcc -Isrc -c src/fileprocessing.c -fcommon
+	$(CC) $(CFLAGS) -Wno-unused-result $(INCLUDES) -c src/fileprocessing.c $(LDFLAGS)
 
 gridprocessing.o: src/gridprocessing.c src/gridprocessing.h
-	gcc -fopenmp -O3 -Isrc -c src/gridprocessing.c -lm -fcommon
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/gridprocessing.c $(LDFLAGS)
 
 argparser.o: src/argparser.c src/argparser.h
-	gcc -Isrc -c src/argparser.c -fcommon
+	$(CC) $(CFLAGS) -Wno-unused-result $(INCLUDES) -c src/argparser.c $(LDFLAGS)
 
 move: utils.o fileprocessing.o gridprocessing.o argparser.o
 	if [ ! -d "lib" ]; then mkdir lib/; fi
 	mv utils.o fileprocessing.o gridprocessing.o argparser.o lib/
 
-requirements: pip pip3
+requirements: pip3
 
-PIP := $(shell command -v pip 2> /dev/null)
 PIP3 := $(shell command -v pip3 2> /dev/null)
-
-pip:
-ifndef PIP
-	printf "\n> python-pip is not available. To use parKVFinder with PyMOL v1, please install python-pip and run make pip\n\n"
-else
-	pip install -r tools/tk/requirements.txt
-endif
 
 pip3:
 ifndef PIP3
@@ -50,10 +57,10 @@ else
 endif
 
 link:
-	@if [ -f /usr/local/bin/parKVFinder ]; then \
-  		printf "[==> parKVFinder symbolic link already exist ...\n"; \
+	@if [ -f $(HOME)/.local/bin/parKVFinder ]; then \
+		printf "[==> parKVFinder symbolic link already exists ...\n"; \
 	else \
-		sudo ln -s `pwd`/parKVFinder /usr/local/bin/parKVFinder; \
+		ln -s `pwd`/parKVFinder $(HOME)/.local/bin/parKVFinder; \
 	fi
 
 clean:
