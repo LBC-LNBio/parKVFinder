@@ -35,6 +35,7 @@ jobs:
           /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/fileprocessing.c
           /opt/homebrew/opt/llvm/bin/clang -Isrc -Xpreprocessor -fopenmp=libomp -ffast-math -O3 -c src/gridprocessing.c -lm -L/opt/homebrew/opt/libomp/lib -lomp
           /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/argparser.c
+          mkdir lib/
           mv utils.o fileprocessing.o gridprocessing.o argparser.o lib/
           /opt/homebrew/opt/llvm/bin/clang -Xpreprocessor -fopenmp=libomp -O3 -ffast-math -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -L/opt/homebrew/opt/libomp/lib -lomp
       
