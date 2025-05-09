@@ -1,30 +1,39 @@
-name: Integration testing
+name: Build and testing parKVFinder
 
 on:
   push:
-    branches: [master]
+    branches:
+      - '**'
   pull_request:
-    branches: [master]
+    branches:
+      - '**'
   workflow_dispatch:
 
 jobs:
-  ubuntu-testing:
-    name: Test on Ubuntu with gcc-${{ matrix.gcc }}
-    runs-on: ubuntu-latest
+  build-n-test:
+    name: Build binary on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
       matrix:
-        gcc: [9, 10, 11, 12]
+        os: [macos-latest, macos-15, ubuntu-latest]
+      fail-fast: false
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Build parKVFinder
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
         run: |
-          sudo apt install gcc-${{ matrix.gcc }}
+          if [[ "${{ matrix.os }}" == macos* ]]; then
+            brew install llvm libomp
+          fi
+      
+      - name: Build parKVFinder binary in ${{ matrix.os }}
+        run: |
           make clean
           make
           sudo make link
-        env:
-          CC: gcc-${{ matrix.gcc }}
+      
       - name: Integration testing
         run: |
           export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
