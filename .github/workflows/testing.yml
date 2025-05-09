@@ -31,7 +31,7 @@ jobs:
       
       - name: Build parKVFinder binary in ${{ matrix.os }}
         run: |
-          /opt/homebrew/opt/llvm/bin/clang -Wnoreturn-type -Isrc -c src/utils.c
+          /opt/homebrew/opt/llvm/bin/clang -Wreturn-type -Isrc -c src/utils.c
           /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/fileprocessing.c
           /opt/homebrew/opt/llvm/bin/clang -Isrc -Xpreprocessor -fopenmp=libomp -ffast-math -O3 -c src/gridprocessing.c -lm -L/opt/homebrew/opt/libomp/lib -lomp
           /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/argparser.c
