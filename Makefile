@@ -5,7 +5,7 @@ ifeq ($(UNAME_S), Linux)
 	CFLAGS := -fopenmp -O3
 	LDFLAGS := -lm -fcommon
 else ifeq ($(UNAME_S), Darwin)
-	CC := clang
+	CC := /opt/homebrew/opt/llvm/bin/clang
 	CFLAGS := -Xpreprocessor -fopenmp=libomp -O3 -ffast-math
 	LDFLAGS := -L/opt/homebrew/opt/libomp/lib -lomp
 endif

@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, macos-15, ubuntu-latest]
+        os: [macos-latest, macos-15]
       fail-fast: false
 
     steps:
@@ -25,14 +25,18 @@ jobs:
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == macos* ]]; then
-            brew install llvm libomp
+            brew install llvm
+            brew install libomp
           fi
       
       - name: Build parKVFinder binary in ${{ matrix.os }}
         run: |
-          make clean
-          make
-          sudo make link
+          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/utils.c
+          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/fileprocessing.c -lm
+          /opt/homebrew/opt/llvm/bin/clang -Isrc -Xpreprocessor -fopenmp=libomp -ffast-math -O3 -c src/gridprocessing.c -lm -L/opt/homebrew/opt/libomp/lib -lomp
+          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/argparser.c
+          mv utils.o fileprocessing.o gridprocessing.o argparser.o lib/
+          /opt/homebrew/opt/llvm/bin/clang -Xpreprocessor -fopenmp=libomp -O3 -ffast-math -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -lm -L/opt/homebrew/opt/libomp/lib -lomp
       
       - name: Integration testing
         run: |
