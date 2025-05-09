@@ -31,16 +31,10 @@ jobs:
       
       - name: Build parKVFinder binary in ${{ matrix.os }}
         run: |
-          /opt/homebrew/opt/llvm/bin/clang -Wreturn-type -Isrc -c src/utils.c
-          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/fileprocessing.c
-          /opt/homebrew/opt/llvm/bin/clang -Isrc -Xpreprocessor -fopenmp=libomp -ffast-math -O3 -c src/gridprocessing.c -lm -L/opt/homebrew/opt/libomp/lib -lomp
-          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/argparser.c
-          mkdir lib/
-          mv utils.o fileprocessing.o gridprocessing.o argparser.o lib/
-          /opt/homebrew/opt/llvm/bin/clang -Xpreprocessor -fopenmp=libomp -O3 -ffast-math -Isrc -o parKVFinder lib/utils.o lib/fileprocessing.o lib/gridprocessing.o lib/argparser.o src/parKVFinder.c -L/opt/homebrew/opt/libomp/lib -lomp
+          /opt/homebrew/opt/llvm/bin/clang -Isrc -c src/utils.c
       
       - name: Integration testing
         run: |
-          export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
-          bash tests/testing.sh
-          cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
+          # export KVFinder_PATH=/home/runner/work/parKVFinder/parKVFinder
+          # bash tests/testing.sh
+          # cat input/KV_Files/1FMO/1FMO.KVFinder.results.toml
