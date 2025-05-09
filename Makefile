@@ -30,7 +30,7 @@ build: utils.o fileprocessing.o gridprocessing.o argparser.o move src/parKVFinde
 	fi
 
 utils.o: src/utils.c src/utils.h
-	$(CC) $(CFLAGS) $(INCLUDES) -c src/utils.c $(LDFLAGS)
+	$(CC) $(INCLUDES) -c src/utils.c $(LDFLAGS)
 
 fileprocessing.o: src/fileprocessing.c src/fileprocessing.h utils.o
 	$(CC) $(INCLUDES) -c src/fileprocessing.c $(LDFLAGS)
